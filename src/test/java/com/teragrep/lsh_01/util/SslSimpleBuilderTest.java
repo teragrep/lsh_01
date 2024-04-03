@@ -1,4 +1,4 @@
-package org.logstash.plugins.inputs.http.util;
+package com.teragrep.lsh_01.util;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.ssl.ClientAuth;
@@ -34,17 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.logstash.plugins.inputs.http.util.SslSimpleBuilder.SUPPORTED_CIPHERS;
 import static org.logstash.plugins.inputs.http.util.SslSimpleBuilder.SslClientVerifyMode;
 import static org.logstash.plugins.inputs.http.util.SslSimpleBuilder.getDefaultCiphers;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.CA;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.CERTIFICATE;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.KEY;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.KEYSTORE;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.KEYSTORE_PASSWORD;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.KEYSTORE_TYPE;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.KEY_ENCRYPTED;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.KEY_ENCRYPTED_PASS;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.TRUSTSTORE;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.TRUSTSTORE_PASSWORD;
-import static org.logstash.plugins.inputs.http.util.TestCertificates.TRUSTSTORE_TYPE;
 import static org.mockito.Matchers.eq;
 
 /**
@@ -56,7 +45,7 @@ class SslSimpleBuilderTest {
     void testWithPemCertificateShouldFailWhenCertificatePathIsInvalid() {
         final IllegalArgumentException thrown = assertThrows(
                 IllegalArgumentException.class,
-                () -> SslSimpleBuilder.withPemCertificate("foo-bar.crt", KEY_ENCRYPTED, KEY_ENCRYPTED_PASS)
+                () -> SslSimpleBuilder.withPemCertificate("foo-bar.crt", TestCertificates.KEY_ENCRYPTED, TestCertificates.KEY_ENCRYPTED_PASS)
         );
 
         assertEquals(
@@ -69,7 +58,7 @@ class SslSimpleBuilderTest {
     void testWithPemCertificateShouldFailWhenKeyPathIsInvalid() {
         final IllegalArgumentException thrown = assertThrows(
                 IllegalArgumentException.class,
-                () -> SslSimpleBuilder.withPemCertificate(CERTIFICATE, "invalid.key", KEY_ENCRYPTED_PASS)
+                () -> SslSimpleBuilder.withPemCertificate(TestCertificates.CERTIFICATE, "invalid.key", TestCertificates.KEY_ENCRYPTED_PASS)
         );
 
         assertEquals(
@@ -87,7 +76,7 @@ class SslSimpleBuilderTest {
     void testWithKeyStoreShouldFailWhenKeystorePathIsInvalid() {
         final IllegalArgumentException thrown = assertThrows(
                 IllegalArgumentException.class,
-                () -> SslSimpleBuilder.withKeyStore(KEYSTORE_TYPE, "foo-bar.jks", KEYSTORE_PASSWORD)
+                () -> SslSimpleBuilder.withKeyStore(TestCertificates.KEYSTORE_TYPE, "foo-bar.jks", TestCertificates.KEYSTORE_PASSWORD)
         );
 
         assertEquals(
@@ -103,8 +92,8 @@ class SslSimpleBuilderTest {
 
     @Test
     void testWithKeyStoreShouldNotFailWithNullType() throws Exception {
-        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withKeyStore(null, KEYSTORE, KEYSTORE_PASSWORD);
-        assertEquals(KEYSTORE_TYPE, sslSimpleBuilder.getKeyStore().getType());
+        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withKeyStore(null, TestCertificates.KEYSTORE, TestCertificates.KEYSTORE_PASSWORD);
+        assertEquals(TestCertificates.KEYSTORE_TYPE, sslSimpleBuilder.getKeyStore().getType());
     }
 
     @Test
@@ -154,7 +143,7 @@ class SslSimpleBuilderTest {
 
     @Test
     void testSetCertificateAuthorities() {
-        final String[] certificateAuthorities = {CA};
+        final String[] certificateAuthorities = {TestCertificates.CA};
 
         final SslSimpleBuilder sslSimpleBuilder = createPemSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.REQUIRED)
@@ -190,7 +179,7 @@ class SslSimpleBuilderTest {
 
         final IllegalArgumentException thrown = assertThrows(
                 IllegalArgumentException.class,
-                () -> sslSimpleBuilder.setTrustStore(TRUSTSTORE_TYPE, "trust-me.jks", TRUSTSTORE_PASSWORD)
+                () -> sslSimpleBuilder.setTrustStore(TestCertificates.TRUSTSTORE_TYPE, "trust-me.jks", TestCertificates.TRUSTSTORE_PASSWORD)
         );
 
         assertEquals(
@@ -201,14 +190,14 @@ class SslSimpleBuilderTest {
 
     @Test
     void testSetTrustStoreWithValidArguments() {
-        assertDoesNotThrow(() -> createPemSslSimpleBuilder().setTrustStore(TRUSTSTORE_TYPE, TRUSTSTORE, TRUSTSTORE_PASSWORD));
+        assertDoesNotThrow(() -> createPemSslSimpleBuilder().setTrustStore(TestCertificates.TRUSTSTORE_TYPE, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD));
     }
 
     @Test
     void testSetTrustStoreWithNullTrustStoreType() throws Exception {
         final SslSimpleBuilder sslSimpleBuilder = createPemSslSimpleBuilder()
-                .setTrustStore(null, TRUSTSTORE, TRUSTSTORE_PASSWORD);
-        assertEquals(TRUSTSTORE_TYPE, sslSimpleBuilder.getTrustStore().getType());
+                .setTrustStore(null, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD);
+        assertEquals(TestCertificates.TRUSTSTORE_TYPE, sslSimpleBuilder.getTrustStore().getType());
     }
 
     @Test
@@ -217,8 +206,8 @@ class SslSimpleBuilderTest {
                 IllegalArgumentException.class,
                 () -> createPemSslSimpleBuilder()
                         .setClientAuthentication(SslClientVerifyMode.REQUIRED)
-                        .setTrustStore(KEYSTORE_TYPE, KEYSTORE, KEYSTORE_PASSWORD),
-                String.format("The provided Trust Store file does not contains any trusted certificate entry: %s", KEYSTORE)
+                        .setTrustStore(TestCertificates.KEYSTORE_TYPE, TestCertificates.KEYSTORE, TestCertificates.KEYSTORE_PASSWORD),
+                String.format("The provided Trust Store file does not contains any trusted certificate entry: %s", TestCertificates.KEYSTORE)
         );
     }
 
@@ -237,19 +226,19 @@ class SslSimpleBuilderTest {
 
     @Test
     void testBuildContextWithNonEncryptedCertificateKey() {
-        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withPemCertificate(CERTIFICATE, KEY, null);
+        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withPemCertificate(TestCertificates.CERTIFICATE, TestCertificates.KEY, null);
         assertDoesNotThrow(sslSimpleBuilder::build);
     }
 
     @Test
     void testBuildContextWithEncryptedCertificateKey() {
-        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withPemCertificate(CERTIFICATE, KEY_ENCRYPTED, KEY_ENCRYPTED_PASS);
+        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withPemCertificate(TestCertificates.CERTIFICATE, TestCertificates.KEY_ENCRYPTED, TestCertificates.KEY_ENCRYPTED_PASS);
         assertDoesNotThrow(sslSimpleBuilder::build);
     }
 
     @Test
     void testBuildContextWithKeyStore() throws Exception {
-        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withKeyStore(KEYSTORE_TYPE, KEYSTORE, KEYSTORE_PASSWORD);
+        final SslSimpleBuilder sslSimpleBuilder = SslSimpleBuilder.withKeyStore(TestCertificates.KEYSTORE_TYPE, TestCertificates.KEYSTORE, TestCertificates.KEYSTORE_PASSWORD);
         assertDoesNotThrow(sslSimpleBuilder::build);
     }
 
@@ -257,7 +246,7 @@ class SslSimpleBuilderTest {
     void testBuildContextWithClientAuthenticationRequiredAndCAs() throws Exception {
         final SSLEngine sslEngine = assertSSlEngineFromBuilder(createPemSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.REQUIRED)
-                .setCertificateAuthorities(new String[]{CA})
+                .setCertificateAuthorities(new String[]{TestCertificates.CA})
         );
 
         assertTrue(sslEngine.getNeedClientAuth());
@@ -268,7 +257,7 @@ class SslSimpleBuilderTest {
     void testBuildContextWithClientAuthenticationRequiredAndTrustStore() throws Exception {
         final SSLEngine sslEngine = assertSSlEngineFromBuilder(createPemSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.REQUIRED)
-                .setTrustStore(TRUSTSTORE_TYPE, TRUSTSTORE, TRUSTSTORE_PASSWORD)
+                .setTrustStore(TestCertificates.TRUSTSTORE_TYPE, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD)
         );
 
         assertTrue(sslEngine.getNeedClientAuth());
@@ -279,7 +268,7 @@ class SslSimpleBuilderTest {
     void testBuildContextWithClientAuthenticationOptionalAndCAs() throws Exception {
         final SSLEngine sslEngine = assertSSlEngineFromBuilder(createPemSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.OPTIONAL)
-                .setCertificateAuthorities(new String[]{CA})
+                .setCertificateAuthorities(new String[]{TestCertificates.CA})
         );
 
         assertFalse(sslEngine.getNeedClientAuth());
@@ -290,7 +279,7 @@ class SslSimpleBuilderTest {
     void testBuildContextWithClientAuthenticationOptionalAndTrustStore() throws Exception {
         final SSLEngine sslEngine = assertSSlEngineFromBuilder(createPemSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.OPTIONAL)
-                .setTrustStore(TRUSTSTORE_TYPE, TRUSTSTORE, TRUSTSTORE_PASSWORD)
+                .setTrustStore(TestCertificates.TRUSTSTORE_TYPE, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD)
         );
 
         assertFalse(sslEngine.getNeedClientAuth());
@@ -310,7 +299,7 @@ class SslSimpleBuilderTest {
     void testBuildContextWithClientAuthenticationNoneAndTrustStore() throws Exception {
         final SSLEngine sslEngine = assertSSlEngineFromBuilder(createPemSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.NONE)
-                .setTrustStore(TRUSTSTORE_TYPE, TRUSTSTORE, TRUSTSTORE_PASSWORD)
+                .setTrustStore(TestCertificates.TRUSTSTORE_TYPE, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD)
         );
 
         assertFalse(sslEngine.getNeedClientAuth());
@@ -331,8 +320,8 @@ class SslSimpleBuilderTest {
     void testBuildContextWithCAsAndTrustStore() throws Exception {
         final SslSimpleBuilder sslSimpleBuilder = createJksSslSimpleBuilder()
                 .setClientAuthentication(SslClientVerifyMode.REQUIRED)
-                .setCertificateAuthorities(new String[]{CA})
-                .setTrustStore(TRUSTSTORE_TYPE, TRUSTSTORE, TRUSTSTORE_PASSWORD);
+                .setCertificateAuthorities(new String[]{TestCertificates.CA})
+                .setTrustStore(TestCertificates.TRUSTSTORE_TYPE, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD);
 
         final IllegalStateException thrown  = assertThrows(
                 IllegalStateException.class,
@@ -373,7 +362,7 @@ class SslSimpleBuilderTest {
     void testClientAuthenticationWithTrustStoreUsesTruststore() throws Exception {
         final SslSimpleBuilder jksSslBuilder = spy(createJksSslSimpleBuilder())
                 .setClientAuthentication(SslClientVerifyMode.REQUIRED)
-                .setTrustStore(TRUSTSTORE_TYPE, TRUSTSTORE, TRUSTSTORE_PASSWORD);
+                .setTrustStore(TestCertificates.TRUSTSTORE_TYPE, TestCertificates.TRUSTSTORE, TestCertificates.TRUSTSTORE_PASSWORD);
 
         final DummyTrustManagerFactorySpi factorySpi = spy(new DummyTrustManagerFactorySpi());
         final TrustManagerFactory trustManagerFactory = new DummyTrustManagerFactory(factorySpi);
@@ -432,12 +421,12 @@ class SslSimpleBuilderTest {
     }
 
     private SslSimpleBuilder createPemSslSimpleBuilder() {
-        return SslSimpleBuilder.withPemCertificate(CERTIFICATE, KEY_ENCRYPTED, KEY_ENCRYPTED_PASS);
+        return SslSimpleBuilder.withPemCertificate(TestCertificates.CERTIFICATE, TestCertificates.KEY_ENCRYPTED, TestCertificates.KEY_ENCRYPTED_PASS);
     }
 
     private SslSimpleBuilder createJksSslSimpleBuilder() {
         try {
-            return SslSimpleBuilder.withKeyStore(KEYSTORE_TYPE, KEYSTORE, KEYSTORE_PASSWORD);
+            return SslSimpleBuilder.withKeyStore(TestCertificates.KEYSTORE_TYPE, TestCertificates.KEYSTORE, TestCertificates.KEYSTORE_PASSWORD);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,4 +1,4 @@
-package org.logstash.plugins.inputs.http.util;
+package com.teragrep.lsh_01.util;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
