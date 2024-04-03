@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01;
 
 import io.netty.buffer.ByteBuf;
@@ -40,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MessageProcessor implements RejectableRunnable {
+
     private final ChannelHandlerContext ctx;
     private final FullHttpRequest req;
     private final String remoteAddress;
@@ -49,8 +49,13 @@ public class MessageProcessor implements RejectableRunnable {
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private final static Logger LOGGER = LogManager.getLogger(MessageHandler.class);
 
-    MessageProcessor(ChannelHandlerContext ctx, FullHttpRequest req, String remoteAddress,
-                            IMessageHandler messageHandler, HttpResponseStatus responseStatus) {
+    MessageProcessor(
+            ChannelHandlerContext ctx,
+            FullHttpRequest req,
+            String remoteAddress,
+            IMessageHandler messageHandler,
+            HttpResponseStatus responseStatus
+    ) {
         this.ctx = ctx;
         this.req = req;
         this.remoteAddress = remoteAddress;
@@ -62,7 +67,8 @@ public class MessageProcessor implements RejectableRunnable {
         try {
             final FullHttpResponse response = generateFailedResponse(HttpResponseStatus.TOO_MANY_REQUESTS);
             ctx.writeAndFlush(response);
-        } finally {
+        }
+        finally {
             req.release();
         }
     }
@@ -74,19 +80,22 @@ public class MessageProcessor implements RejectableRunnable {
             if (messageHandler.requiresToken() && !req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
                 LOGGER.debug("Required authorization not provided; requesting authentication.");
                 response = generateAuthenticationRequestResponse();
-            } else {
+            }
+            else {
                 final String token = req.headers().get(HttpHeaderNames.AUTHORIZATION);
                 req.headers().remove(HttpHeaderNames.AUTHORIZATION);
                 if (messageHandler.validatesToken(token)) {
                     LOGGER.debug("Valid authorization; processing request.");
                     response = processMessage();
-                } else {
+                }
+                else {
                     LOGGER.debug("Invalid authorization; rejecting request.");
                     response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
                 }
             }
             ctx.writeAndFlush(response);
-        } finally {
+        }
+        finally {
             req.release();
         }
     }
@@ -96,7 +105,8 @@ public class MessageProcessor implements RejectableRunnable {
         final String body = req.content().toString(UTF8_CHARSET);
         if (messageHandler.onNewMessage(remoteAddress, formattedHeaders, body)) {
             return generateResponse(messageHandler.responseHeaders());
-        } else {
+        }
+        else {
             return generateFailedResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -108,7 +118,10 @@ public class MessageProcessor implements RejectableRunnable {
     }
 
     private FullHttpResponse generateAuthenticationRequestResponse() {
-        final FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), HttpResponseStatus.UNAUTHORIZED);
+        final FullHttpResponse response = new DefaultFullHttpResponse(
+                req.protocolVersion(),
+                HttpResponseStatus.UNAUTHORIZED
+        );
         response.headers().set(HttpHeaderNames.WWW_AUTHENTICATE, "Basic realm=\"Logstash HTTP Input\"");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
         return response;
@@ -116,11 +129,9 @@ public class MessageProcessor implements RejectableRunnable {
 
     private FullHttpResponse generateResponse(Map<String, String> stringHeaders) {
 
-        final FullHttpResponse response = new DefaultFullHttpResponse(
-                req.protocolVersion(),
-                responseStatus);
+        final FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), responseStatus);
         final DefaultHttpHeaders headers = new DefaultHttpHeaders();
-        for(String key : stringHeaders.keySet()) {
+        for (String key : stringHeaders.keySet()) {
             headers.set(key, stringHeaders.get(key));
         }
         response.headers().set(headers);
@@ -135,7 +146,7 @@ public class MessageProcessor implements RejectableRunnable {
         return response;
     }
 
-    private Map<String,String>formatHeaders(HttpHeaders headers) {
+    private Map<String, String> formatHeaders(HttpHeaders headers) {
         final HashMap<String, String> formattedHeaders = new HashMap<>();
         for (Map.Entry<String, String> header : headers) {
             String key = header.getKey();
@@ -152,4 +163,3 @@ public class MessageProcessor implements RejectableRunnable {
         return formattedHeaders;
     }
 }
-

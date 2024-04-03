@@ -17,23 +17,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01.util;
 
 import io.netty.handler.ssl.SslContext;
-
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 
 public interface SslBuilder {
 
     /**
      * @return context
-     * @throws Exception (IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException)
+     * @throws Exception (IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException,
+     *                   UnrecoverableKeyException, KeyManagementException)
      */
     SslContext build() throws Exception;
 

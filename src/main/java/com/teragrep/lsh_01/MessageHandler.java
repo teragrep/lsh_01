@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,23 +25,22 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 
 /**
- * This class is implemented in ruby in `lib/logstash/inputs/http/message_listener`,
- * this class is used to link the events triggered from the different connection to the actual
- * work inside the plugin.
+ * This class is implemented in ruby in `lib/logstash/inputs/http/message_listener`, this class is used to link the
+ * events triggered from the different connection to the actual work inside the plugin.
  */
 // This need to be implemented in Ruby
 public class MessageHandler implements IMessageHandler {
+
     private final static Logger logger = LogManager.getLogger(MessageHandler.class);
 
     /**
-     * This is triggered on every new message parsed by the http handler
-     * and should be executed in the ruby world.
+     * This is triggered on every new message parsed by the http handler and should be executed in the ruby world.
      *
      * @param remoteAddress
      * @param headers
      * @param body
      */
-    public boolean onNewMessage(String remoteAddress, Map<String,String> headers, String body) {
+    public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
         logger.debug("onNewMessage");
         return false;
     }
@@ -62,5 +60,7 @@ public class MessageHandler implements IMessageHandler {
         return null;
     }
 
-    public boolean requiresToken() { return false; }
+    public boolean requiresToken() {
+        return false;
+    }
 }

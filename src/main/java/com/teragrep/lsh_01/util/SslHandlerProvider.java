@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01.util;
 
 import io.netty.buffer.ByteBufAllocator;
@@ -29,7 +28,7 @@ public class SslHandlerProvider {
     private final SslContext sslContext;
     private final int sslHandshakeTimeoutMillis;
 
-    public SslHandlerProvider(SslContext context, int sslHandshakeTimeoutMillis){
+    public SslHandlerProvider(SslContext context, int sslHandshakeTimeoutMillis) {
         this.sslContext = context;
         this.sslHandshakeTimeoutMillis = sslHandshakeTimeoutMillis;
     }

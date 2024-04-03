@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01.util;
 
 import java.util.concurrent.ThreadFactory;
@@ -36,9 +35,7 @@ public class DaemonThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(group, r,
-                namePrefix + "[T#" + threadNumber.getAndIncrement() + "]",
-                0);
+        Thread t = new Thread(group, r, namePrefix + "[T#" + threadNumber.getAndIncrement() + "]", 0);
         t.setDaemon(true);
         return t;
     }

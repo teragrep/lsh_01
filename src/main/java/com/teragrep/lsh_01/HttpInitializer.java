@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.util.SslHandlerProvider;
@@ -36,14 +35,19 @@ import java.util.concurrent.ThreadPoolExecutor;
  * Created by joaoduarte on 11/10/2017.
  */
 public class HttpInitializer extends ChannelInitializer<SocketChannel> {
+
     private final IMessageHandler messageHandler;
     private SslHandlerProvider sslHandlerProvider;
     private final int maxContentLength;
     private final HttpResponseStatus responseStatus;
     private final ThreadPoolExecutor executorGroup;
 
-    public HttpInitializer(IMessageHandler messageHandler, ThreadPoolExecutor executorGroup,
-                           int maxContentLength, HttpResponseStatus responseStatus) {
+    public HttpInitializer(
+            IMessageHandler messageHandler,
+            ThreadPoolExecutor executorGroup,
+            int maxContentLength,
+            HttpResponseStatus responseStatus
+    ) {
         this.messageHandler = messageHandler;
         this.executorGroup = executorGroup;
         this.maxContentLength = maxContentLength;
@@ -53,7 +57,7 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline pipeline = socketChannel.pipeline();
 
-        if(sslHandlerProvider != null) {
+        if (sslHandlerProvider != null) {
             SslHandler sslHandler = sslHandlerProvider.getSslHandler(socketChannel.alloc());
             pipeline.addLast(sslHandler);
         }
@@ -67,4 +71,3 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
         this.sslHandlerProvider = sslHandlerProvider;
     }
 }
-

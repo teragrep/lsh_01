@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01;
 
 import io.netty.buffer.ByteBuf;
@@ -44,8 +43,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     private final ThreadPoolExecutor executorGroup;
     private final HttpResponseStatus responseStatus;
 
-    public HttpServerHandler(IMessageHandler messageHandler, ThreadPoolExecutor executorGroup,
-                             HttpResponseStatus responseStatus) {
+    public HttpServerHandler(
+            IMessageHandler messageHandler,
+            ThreadPoolExecutor executorGroup,
+            HttpResponseStatus responseStatus
+    ) {
         this.messageHandler = messageHandler;
         this.executorGroup = executorGroup;
         this.responseStatus = responseStatus;
@@ -55,7 +57,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
         final String remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
         msg.retain();
-        final MessageProcessor messageProcessor = new MessageProcessor(ctx, msg, remoteAddress, messageHandler, responseStatus);
+        final MessageProcessor messageProcessor = new MessageProcessor(
+                ctx,
+                msg,
+                remoteAddress,
+                messageHandler,
+                responseStatus
+        );
         executorGroup.execute(messageProcessor);
     }
 
@@ -66,7 +74,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         if (cause instanceof DecompressionException) {
             responseStatus = HttpResponseStatus.BAD_REQUEST;
-        } else {
+        }
+        else {
             responseStatus = HttpResponseStatus.INTERNAL_SERVER_ERROR;
         }
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(

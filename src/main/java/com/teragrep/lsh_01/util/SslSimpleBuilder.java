@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01.util;
 
 import io.netty.handler.ssl.ClientAuth;
@@ -58,9 +57,7 @@ import javax.net.ssl.TrustManagerFactory;
 public class SslSimpleBuilder implements SslBuilder {
 
     public enum SslClientVerifyMode {
-        NONE(ClientAuth.NONE),
-        OPTIONAL(ClientAuth.OPTIONAL),
-        REQUIRED(ClientAuth.REQUIRE);
+        NONE(ClientAuth.NONE), OPTIONAL(ClientAuth.OPTIONAL), REQUIRED(ClientAuth.REQUIRE);
 
         private final ClientAuth clientAuth;
 
@@ -75,9 +72,9 @@ public class SslSimpleBuilder implements SslBuilder {
 
     private final static Logger logger = LogManager.getLogger(SslSimpleBuilder.class);
 
-    public static final Set<String> SUPPORTED_CIPHERS = new HashSet<>(Arrays.asList(
-        ((SSLServerSocketFactory) SSLServerSocketFactory.getDefault()).getSupportedCipherSuites()
-    ));
+    public static final Set<String> SUPPORTED_CIPHERS = new HashSet<>(
+            Arrays.asList(((SSLServerSocketFactory) SSLServerSocketFactory.getDefault()).getSupportedCipherSuites())
+    );
 
     /*
     Ciphers Compatibility List from https://wiki.mozilla.org/Security/Server_Side_TLS
@@ -85,24 +82,27 @@ public class SslSimpleBuilder implements SslBuilder {
     private final static String[] DEFAULT_CIPHERS;
     static {
         String[] defaultCipherCandidates = new String[] {
-            // Modern compatibility
-            "TLS_AES_256_GCM_SHA384", // TLS 1.3
-            "TLS_AES_128_GCM_SHA256", // TLS 1.3
-            "TLS_CHACHA20_POLY1305_SHA256", // TLS 1.3 (since Java 11.0.14)
-            // Intermediate compatibility
-            "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-            "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256", // (since Java 11.0.14)
-            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256", // (since Java 11.0.14)
-            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-            "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-            // Backward compatibility
-            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
-            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
+                // Modern compatibility
+                "TLS_AES_256_GCM_SHA384", // TLS 1.3
+                "TLS_AES_128_GCM_SHA256", // TLS 1.3
+                "TLS_CHACHA20_POLY1305_SHA256", // TLS 1.3 (since Java 11.0.14)
+                // Intermediate compatibility
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256", // (since Java 11.0.14)
+                "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256", // (since Java 11.0.14)
+                "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+                // Backward compatibility
+                "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+                "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
         };
-        DEFAULT_CIPHERS = Arrays.stream(defaultCipherCandidates).filter(SUPPORTED_CIPHERS::contains).toArray(String[]::new);
+        DEFAULT_CIPHERS = Arrays
+                .stream(defaultCipherCandidates)
+                .filter(SUPPORTED_CIPHERS::contains)
+                .toArray(String[]::new);
     }
 
     private final static String[] DEFAULT_CIPHERS_LIMITED = new String[] {
@@ -116,7 +116,9 @@ public class SslSimpleBuilder implements SslBuilder {
             "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
     };
 
-    private String[] protocols = new String[] { "TLSv1.2", "TLSv1.3" };
+    private String[] protocols = new String[] {
+            "TLSv1.2", "TLSv1.3"
+    };
     private String[] ciphers = getDefaultCiphers();
     private File sslKeyFile;
     private File sslCertificateFile;
@@ -127,34 +129,57 @@ public class SslSimpleBuilder implements SslBuilder {
     private String passphrase;
     private SslClientVerifyMode verifyMode = SslClientVerifyMode.NONE;
 
-    public static SslSimpleBuilder withPemCertificate(String sslCertificateFilePath, String sslKeyFilePath, String pass) {
+    public static SslSimpleBuilder withPemCertificate(
+            String sslCertificateFilePath,
+            String sslKeyFilePath,
+            String pass
+    ) {
         SslSimpleBuilder builder = new SslSimpleBuilder();
 
         builder.sslCertificateFile = new File(sslCertificateFilePath);
         if (!builder.sslCertificateFile.canRead()) {
             throw new IllegalArgumentException(
-                    String.format("Certificate file cannot be read. Please confirm the user running Logstash has permissions to read: %s", sslCertificateFilePath));
+                    String
+                            .format(
+                                    "Certificate file cannot be read. Please confirm the user running Logstash has permissions to read: %s",
+                                    sslCertificateFilePath
+                            )
+            );
         }
 
         builder.sslKeyFile = new File(sslKeyFilePath);
         if (!builder.sslKeyFile.canRead()) {
             throw new IllegalArgumentException(
-                    String.format("Private key file cannot be read. Please confirm the user running Logstash has permissions to read: %s", sslKeyFilePath));
+                    String
+                            .format(
+                                    "Private key file cannot be read. Please confirm the user running Logstash has permissions to read: %s",
+                                    sslKeyFilePath
+                            )
+            );
         }
 
         builder.passphrase = pass;
         return builder;
     }
 
-    public static SslSimpleBuilder withKeyStore(String keyStoreType, String keyStoreFile, String keyStorePassword) throws Exception {
+    public static SslSimpleBuilder withKeyStore(String keyStoreType, String keyStoreFile, String keyStorePassword)
+            throws Exception {
         SslSimpleBuilder builder = new SslSimpleBuilder();
         final Path keyStorePath = Paths.get(Objects.requireNonNull(keyStoreFile, "Keystore path cannot be null"));
         if (!Files.isReadable(keyStorePath)) {
-            throw new IllegalArgumentException(String.format("Keystore file cannot be read. Please confirm the user running Logstash has permissions to read: %s", keyStoreFile));
+            throw new IllegalArgumentException(
+                    String
+                            .format(
+                                    "Keystore file cannot be read. Please confirm the user running Logstash has permissions to read: %s",
+                                    keyStoreFile
+                            )
+            );
         }
 
         builder.keyStorePassword = formatJksPassword(keyStorePassword);
-        builder.keyStore = readKeyStore(keyStorePath, resolveKeyStoreType(keyStoreType, keyStorePath), builder.keyStorePassword);
+        builder.keyStore = readKeyStore(
+                keyStorePath, resolveKeyStoreType(keyStoreType, keyStorePath), builder.keyStorePassword
+        );
         return builder;
     }
 
@@ -170,7 +195,8 @@ public class SslSimpleBuilder implements SslBuilder {
         for (String cipher : ciphersSuite) {
             if (SUPPORTED_CIPHERS.contains(cipher)) {
                 logger.debug("{} cipher is supported", cipher);
-            } else {
+            }
+            else {
                 if (!isUnlimitedJCEAvailable()) {
                     logger.warn("JCE Unlimited Strength Jurisdiction Policy not installed");
                 }
@@ -188,7 +214,7 @@ public class SslSimpleBuilder implements SslBuilder {
     }
 
     public SslSimpleBuilder setCertificateAuthorities(String[] certificateAuthorities) {
-        if (certificateAuthorities == null || certificateAuthorities.length == 0){
+        if (certificateAuthorities == null || certificateAuthorities.length == 0) {
             throw new IllegalArgumentException("SSL certificate authorities is required");
         }
 
@@ -196,20 +222,32 @@ public class SslSimpleBuilder implements SslBuilder {
         return this;
     }
 
-    public SslSimpleBuilder setTrustStore(String trustStoreType, String trustStoreFile, String trustStorePassword) throws Exception {
-        final Path trustStorePath = Paths.get(Objects.requireNonNull(trustStoreFile, "Trust Store path cannot be null"));
+    public SslSimpleBuilder setTrustStore(String trustStoreType, String trustStoreFile, String trustStorePassword)
+            throws Exception {
+        final Path trustStorePath = Paths
+                .get(Objects.requireNonNull(trustStoreFile, "Trust Store path cannot be null"));
         if (!Files.isReadable(trustStorePath)) {
-            throw new IllegalArgumentException(String.format("Trust Store file cannot be read. Please confirm the user running Logstash has permissions to read: %s", trustStoreFile));
+            throw new IllegalArgumentException(
+                    String
+                            .format(
+                                    "Trust Store file cannot be read. Please confirm the user running Logstash has permissions to read: %s",
+                                    trustStoreFile
+                            )
+            );
         }
 
         this.trustStore = readKeyStore(
-                trustStorePath,
-                resolveKeyStoreType(trustStoreType, trustStorePath),
-                formatJksPassword(trustStorePassword)
+                trustStorePath, resolveKeyStoreType(trustStoreType, trustStorePath), formatJksPassword(trustStorePassword)
         );
 
         if (!hasTrustStoreEntry(this.trustStore) && isClientAuthenticationRequired()) {
-            throw new IllegalArgumentException(String.format("The provided Trust Store file does not contains any trusted certificate entry: %s", trustStoreFile));
+            throw new IllegalArgumentException(
+                    String
+                            .format(
+                                    "The provided Trust Store file does not contains any trusted certificate entry: %s",
+                                    trustStoreFile
+                            )
+            );
         }
 
         return this;
@@ -225,7 +263,9 @@ public class SslSimpleBuilder implements SslBuilder {
 
     public SslContext build() throws Exception {
         if (this.trustStore != null && this.certificateAuthorities != null) {
-            throw new IllegalStateException("Use either a bundle of Certificate Authorities or a Trust Store to configure client authentication");
+            throw new IllegalStateException(
+                    "Use either a bundle of Certificate Authorities or a Trust Store to configure client authentication"
+            );
         }
 
         if (logger.isDebugEnabled()) {
@@ -245,10 +285,14 @@ public class SslSimpleBuilder implements SslBuilder {
                 }
 
                 builder.trustManager(loadCertificateCollection(certificateAuthorities));
-            } else if (trustStore != null || keyStore != null) {
+            }
+            else if (trustStore != null || keyStore != null) {
                 builder.trustManager(createTrustManagerFactory());
-            } else {
-                throw new IllegalStateException("Either an SSL certificate or an SSL Trust Store is required when SSL is enabled");
+            }
+            else {
+                throw new IllegalStateException(
+                        "Either an SSL certificate or an SSL Trust Store is required when SSL is enabled"
+                );
             }
         }
 
@@ -267,7 +311,8 @@ public class SslSimpleBuilder implements SslBuilder {
         throw new IllegalStateException("Either a KeyStore or an SSL certificate must be provided");
     }
 
-    private KeyManagerFactory createKeyManagerFactory() throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
+    private KeyManagerFactory createKeyManagerFactory()
+            throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
         final KeyManagerFactory kmf = getDefaultKeyManagerFactory();
         kmf.init(this.keyStore, this.keyStorePassword);
         return kmf;
@@ -302,22 +347,28 @@ public class SslSimpleBuilder implements SslBuilder {
     static SslContext doBuild(final SslContextBuilder builder) throws Exception {
         try {
             return builder.build();
-        } catch (SSLException e) {
+        }
+        catch (SSLException e) {
             logger.debug("Failed to initialize SSL", e);
             // unwrap generic wrapped exception from Netty's JdkSsl{Client|Server}Context
-            if ("failed to initialize the server-side SSL context".equals(e.getMessage()) ||
-                "failed to initialize the client-side SSL context".equals(e.getMessage())) {
+            if (
+                "failed to initialize the server-side SSL context".equals(e.getMessage())
+                        || "failed to initialize the client-side SSL context".equals(e.getMessage())
+            ) {
                 // Netty catches Exception and simply wraps: throw new SSLException("...", e);
-                if (e.getCause() instanceof Exception) throw (Exception) e.getCause();
+                if (e.getCause() instanceof Exception)
+                    throw (Exception) e.getCause();
             }
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.debug("Failed to initialize SSL", e);
             throw e;
         }
     }
 
-    private X509Certificate[] loadCertificateCollection(String[] certificates) throws IOException, CertificateException {
+    private X509Certificate[] loadCertificateCollection(String[] certificates)
+            throws IOException, CertificateException {
         logger.debug("Load certificates collection");
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 
@@ -327,7 +378,8 @@ public class SslSimpleBuilder implements SslBuilder {
             logger.debug("Loading certificates from file {}", certificate);
 
             try (InputStream in = new FileInputStream(certificate)) {
-                List<X509Certificate> certificatesChains = (List<X509Certificate>) certificateFactory.generateCertificates(in);
+                List<X509Certificate> certificatesChains = (List<X509Certificate>) certificateFactory
+                        .generateCertificates(in);
                 collections.addAll(certificatesChains);
             }
         }
@@ -335,19 +387,20 @@ public class SslSimpleBuilder implements SslBuilder {
     }
 
     public static String[] getDefaultCiphers() {
-        if (isUnlimitedJCEAvailable()){
+        if (isUnlimitedJCEAvailable()) {
             return DEFAULT_CIPHERS;
-        } else {
+        }
+        else {
             logger.warn("JCE Unlimited Strength Jurisdiction Policy not installed - max key length is 128 bits");
             return DEFAULT_CIPHERS_LIMITED;
         }
     }
 
-
-    public static boolean isUnlimitedJCEAvailable(){
+    public static boolean isUnlimitedJCEAvailable() {
         try {
             return (Cipher.getMaxAllowedKeyLength("AES") > 128);
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e) {
             logger.warn("AES not available", e);
             return false;
         }
@@ -380,20 +433,22 @@ public class SslSimpleBuilder implements SslBuilder {
         String name = path == null ? "" : path.getFileName().toString().toLowerCase(Locale.ROOT);
         if (name.endsWith(".p12") || name.endsWith(".pfx") || name.endsWith(".pkcs12")) {
             return "PKCS12";
-        } else {
+        }
+        else {
             return "jks";
         }
     }
 
     private static char[] formatJksPassword(String password) {
-        if (password == null){
+        if (password == null) {
             return null;
         }
 
         return password.toCharArray();
     }
 
-    private static KeyStore readKeyStore(Path path, String ksType, char[] password) throws GeneralSecurityException, IOException {
+    private static KeyStore readKeyStore(Path path, String ksType, char[] password)
+            throws GeneralSecurityException, IOException {
         final KeyStore keyStore = KeyStore.getInstance(ksType);
         if (path != null) {
             try (InputStream in = Files.newInputStream(path)) {
