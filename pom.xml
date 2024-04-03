@@ -8,10 +8,11 @@
   <name>lsh_01</name>
   <properties>
     <changelist>-SNAPSHOT</changelist>
+    <elasticsearch.securemock.version>1.2</elasticsearch.securemock.version>
+    <hamcrest-library.version>2.2</hamcrest-library.version>
     <java.version>8</java.version>
     <junit.version>5.10.2</junit.version>
     <log4j.version>2.23.1</log4j.version>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <netty.version>4.1.108.Final</netty.version>
@@ -41,6 +42,16 @@
       <artifactId>netty-common</artifactId>
       <version>${netty.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
     <!-- log4j -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -58,6 +69,20 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- securemock, testing -->
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>securemock</artifactId>
+      <version>${elasticsearch.securemock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- hamcrest, testing -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>${hamcrest-library.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -106,6 +131,7 @@
             <!-- maven -->
             <exclude>rpm/rpm.pom.xml</exclude>
             <exclude>pom.xml</exclude>
+            <exclude>eclipse-java-formatter.xml</exclude>
             <!-- rpm -->
             <exclude>rpm/pom.xml</exclude>
             <exclude>rpm/src/main/resources/*</exclude>
@@ -175,7 +201,6 @@
           <compilerArgument>-Xlint:all</compilerArgument>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
-          <release>${maven.compiler.release}</release>
           <testSource>${maven.compiler.source}</testSource>
           <testTarget>${maven.compiler.target}</testTarget>
         </configuration>
@@ -196,7 +221,8 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>2.43.0</version>
+        <!-- can't be upgraded, maximum java8 supports -->
+        <version>2.30.0</version>
         <configuration>
           <java>
             <eclipse>

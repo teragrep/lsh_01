@@ -50,9 +50,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.logstash.plugins.inputs.http.util.SslSimpleBuilder.SUPPORTED_CIPHERS;
-import static org.logstash.plugins.inputs.http.util.SslSimpleBuilder.SslClientVerifyMode;
-import static org.logstash.plugins.inputs.http.util.SslSimpleBuilder.getDefaultCiphers;
+import static com.teragrep.lsh_01.util.SslSimpleBuilder.SUPPORTED_CIPHERS;
+import static com.teragrep.lsh_01.util.SslSimpleBuilder.SslClientVerifyMode;
+import static com.teragrep.lsh_01.util.SslSimpleBuilder.getDefaultCiphers;
 import static org.mockito.Matchers.eq;
 
 /**

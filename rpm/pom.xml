@@ -66,7 +66,7 @@
           <packager>Teragrep &lt;servicedesk@teragrep.com&gt;</packager>
           <group>Teragrep/lsh_01</group>
           <description>${project.groupId}-${project.artifactId}</description>
-          <needarch>true</needarch>
+          <needarch>false</needarch>
           <defaultUsername>srv-lsh</defaultUsername>
           <defaultGroupname>srv-lsh</defaultGroupname>
           <defaultFilemode>0644</defaultFilemode>
