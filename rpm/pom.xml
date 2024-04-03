@@ -67,8 +67,8 @@
           <group>Teragrep/lsh_01</group>
           <description>${project.groupId}-${project.artifactId}</description>
           <needarch>false</needarch>
-          <defaultUsername>srv-lsh</defaultUsername>
-          <defaultGroupname>srv-lsh</defaultGroupname>
+          <defaultUsername>srv-lsh_01</defaultUsername>
+          <defaultGroupname>srv-lsh_01</defaultGroupname>
           <defaultFilemode>0644</defaultFilemode>
           <defaultDirmode>0755</defaultDirmode>
           <mappings>
@@ -87,8 +87,8 @@
               <directoryIncluded>true</directoryIncluded>
               <filemode>600</filemode>
               <dirmode>700</dirmode>
-              <username>srv-lsh</username>
-              <groupname>srv-lsh</groupname>
+              <username>srv-lsh_01</username>
+              <groupname>srv-lsh_01</groupname>
               <recurseDirectories>true</recurseDirectories>
               <sources>
                 <source>
@@ -101,8 +101,8 @@
               <directoryIncluded>true</directoryIncluded>
               <filemode>755</filemode>
               <dirmode>755</dirmode>
-              <username>srv-lsh</username>
-              <groupname>srv-lsh</groupname>
+              <username>srv-lsh_01</username>
+              <groupname>srv-lsh_01</groupname>
               <recurseDirectories>true</recurseDirectories>
               <sources>
                 <source>
@@ -116,8 +116,8 @@
           </requires>
           <preinstallScriptlet>
             <script>
-getent group srv-lsh > /dev/null || groupadd -r srv-lsh;
-getent passwd srv-lsh > /dev/null || useradd -r -g srv-lsh -d /opt/teragrep/${project.artifactId} -s /sbin/nologin -c "Service User" srv-lsh;
+getent group srv-lsh_01 > /dev/null || groupadd -r srv-lsh_01;
+getent passwd srv-lsh_01 > /dev/null || useradd -r -g srv-lsh_01 -d /opt/teragrep/${project.artifactId} -s /sbin/nologin -c "Service User" srv-lsh_01;
 exit 0;
             </script>
           </preinstallScriptlet>
