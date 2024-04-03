@@ -58,6 +58,6 @@ public class AppConfig {
     @Override
     public String toString() {
         return "AppConfig{" + "hostname='" + hostname + '\'' + ", port=" + port + ", threads=" + threads
-                + ", maxPendingRequests=" + maxPendingRequests + '}';
+                + ", maxPendingRequests=" + maxPendingRequests + ", maxContentLength=" + maxContentLength + '}';
     }
 }
