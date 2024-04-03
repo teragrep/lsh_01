@@ -19,7 +19,6 @@
 */
 package com.teragrep.lsh_01;
 
-import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.rlo_14.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -36,16 +35,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.teragrep.lsh_01.util.RejectableRunnable;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
-import com.teragrep.rlp_01.RelpBatch;
-import com.teragrep.rlp_01.RelpConnection;
 
 public class MessageProcessor implements RejectableRunnable {
 
@@ -56,10 +49,7 @@ public class MessageProcessor implements RejectableRunnable {
     private final HttpResponseStatus responseStatus;
 
     private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
-    private final static Logger LOGGER = LogManager.getLogger(MessageHandler.class);
-    private final RelpConnection relpConnection;
-    private final RelpConfig relpConfig;
-    private boolean isConnected = false;
+    private final static Logger LOGGER = LogManager.getLogger(MessageProcessor.class);
 
     MessageProcessor(
             ChannelHandlerContext ctx,
@@ -73,8 +63,6 @@ public class MessageProcessor implements RejectableRunnable {
         this.remoteAddress = remoteAddress;
         this.messageHandler = messageHandler;
         this.responseStatus = responseStatus;
-        this.relpConfig = new RelpConfig();
-        this.relpConnection = new RelpConnection();
     }
 
     public void onRejection() {
@@ -118,7 +106,6 @@ public class MessageProcessor implements RejectableRunnable {
         final Map<String, String> formattedHeaders = formatHeaders(req.headers());
         final String body = req.content().toString(UTF8_CHARSET);
         if (messageHandler.onNewMessage(remoteAddress, formattedHeaders, body)) {
-            sendMessage(body, formattedHeaders);
             return generateResponse(messageHandler.responseHeaders());
         }
         else {
@@ -178,89 +165,4 @@ public class MessageProcessor implements RejectableRunnable {
         return formattedHeaders;
     }
 
-    private void connect() {
-        boolean notConnected = true;
-        while (notConnected) {
-            boolean connected = false;
-            try {
-                String realHostname = java.net.InetAddress.getLocalHost().getHostName();
-                connected = relpConnection.connect(relpConfig.target, relpConfig.port);
-            }
-            catch (Exception e) {
-                LOGGER
-                        .error(
-                                "Failed to connect to relp server <[{}]>:<[{}]>: {}", relpConfig.target,
-                                relpConfig.port, e.getMessage()
-                        );
-            }
-            if (connected) {
-                notConnected = false;
-            }
-            else {
-                try {
-                    Thread.sleep(relpConfig.reconnectInterval);
-                }
-                catch (InterruptedException e) {
-                    LOGGER.error("Reconnect timer interrupted, reconnecting now");
-                }
-            }
-        }
-        isConnected = true;
-    }
-
-    private void tearDown() {
-        relpConnection.tearDown();
-    }
-
-    private void disconnect() {
-        boolean disconnected = false;
-        try {
-            disconnected = relpConnection.disconnect();
-        }
-        catch (IllegalStateException | IOException | TimeoutException e) {
-            LOGGER.error("Forcefully closing connection due to exception <{}>", e.getMessage());
-        }
-        finally {
-            this.tearDown();
-        }
-        isConnected = false;
-    }
-
-    private void sendMessage(String message, Map<String, String> headers) {
-        if (!isConnected) {
-            connect();
-        }
-        final RelpBatch relpBatch = new RelpBatch();
-        Instant time = Instant.now();
-        SDElement sdElement = new SDElement("lsh_01@48577");
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            sdElement.addSDParam(new SDParam(header.getKey(), header.getValue()));
-        }
-        SyslogMessage syslogMessage = new SyslogMessage()
-                .withTimestamp(time.toEpochMilli())
-                .withAppName(relpConfig.appName)
-                .withHostname(relpConfig.hostname)
-                .withFacility(Facility.USER)
-                .withSeverity(Severity.INFORMATIONAL)
-                .withMsg(message)
-                .withSDElement(sdElement);
-        relpBatch.insert(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
-        boolean notSent = true;
-        while (notSent) {
-            try {
-                relpConnection.commit(relpBatch);
-            }
-            catch (IllegalStateException | IOException | TimeoutException e) {
-                LOGGER.error("Failed to send relp message: <{}>", e.getMessage());
-            }
-            if (!relpBatch.verifyTransactionAll()) {
-                relpBatch.retryAllFailed();
-                this.tearDown();
-                this.connect();
-            }
-            else {
-                notSent = false;
-            }
-        }
-    }
 }
