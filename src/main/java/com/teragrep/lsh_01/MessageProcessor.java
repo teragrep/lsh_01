@@ -55,7 +55,7 @@ public class MessageProcessor implements RejectableRunnable {
     private final IMessageHandler messageHandler;
     private final HttpResponseStatus responseStatus;
 
-    private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
     private final static Logger LOGGER = LogManager.getLogger(MessageHandler.class);
     private final RelpConnection relpConnection;
     private final RelpConfig relpConfig;
@@ -250,7 +250,7 @@ public class MessageProcessor implements RejectableRunnable {
             try {
                 relpConnection.commit(relpBatch);
             }
-            catch (IllegalStateException | IOException | java.util.concurrent.TimeoutException e) {
+            catch (IllegalStateException | IOException | TimeoutException e) {
                 LOGGER.error("Failed to send relp message: <{}>", e.getMessage());
             }
             if (!relpBatch.verifyTransactionAll()) {
