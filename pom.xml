@@ -58,6 +58,11 @@
       <artifactId>log4j-api</artifactId>
       <version>${log4j.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
     <!-- junit, testing -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -137,7 +142,8 @@
             <exclude>rpm/src/main/resources/*</exclude>
             <!-- docker -->
             <exclude>Dockerfile</exclude>
-            <!-- test resources -->
+            <!-- resources -->
+            <exclude>src/main/resources/*</exclude>
             <exclude>src/test/resources/certificates/*</exclude>
             <!-- readme -->
             <exclude>README.adoc</exclude>
