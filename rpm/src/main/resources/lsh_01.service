@@ -1,0 +1,11 @@
+[Unit]
+Description=com.teragrep.lsh_01
+ConditionPathExists=/opt/teragrep/lsh_01/share/lsh_01.jar
+
+[Service]
+ExecStart=/usr/lib/jvm/jre-1.8.0-openjdk/bin/java -Dlog4j.configuration=file:/opt/teragrep/lsh_01/etc/log4j2.xml -jar /opt/teragrep/lsh_01/share/lsh_01.jar
+User=srv-lsh_01
+WorkingDirectory=/opt/teragrep/lsh_01/etc
+
+[Install]
+WantedBy=multi-user.target
