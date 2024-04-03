@@ -24,32 +24,32 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
-public class RelpSender implements IMessageHandler {
+public class RelpConversion implements IMessageHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(RelpSender.class);
+    private final static Logger LOGGER = LogManager.getLogger(RelpConversion.class);
 
     public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
-        LOGGER.debug("RelpSender.onNewMessage called");
-        return true;
+        LOGGER.error("RelpConversion onNewMessage not yet implemented. Contact assistance.");
+        return false;
     }
 
     public boolean validatesToken(String token) {
-        LOGGER.debug("RelpSender.validatesToken called");
-        return true;
+        LOGGER.error("RelpConversion validatesToken not yet implemented. Contact assistance.");
+        return false;
     }
 
     public boolean requiresToken() {
-        LOGGER.debug("RelpSender.requiresToken called");
-        return true;
+        LOGGER.error("RelpConversion requiresToken not yet implemented. Contact assistance.");
+        return false;
     }
 
-    public RelpSender copy() {
-        LOGGER.debug("RelpSender.copy called");
-        return new RelpSender();
+    public RelpConversion copy() {
+        LOGGER.debug("RelpConversion.copy called");
+        return new RelpConversion();
     }
 
     public Map<String, String> responseHeaders() {
-        LOGGER.debug("RelpSender.responseHeaders called");
+        LOGGER.error("RelpConversion responseHeaders not yet implemented. Contact assistance.");
         return null;
     }
 }

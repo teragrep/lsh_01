@@ -28,17 +28,24 @@ public class Main {
 
     public static void main(String[] args) {
         AppConfig appConfig = new AppConfig();
+        try {
+            appConfig.validate();
+        }
+        catch (IllegalArgumentException e) {
+            LOGGER.error("Can't parse config properly: {}", e.getMessage());
+            System.exit(1);
+        }
         LOGGER.info("Got config: <[{}]>", appConfig);
-        RelpSender messageHandler = new RelpSender();
+        RelpConversion relpConversion = new RelpConversion();
         try (
                 NettyHttpServer server = new NettyHttpServer(
                         appConfig.hostname,
                         appConfig.port,
-                        messageHandler,
+                        relpConversion,
                         null,
                         appConfig.threads,
                         appConfig.maxPendingRequests,
-                        10000,
+                        appConfig.maxContentLength,
                         200
                 )
         ) {
