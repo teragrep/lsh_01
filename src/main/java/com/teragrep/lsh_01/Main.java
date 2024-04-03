@@ -24,9 +24,25 @@ import org.apache.logging.log4j.Logger;
 
 public class Main {
 
-    private final static Logger LOGGER = LogManager.getLogger(MessageHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        LOGGER.info("Hello World!");
+        AppConfig appConfig = new AppConfig();
+        LOGGER.info("Got config: <[{}]>", appConfig);
+        RelpSender messageHandler = new RelpSender();
+        try (
+                NettyHttpServer server = new NettyHttpServer(
+                        appConfig.hostname,
+                        appConfig.port,
+                        messageHandler,
+                        null,
+                        appConfig.threads,
+                        appConfig.maxPendingRequests,
+                        10000,
+                        200
+                )
+        ) {
+            server.run();
+        }
     }
 }
