@@ -18,9 +18,22 @@
     <netty.version>4.1.108.Final</netty.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <revision>0.0.1</revision>
+    <rlo_14.version>1.0.1</rlo_14.version>
+    <rlp_01.version>4.0.1</rlp_01.version>
     <sha1></sha1>
   </properties>
   <dependencies>
+    <!-- relp -->
+    <dependency>
+      <groupId>com.teragrep</groupId>
+      <artifactId>rlp_01</artifactId>
+      <version>${rlp_01.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.teragrep</groupId>
+      <artifactId>rlo_14</artifactId>
+      <version>${rlo_14.version}</version>
+    </dependency>
     <!-- netty -->
     <dependency>
       <groupId>io.netty</groupId>
@@ -143,6 +156,7 @@
             <!-- docker -->
             <exclude>Dockerfile</exclude>
             <!-- resources -->
+            <exclude>src/main/assembly/jar-with-dependencies.xml</exclude>
             <exclude>src/main/resources/*</exclude>
             <exclude>src/test/resources/certificates/*</exclude>
             <!-- readme -->
@@ -210,6 +224,31 @@
           <testSource>${maven.compiler.source}</testSource>
           <testTarget>${maven.compiler.target}</testTarget>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/jar-with-dependencies.xml</descriptor>
+          </descriptors>
+          <archive>
+            <manifest>
+              <mainClass>com.teragrep.lsh_01.Main</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.rlo_14.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import com.teragrep.lsh_01.util.RejectableRunnable;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,8 +48,8 @@ public class MessageProcessor implements RejectableRunnable {
     private final IMessageHandler messageHandler;
     private final HttpResponseStatus responseStatus;
 
-    private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
-    private final static Logger LOGGER = LogManager.getLogger(MessageHandler.class);
+    private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
+    private final static Logger LOGGER = LogManager.getLogger(MessageProcessor.class);
 
     MessageProcessor(
             ChannelHandlerContext ctx,
@@ -162,4 +164,5 @@ public class MessageProcessor implements RejectableRunnable {
         formattedHeaders.put("http_version", req.protocolVersion().text());
         return formattedHeaders;
     }
+
 }

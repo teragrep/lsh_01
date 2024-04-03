@@ -92,7 +92,7 @@
               <recurseDirectories>true</recurseDirectories>
               <sources>
                 <source>
-                  <location>${project.basedir}/src/main/resources/log4j.xml</location>
+                  <location>${project.basedir}/src/main/resources/log4j2.xml</location>
                 </source>
               </sources>
             </mapping>
@@ -106,7 +106,8 @@
               <recurseDirectories>true</recurseDirectories>
               <sources>
                 <source>
-                  <location>${project.basedir}/../target/lsh_01.jar</location>
+                  <location>${project.basedir}/../target/lsh_01-jar-with-dependencies.jar</location>
+                  <destination>lsh_01.jar</destination>
                 </source>
               </sources>
             </mapping>
