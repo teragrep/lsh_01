@@ -17,18 +17,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.config;
 
-public class AppConfig {
+public class Config {
 
-    public final String hostname;
+    public final String listen;
     public final int port;
     public final int threads;
     public final int maxPendingRequests;
     public final int maxContentLength;
 
-    public AppConfig() {
-        hostname = System.getProperty("hostname", "localhost");
+    public Config() {
+        listen = System.getProperty("hostname", "localhost");
         port = Integer.parseInt(System.getProperty("port", "8080"));
         threads = Integer.parseInt(System.getProperty("threads", "1"));
         maxPendingRequests = Integer.parseInt(System.getProperty("maxPendingRequests", "128"));
@@ -36,8 +36,8 @@ public class AppConfig {
     }
 
     public void validate() throws IllegalArgumentException {
-        if (hostname == null || hostname.isEmpty()) {
-            throw new IllegalArgumentException("Hostname must be specified");
+        if (listen == null || listen.isEmpty()) {
+            throw new IllegalArgumentException("Listen must be specified");
         }
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Port must be between 0 and 65535, was <[" + port + "]>");
@@ -57,7 +57,7 @@ public class AppConfig {
 
     @Override
     public String toString() {
-        return "AppConfig{" + "hostname='" + hostname + '\'' + ", port=" + port + ", threads=" + threads
+        return "Config{" + "listen='" + listen + '\'' + ", port=" + port + ", threads=" + threads
                 + ", maxPendingRequests=" + maxPendingRequests + ", maxContentLength=" + maxContentLength + '}';
     }
 }

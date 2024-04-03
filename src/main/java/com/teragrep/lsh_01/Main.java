@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class Main {
     private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        AppConfig appConfig = new AppConfig();
+        Config appConfig = new Config();
         try {
             appConfig.validate();
         }
@@ -39,7 +40,7 @@ public class Main {
         RelpConversion relpConversion = new RelpConversion();
         try (
                 NettyHttpServer server = new NettyHttpServer(
-                        appConfig.hostname,
+                        appConfig.listen,
                         appConfig.port,
                         relpConversion,
                         null,

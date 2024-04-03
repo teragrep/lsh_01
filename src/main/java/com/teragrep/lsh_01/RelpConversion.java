@@ -22,6 +22,7 @@ package com.teragrep.lsh_01;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RelpConversion implements IMessageHandler {
@@ -29,17 +30,14 @@ public class RelpConversion implements IMessageHandler {
     private final static Logger LOGGER = LogManager.getLogger(RelpConversion.class);
 
     public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
-        LOGGER.error("RelpConversion onNewMessage not yet implemented. Contact assistance.");
-        return false;
+        return true;
     }
 
     public boolean validatesToken(String token) {
-        LOGGER.error("RelpConversion validatesToken not yet implemented. Contact assistance.");
-        return false;
+        return true;
     }
 
     public boolean requiresToken() {
-        LOGGER.error("RelpConversion requiresToken not yet implemented. Contact assistance.");
         return false;
     }
 
@@ -49,7 +47,6 @@ public class RelpConversion implements IMessageHandler {
     }
 
     public Map<String, String> responseHeaders() {
-        LOGGER.error("RelpConversion responseHeaders not yet implemented. Contact assistance.");
-        return null;
+        return new HashMap<String, String>();
     }
 }
