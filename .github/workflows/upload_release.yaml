@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-          
+
       - name: Cache Local Maven Repository
         uses: actions/cache@v2
         with:
@@ -23,8 +23,20 @@ jobs:
         with:
           java-version: 17
           distribution: 'adopt'
-          
-      - name: Publish to GitHub Packages
-        run: mvn --batch-mode -Drevision=${{ github.event.release.tag_name }} -Dsha1= -Dchangelist= clean deploy -Ppublish-github-packages
+
+      - name: Build jar
+        run: mvn --batch-mode -Drevision=${{ github.event.release.tag_name }} -Dsha1= -Dchangelist= clean package
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build rpm
+        run: cd rpm/ && mvn --batch-mode -Drevision=${{ github.event.release.tag_name }} -Dsha1= -Dchangelist= package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attach jar and rpm to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            rpm/target/rpm/com.teragrep-lsh_01/RPMS/noarch/com.teragrep-lsh_01-*.rpm
+            target/lsh_01-jar-with-dependencies.jar
