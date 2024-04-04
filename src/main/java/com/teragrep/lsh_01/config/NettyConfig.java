@@ -45,8 +45,8 @@ public class NettyConfig implements Config {
 
     @Override
     public String toString() {
-        return "NettyConfig{" + "listenAddress='" + listenAddress + '\'' + ", listenPort=" + listenPort
-                + ", serverThreads=" + threads + ", serverMaxPendingRequests=" + maxPendingRequests
-                + ", serverMaxContentLength=" + maxContentLength + '}';
+        return "NettyConfig{" + "listenAddress='" + listenAddress + '\'' + ", listenPort=" + listenPort + ", threads="
+                + threads + ", maxPendingRequests=" + maxPendingRequests + ", maxContentLength=" + maxContentLength
+                + '}';
     }
 }
