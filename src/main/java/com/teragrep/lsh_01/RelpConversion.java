@@ -53,7 +53,7 @@ public class RelpConversion implements IMessageHandler {
             sendMessage(body, headers);
         }
         catch (Exception e) {
-            LOGGER.error("Unexpected error when sending a message: " + e.getMessage(), e);
+            LOGGER.error("Unexpected error when sending a message: <{}>", e.getMessage(), e);
             return false;
         }
         return true;
