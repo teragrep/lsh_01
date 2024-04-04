@@ -266,8 +266,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <!-- can't be upgraded, maximum java8 supports -->
-        <version>2.30.0</version>
+        <version>2.43.0</version>
         <configuration>
           <java>
             <eclipse>
