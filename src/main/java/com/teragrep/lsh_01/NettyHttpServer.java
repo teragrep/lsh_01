@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.NettyConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -51,26 +52,22 @@ public class NettyHttpServer implements Runnable, Closeable {
     private final HttpResponseStatus responseStatus;
 
     public NettyHttpServer(
-            String host,
-            int port,
+            NettyConfig nettyConfig,
             IMessageHandler messageHandler,
             SslHandlerProvider sslHandlerProvider,
-            int threads,
-            int maxPendingRequests,
-            int maxContentLength,
             int responseCode
     ) {
-        this.host = host;
-        this.port = port;
+        this.host = nettyConfig.listenAddress;
+        this.port = nettyConfig.listenPort;
         this.responseStatus = HttpResponseStatus.valueOf(responseCode);
-        processorGroup = new NioEventLoopGroup(threads, daemonThreadFactory("http-input-processor"));
+        processorGroup = new NioEventLoopGroup(nettyConfig.threads, daemonThreadFactory("http-input-processor"));
 
         executorGroup = new ThreadPoolExecutor(
-                threads,
-                threads,
+                nettyConfig.threads,
+                nettyConfig.threads,
                 0,
                 TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(maxPendingRequests),
+                new ArrayBlockingQueue<>(nettyConfig.maxPendingRequests),
                 daemonThreadFactory("http-input-handler-executor"),
                 new CustomRejectedExecutionHandler()
         );
@@ -78,7 +75,7 @@ public class NettyHttpServer implements Runnable, Closeable {
         final HttpInitializer httpInitializer = new HttpInitializer(
                 messageHandler,
                 executorGroup,
-                maxContentLength,
+                nettyConfig.maxContentLength,
                 responseStatus
         );
 

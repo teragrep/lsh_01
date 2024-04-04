@@ -156,6 +156,7 @@
             <!-- docker -->
             <exclude>Dockerfile</exclude>
             <!-- resources -->
+            <exclude>etc/config.properties</exclude>
             <exclude>src/main/assembly/jar-with-dependencies.xml</exclude>
             <exclude>src/main/resources/*</exclude>
             <exclude>src/test/resources/certificates/*</exclude>

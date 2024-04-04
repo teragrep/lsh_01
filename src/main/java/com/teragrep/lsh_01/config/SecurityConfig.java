@@ -19,34 +19,21 @@
 */
 package com.teragrep.lsh_01.config;
 
-public class RelpConfig implements Validateable {
+public class SecurityConfig implements Validateable {
 
-    public final String relpTarget;
-    public final int relpPort;
-    public final int relpReconnectInterval;
-    public final String relpHostname;
-    public final String relpAppName;
+    public final boolean tokenRequired;
+    public final String token;
 
-    public RelpConfig() {
+    public SecurityConfig() {
         PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
                 System.getProperty("properties.file", "etc/config.properties")
         );
-        relpTarget = propertiesReader.getStringProperty("relp.target");
-        relpPort = propertiesReader.getIntProperty("relp.port");
-        relpReconnectInterval = propertiesReader.getIntProperty("relp.reconnectInterval");
-        relpHostname = propertiesReader.getStringProperty("relp.hostname");
-        relpAppName = propertiesReader.getStringProperty("relp.appName");
+        tokenRequired = propertiesReader.getBooleanProperty("security.tokenRequired");
+        token = propertiesReader.getStringProperty("security.token");
     }
 
     @Override
     public void validate() {
 
-    }
-
-    @Override
-    public String toString() {
-        return "RelpConfig{" + "relpTarget='" + relpTarget + '\'' + ", relpPort=" + relpPort
-                + ", relpReconnectInterval=" + relpReconnectInterval + ", relpHostname='" + relpHostname + '\''
-                + ", relpAppName='" + relpAppName + '\'' + '}';
     }
 }

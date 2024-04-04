@@ -19,23 +19,23 @@
 */
 package com.teragrep.lsh_01.config;
 
-public class RelpConfig implements Validateable {
+public class NettyConfig implements Validateable {
 
-    public final String relpTarget;
-    public final int relpPort;
-    public final int relpReconnectInterval;
-    public final String relpHostname;
-    public final String relpAppName;
+    public final String listenAddress;
+    public final int listenPort;
+    public final int threads;
+    public final int maxPendingRequests;
+    public final int maxContentLength;
 
-    public RelpConfig() {
+    public NettyConfig() {
         PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
                 System.getProperty("properties.file", "etc/config.properties")
         );
-        relpTarget = propertiesReader.getStringProperty("relp.target");
-        relpPort = propertiesReader.getIntProperty("relp.port");
-        relpReconnectInterval = propertiesReader.getIntProperty("relp.reconnectInterval");
-        relpHostname = propertiesReader.getStringProperty("relp.hostname");
-        relpAppName = propertiesReader.getStringProperty("relp.appName");
+        listenAddress = propertiesReader.getStringProperty("server.listenAddress");
+        listenPort = propertiesReader.getIntProperty("server.listenPort");
+        threads = propertiesReader.getIntProperty("server.threads");
+        maxPendingRequests = propertiesReader.getIntProperty("server.maxPendingRequests");
+        maxContentLength = propertiesReader.getIntProperty("server.maxContentLength");
     }
 
     @Override
@@ -45,8 +45,8 @@ public class RelpConfig implements Validateable {
 
     @Override
     public String toString() {
-        return "RelpConfig{" + "relpTarget='" + relpTarget + '\'' + ", relpPort=" + relpPort
-                + ", relpReconnectInterval=" + relpReconnectInterval + ", relpHostname='" + relpHostname + '\''
-                + ", relpAppName='" + relpAppName + '\'' + '}';
+        return "NettyConfig{" + "listenAddress='" + listenAddress + '\'' + ", listenPort=" + listenPort + ", threads="
+                + threads + ", maxPendingRequests=" + maxPendingRequests + ", maxContentLength=" + maxContentLength
+                + '}';
     }
 }
