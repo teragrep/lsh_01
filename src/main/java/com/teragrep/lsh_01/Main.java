@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.NettyConfig;
+import com.teragrep.lsh_01.config.RelpConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,17 +29,20 @@ public class Main {
     private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        AppConfig appConfig = new AppConfig();
+        NettyConfig nettyConfig = new NettyConfig();
+        RelpConfig relpConfig = new RelpConfig();
         try {
-            appConfig.validate();
+            nettyConfig.validate();
+            relpConfig.validate();
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("Can't parse config properly: {}", e.getMessage());
             System.exit(1);
         }
-        LOGGER.info("Got config: <[{}]>", appConfig);
-        RelpConversion relpConversion = new RelpConversion(appConfig);
-        try (NettyHttpServer server = new NettyHttpServer(appConfig, relpConversion, null, 200)) {
+        LOGGER.info("Got server config: <[{}]>", nettyConfig);
+        LOGGER.info("Got relp config: <[{}]>", relpConfig);
+        RelpConversion relpConversion = new RelpConversion(relpConfig);
+        try (NettyHttpServer server = new NettyHttpServer(nettyConfig, relpConversion, null, 200)) {
             server.run();
         }
     }
