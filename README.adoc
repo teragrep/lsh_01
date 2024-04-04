@@ -41,9 +41,11 @@ Run maven on java 11
 
 `mvn clean package`
 
-== How to run in docker
+== How to run in a container
 
-Mount configuration so it is in `/config/config.properties` and run.
+Mount configurations to `/config/` and run.
+
+Expected files are `/config/config.properties` and `/config/log4j2.xml`
 
 For example
 
@@ -62,7 +64,7 @@ Contribution requirements:
 
 Read more in our https://github.com/teragrep/teragrep/blob/main/contributing.adoc[Contributing Guideline].
 
-### Contributor License Agreement
+=== Contributor License Agreement
 
 Contributors must sign https://github.com/teragrep/teragrep/blob/main/cla.adoc[Teragrep Contributor License Agreement] before a pull request is accepted to organization's repositories.
 
