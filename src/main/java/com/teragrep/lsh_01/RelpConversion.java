@@ -20,6 +20,7 @@
 package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.RelpConfig;
+import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.rlo_14.*;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
@@ -39,9 +40,11 @@ public class RelpConversion implements IMessageHandler {
     private final RelpConnection relpConnection;
     private boolean isConnected = false;
     private final RelpConfig relpConfig;
+    private final SecurityConfig securityConfig;
 
-    public RelpConversion(RelpConfig relpConfig) {
+    public RelpConversion(RelpConfig relpConfig, SecurityConfig securityConfig) {
         this.relpConfig = relpConfig;
+        this.securityConfig = securityConfig;
         this.relpConnection = new RelpConnection();
     }
 
@@ -51,16 +54,16 @@ public class RelpConversion implements IMessageHandler {
     }
 
     public boolean validatesToken(String token) {
-        return true;
+        return securityConfig.token.equals(token);
     }
 
     public boolean requiresToken() {
-        return false;
+        return securityConfig.tokenRequired;
     }
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConfig);
+        return new RelpConversion(relpConfig, securityConfig);
     }
 
     public Map<String, String> responseHeaders() {

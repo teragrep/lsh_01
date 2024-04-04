@@ -19,7 +19,7 @@
 */
 package com.teragrep.lsh_01.config;
 
-public class RelpConfig implements Config {
+public class RelpConfig implements Validateable {
 
     public final String relpTarget;
     public final int relpPort;
@@ -28,7 +28,7 @@ public class RelpConfig implements Config {
     public final String relpAppName;
 
     public RelpConfig() {
-        PropertiesReader propertiesReader = new PropertiesReader(
+        PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
                 System.getProperty("properties.file", "etc/config.properties")
         );
         relpTarget = propertiesReader.getStringProperty("relp.target");

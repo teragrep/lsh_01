@@ -21,6 +21,7 @@ package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.NettyConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
+import com.teragrep.lsh_01.config.SecurityConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,9 +32,11 @@ public class Main {
     public static void main(String[] args) {
         NettyConfig nettyConfig = new NettyConfig();
         RelpConfig relpConfig = new RelpConfig();
+        SecurityConfig securityConfig = new SecurityConfig();
         try {
             nettyConfig.validate();
             relpConfig.validate();
+            securityConfig.validate();
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("Can't parse config properly: {}", e.getMessage());
@@ -41,7 +44,7 @@ public class Main {
         }
         LOGGER.info("Got server config: <[{}]>", nettyConfig);
         LOGGER.info("Got relp config: <[{}]>", relpConfig);
-        RelpConversion relpConversion = new RelpConversion(relpConfig);
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
         try (NettyHttpServer server = new NettyHttpServer(nettyConfig, relpConversion, null, 200)) {
             server.run();
         }

@@ -19,7 +19,7 @@
 */
 package com.teragrep.lsh_01.config;
 
-public class NettyConfig implements Config {
+public class NettyConfig implements Validateable {
 
     public final String listenAddress;
     public final int listenPort;
@@ -28,7 +28,7 @@ public class NettyConfig implements Config {
     public final int maxContentLength;
 
     public NettyConfig() {
-        PropertiesReader propertiesReader = new PropertiesReader(
+        PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
                 System.getProperty("properties.file", "etc/config.properties")
         );
         listenAddress = propertiesReader.getStringProperty("server.listenAddress");

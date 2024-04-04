@@ -24,11 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class PropertiesReader {
+public class PropertiesReaderUtilityClass {
 
     private final Properties properties = new Properties();
 
-    public PropertiesReader(String file) {
+    public PropertiesReaderUtilityClass(String file) {
         try (InputStream input = new FileInputStream(file)) {
             properties.load(input);
         }
@@ -47,5 +47,9 @@ public class PropertiesReader {
 
     public int getIntProperty(String key) {
         return Integer.parseInt(getStringProperty(key));
+    }
+
+    public boolean getBooleanProperty(String key) {
+        return Boolean.parseBoolean(getStringProperty(key));
     }
 }

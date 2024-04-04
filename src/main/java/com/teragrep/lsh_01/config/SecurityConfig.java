@@ -19,7 +19,21 @@
 */
 package com.teragrep.lsh_01.config;
 
-public interface Config {
+public class SecurityConfig implements Validateable {
 
-    public void validate();
+    public final boolean tokenRequired;
+    public final String token;
+
+    public SecurityConfig() {
+        PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
+                System.getProperty("properties.file", "etc/config.properties")
+        );
+        tokenRequired = propertiesReader.getBooleanProperty("security.tokenRequired");
+        token = propertiesReader.getStringProperty("security.token");
+    }
+
+    @Override
+    public void validate() {
+
+    }
 }
