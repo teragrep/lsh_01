@@ -49,7 +49,13 @@ public class RelpConversion implements IMessageHandler {
     }
 
     public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
-        sendMessage(body, headers);
+        try {
+            sendMessage(body, headers);
+        }
+        catch (Exception e) {
+            LOGGER.error("Unexpected error when sending a message: <{}>", e.getMessage(), e);
+            return false;
+        }
         return true;
     }
 
