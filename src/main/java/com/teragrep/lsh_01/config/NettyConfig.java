@@ -23,19 +23,19 @@ public class NettyConfig implements Config {
 
     public final String listenAddress;
     public final int listenPort;
-    public final int serverThreads;
-    public final int serverMaxPendingRequests;
-    public final int serverMaxContentLength;
+    public final int threads;
+    public final int maxPendingRequests;
+    public final int maxContentLength;
 
     public NettyConfig() {
         PropertiesReader propertiesReader = new PropertiesReader(
                 System.getProperty("properties.file", "etc/config.properties")
         );
-        listenAddress = propertiesReader.getStringProperty("listen.address");
-        listenPort = propertiesReader.getIntProperty("listen.port");
-        serverThreads = propertiesReader.getIntProperty("server.threads");
-        serverMaxPendingRequests = propertiesReader.getIntProperty("server.maxPendingRequests");
-        serverMaxContentLength = propertiesReader.getIntProperty("server.maxContentLength");
+        listenAddress = propertiesReader.getStringProperty("server.listenAddress");
+        listenPort = propertiesReader.getIntProperty("server.listenPort");
+        threads = propertiesReader.getIntProperty("server.threads");
+        maxPendingRequests = propertiesReader.getIntProperty("server.maxPendingRequests");
+        maxContentLength = propertiesReader.getIntProperty("server.maxContentLength");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class NettyConfig implements Config {
     @Override
     public String toString() {
         return "NettyConfig{" + "listenAddress='" + listenAddress + '\'' + ", listenPort=" + listenPort
-                + ", serverThreads=" + serverThreads + ", serverMaxPendingRequests=" + serverMaxPendingRequests
-                + ", serverMaxContentLength=" + serverMaxContentLength + '}';
+                + ", serverThreads=" + threads + ", serverMaxPendingRequests=" + maxPendingRequests
+                + ", serverMaxContentLength=" + maxContentLength + '}';
     }
 }
