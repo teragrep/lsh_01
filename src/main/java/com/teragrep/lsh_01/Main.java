@@ -44,6 +44,7 @@ public class Main {
         }
         LOGGER.info("Got server config: <[{}]>", nettyConfig);
         LOGGER.info("Got relp config: <[{}]>", relpConfig);
+        LOGGER.info("Requires token: <[{}]>", securityConfig.tokenRequired);
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
         try (NettyHttpServer server = new NettyHttpServer(nettyConfig, relpConversion, null, 200)) {
             server.run();

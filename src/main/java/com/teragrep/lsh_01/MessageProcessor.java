@@ -79,20 +79,25 @@ public class MessageProcessor implements RejectableRunnable {
     public void run() {
         try {
             final HttpResponse response;
-            if (messageHandler.requiresToken() && !req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
-                LOGGER.debug("Required authorization not provided; requesting authentication.");
-                response = generateAuthenticationRequestResponse();
+            if (!messageHandler.requiresToken()) {
+                response = processMessage();
             }
             else {
-                final String token = req.headers().get(HttpHeaderNames.AUTHORIZATION);
-                req.headers().remove(HttpHeaderNames.AUTHORIZATION);
-                if (messageHandler.validatesToken(token)) {
-                    LOGGER.debug("Valid authorization; processing request.");
-                    response = processMessage();
+                if (!req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
+                    LOGGER.debug("Required authorization not provided; requesting authentication.");
+                    response = generateAuthenticationRequestResponse();
                 }
                 else {
-                    LOGGER.debug("Invalid authorization; rejecting request.");
-                    response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                    final String token = req.headers().get(HttpHeaderNames.AUTHORIZATION);
+                    req.headers().remove(HttpHeaderNames.AUTHORIZATION);
+                    if (messageHandler.validatesToken(token)) {
+                        LOGGER.debug("Valid authorization; processing request.");
+                        response = processMessage();
+                    }
+                    else {
+                        LOGGER.debug("Invalid authorization; rejecting request.");
+                        response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                    }
                 }
             }
             ctx.writeAndFlush(response);
