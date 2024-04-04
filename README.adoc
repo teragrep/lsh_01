@@ -1,26 +1,55 @@
-# lsh_01
+= lsh_01
 
 lsh_01 logstash-http-input to syslog bridge
 
-## Features
+== Features
 
-WIP
+Listens to HTTP requests and sends them forward using RELP
 
-## Documentation
+== Documentation
 
-WIP
+Example configuration can be found link:etc/config.properties[here]
 
-## Limitations
+Currently supported configurations:
+
+[%header,format=csv]
+|===
+Key,Default Value,Notes
+server.listenAddress,127.0.0.1,Address the server will listen to
+server.listenPort,8080,Port the server will listen to
+server.threads,1,How many threads the server will use
+server.maxPendingRequests,128,How many pending requests are allowed
+server.maxContentLength,262144,How big requests are allowed in bytes
+relp.target,127.0.0.1,RELP server address
+relp.port,601,RELP server port
+relp.reconnectInterval,10000,How long to wait before reconnecting in milliseconds
+relp.appName,lsh_01,Appname to use in RELP records
+relp.hostname,localhost,Hostname to use in RELP records
+security.tokenRequired,true,Sets whether "Authorization: SomeSecretToken" headers are required
+security.token,SomeSecretToken,A token every request must contain if security.tokenRequired is enabled.
+|===
+
+== Limitations
 
 Developed on and requires java 11
 
-## How to [compile/use/implement]
+Doesn't support SSL
+
+== How to [compile/use/implement]
 
 Run maven on java 11
 
 `mvn clean package`
 
-## Contributing
+== How to run in docker
+
+Mount configuration so it is in `/config/config.properties` and run.
+
+For example
+
+`docker run -ti -v /path/to/config:/config ghcr.io/teragrep/lsh_01:latest`
+
+== Contributing
 
 You can involve yourself with our project by https://github.com/teragrep/lsh_01/issues/new/choose[opening an issue] or submitting a pull request.
 
