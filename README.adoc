@@ -12,9 +12,11 @@ WIP
 
 ## Limitations
 
-Developed on java 8
+Developed on and requires java 11
 
 ## How to [compile/use/implement]
+
+Run maven on java 11
 
 `mvn clean package`
 
