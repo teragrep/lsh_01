@@ -41,7 +41,7 @@ Run maven on java 11
 
 `mvn clean package`
 
-== How to run in docker
+== How to run in a container
 
 Mount configurations to `/config/` and run.
 
