@@ -19,7 +19,6 @@
 */
 package com.teragrep.lsh_01;
 
-import com.teragrep.lsh_01.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +27,7 @@ public class Main {
     private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        Config appConfig = new Config();
+        AppConfig appConfig = new AppConfig();
         try {
             appConfig.validate();
         }
@@ -37,19 +36,8 @@ public class Main {
             System.exit(1);
         }
         LOGGER.info("Got config: <[{}]>", appConfig);
-        RelpConversion relpConversion = new RelpConversion();
-        try (
-                NettyHttpServer server = new NettyHttpServer(
-                        appConfig.listen,
-                        appConfig.port,
-                        relpConversion,
-                        null,
-                        appConfig.threads,
-                        appConfig.maxPendingRequests,
-                        appConfig.maxContentLength,
-                        200
-                )
-        ) {
+        RelpConversion relpConversion = new RelpConversion(appConfig);
+        try (NettyHttpServer server = new NettyHttpServer(appConfig, relpConversion, null, 200)) {
             server.run();
         }
     }

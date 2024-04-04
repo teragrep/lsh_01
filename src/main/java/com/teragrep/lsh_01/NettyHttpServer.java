@@ -51,26 +51,22 @@ public class NettyHttpServer implements Runnable, Closeable {
     private final HttpResponseStatus responseStatus;
 
     public NettyHttpServer(
-            String host,
-            int port,
+            AppConfig appConfig,
             IMessageHandler messageHandler,
             SslHandlerProvider sslHandlerProvider,
-            int threads,
-            int maxPendingRequests,
-            int maxContentLength,
             int responseCode
     ) {
-        this.host = host;
-        this.port = port;
+        this.host = appConfig.listenAddress;
+        this.port = appConfig.listenPort;
         this.responseStatus = HttpResponseStatus.valueOf(responseCode);
-        processorGroup = new NioEventLoopGroup(threads, daemonThreadFactory("http-input-processor"));
+        processorGroup = new NioEventLoopGroup(appConfig.serverThreads, daemonThreadFactory("http-input-processor"));
 
         executorGroup = new ThreadPoolExecutor(
-                threads,
-                threads,
+                appConfig.serverThreads,
+                appConfig.serverThreads,
                 0,
                 TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(maxPendingRequests),
+                new ArrayBlockingQueue<>(appConfig.serverMaxPendingRequests),
                 daemonThreadFactory("http-input-handler-executor"),
                 new CustomRejectedExecutionHandler()
         );
@@ -78,7 +74,7 @@ public class NettyHttpServer implements Runnable, Closeable {
         final HttpInitializer httpInitializer = new HttpInitializer(
                 messageHandler,
                 executorGroup,
-                maxContentLength,
+                appConfig.serverMaxContentLength,
                 responseStatus
         );
 

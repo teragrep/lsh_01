@@ -19,7 +19,6 @@
 */
 package com.teragrep.lsh_01;
 
-import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.rlo_14.*;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
@@ -37,11 +36,11 @@ public class RelpConversion implements IMessageHandler {
 
     private final static Logger LOGGER = LogManager.getLogger(RelpConversion.class);
     private final RelpConnection relpConnection;
-    private final RelpConfig relpConfig;
     private boolean isConnected = false;
+    private final AppConfig appConfig;
 
-    public RelpConversion() {
-        this.relpConfig = new RelpConfig();
+    public RelpConversion(AppConfig appConfig) {
+        this.appConfig = appConfig;
         this.relpConnection = new RelpConnection();
     }
 
@@ -60,7 +59,7 @@ public class RelpConversion implements IMessageHandler {
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion();
+        return new RelpConversion(appConfig);
     }
 
     public Map<String, String> responseHeaders() {
@@ -73,13 +72,13 @@ public class RelpConversion implements IMessageHandler {
             boolean connected = false;
             try {
                 String realHostname = java.net.InetAddress.getLocalHost().getHostName();
-                connected = relpConnection.connect(relpConfig.target, relpConfig.port);
+                connected = relpConnection.connect(appConfig.relpTarget, appConfig.relpPort);
             }
             catch (Exception e) {
                 LOGGER
                         .error(
-                                "Failed to connect to relp server <[{}]>:<[{}]>: {}", relpConfig.target,
-                                relpConfig.port, e.getMessage()
+                                "Failed to connect to relp server <[{}]>:<[{}]>: {}", appConfig.relpTarget,
+                                appConfig.relpPort, e.getMessage()
                         );
             }
             if (connected) {
@@ -87,7 +86,7 @@ public class RelpConversion implements IMessageHandler {
             }
             else {
                 try {
-                    Thread.sleep(relpConfig.reconnectInterval);
+                    Thread.sleep(appConfig.relpReconnectInterval);
                 }
                 catch (InterruptedException e) {
                     LOGGER.error("Reconnect timer interrupted, reconnecting now");
@@ -127,8 +126,8 @@ public class RelpConversion implements IMessageHandler {
         }
         SyslogMessage syslogMessage = new SyslogMessage()
                 .withTimestamp(time.toEpochMilli())
-                .withAppName(relpConfig.appName)
-                .withHostname(relpConfig.hostname)
+                .withAppName(appConfig.relpAppName)
+                .withHostname(appConfig.relpHostname)
                 .withFacility(Facility.USER)
                 .withSeverity(Severity.INFORMATIONAL)
                 .withMsg(message)
