@@ -10,7 +10,7 @@
     <changelist>-SNAPSHOT</changelist>
     <elasticsearch.securemock.version>1.2</elasticsearch.securemock.version>
     <hamcrest-library.version>2.2</hamcrest-library.version>
-    <java.version>17</java.version>
+    <java.version>11</java.version>
     <junit.version>5.10.2</junit.version>
     <log4j.version>2.23.1</log4j.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
