@@ -3,7 +3,7 @@ Description=com.teragrep.lsh_01
 ConditionPathExists=/opt/teragrep/lsh_01/share/lsh_01.jar
 
 [Service]
-ExecStart=/usr/lib/jvm/jre-11-openjdk/bin/java -Dproperties.file=/opt/teragrep/lsh_01/etc/config.properties -log4j2.configurationFile=file:/opt/teragrep/lsh_01/etc/log4j2.xml -jar /opt/teragrep/lsh_01/share/lsh_01.jar
+ExecStart=/usr/lib/jvm/jre-11-openjdk/bin/java -Dproperties.file=/opt/teragrep/lsh_01/etc/config.properties -Dlog4j2.configurationFile=file:/opt/teragrep/lsh_01/etc/log4j2.xml -jar /opt/teragrep/lsh_01/share/lsh_01.jar
 User=srv-lsh_01
 WorkingDirectory=/opt/teragrep/lsh_01
 
