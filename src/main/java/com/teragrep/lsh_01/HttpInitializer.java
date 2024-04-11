@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
 import com.teragrep.lsh_01.util.SslHandlerProvider;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -41,17 +42,20 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
     private final int maxContentLength;
     private final HttpResponseStatus responseStatus;
     private final ThreadPoolExecutor executorGroup;
+    private final InternalEndpointUrlConfig internalEndpointUrlConfig;
 
     public HttpInitializer(
             IMessageHandler messageHandler,
             ThreadPoolExecutor executorGroup,
             int maxContentLength,
-            HttpResponseStatus responseStatus
+            HttpResponseStatus responseStatus,
+            InternalEndpointUrlConfig internalEndpointUrlConfig
     ) {
         this.messageHandler = messageHandler;
         this.executorGroup = executorGroup;
         this.maxContentLength = maxContentLength;
         this.responseStatus = responseStatus;
+        this.internalEndpointUrlConfig = internalEndpointUrlConfig;
     }
 
     protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -64,7 +68,15 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpContentDecompressor());
         pipeline.addLast(new HttpObjectAggregator(maxContentLength));
-        pipeline.addLast(new HttpServerHandler(messageHandler.copy(), executorGroup, responseStatus));
+        pipeline
+                .addLast(
+                        new HttpServerHandler(
+                                messageHandler.copy(),
+                                executorGroup,
+                                responseStatus,
+                                internalEndpointUrlConfig
+                        )
+                );
     }
 
     public void enableSSL(SslHandlerProvider sslHandlerProvider) {

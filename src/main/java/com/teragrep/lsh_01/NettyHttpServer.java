@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
 import com.teragrep.lsh_01.config.NettyConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -50,15 +51,18 @@ public class NettyHttpServer implements Runnable, Closeable {
     private final EventLoopGroup processorGroup;
     private final ThreadPoolExecutor executorGroup;
     private final HttpResponseStatus responseStatus;
+    private final InternalEndpointUrlConfig internalEndpointUrlConfig;
 
     public NettyHttpServer(
             NettyConfig nettyConfig,
             IMessageHandler messageHandler,
             SslHandlerProvider sslHandlerProvider,
-            int responseCode
+            int responseCode,
+            InternalEndpointUrlConfig internalEndpointUrlConfig
     ) {
         this.host = nettyConfig.listenAddress;
         this.port = nettyConfig.listenPort;
+        this.internalEndpointUrlConfig = internalEndpointUrlConfig;
         this.responseStatus = HttpResponseStatus.valueOf(responseCode);
         processorGroup = new NioEventLoopGroup(nettyConfig.threads, daemonThreadFactory("http-input-processor"));
 
@@ -76,7 +80,8 @@ public class NettyHttpServer implements Runnable, Closeable {
                 messageHandler,
                 executorGroup,
                 nettyConfig.maxContentLength,
-                responseStatus
+                responseStatus,
+                internalEndpointUrlConfig
         );
 
         if (sslHandlerProvider != null) {
