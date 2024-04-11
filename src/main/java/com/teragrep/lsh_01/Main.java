@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
 import com.teragrep.lsh_01.config.NettyConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
@@ -33,10 +34,12 @@ public class Main {
         NettyConfig nettyConfig = new NettyConfig();
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
+        InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
         try {
             nettyConfig.validate();
             relpConfig.validate();
             securityConfig.validate();
+            internalEndpointUrlConfig.validate();
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("Can't parse config properly: {}", e.getMessage());
@@ -44,9 +47,18 @@ public class Main {
         }
         LOGGER.info("Got server config: <[{}]>", nettyConfig);
         LOGGER.info("Got relp config: <[{}]>", relpConfig);
+        LOGGER.info("Got internal endpoint config: <[{}]>", internalEndpointUrlConfig);
         LOGGER.info("Requires token: <[{}]>", securityConfig.tokenRequired);
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
-        try (NettyHttpServer server = new NettyHttpServer(nettyConfig, relpConversion, null, 200)) {
+        try (
+                NettyHttpServer server = new NettyHttpServer(
+                        nettyConfig,
+                        relpConversion,
+                        null,
+                        200,
+                        internalEndpointUrlConfig
+                )
+        ) {
             server.run();
         }
     }

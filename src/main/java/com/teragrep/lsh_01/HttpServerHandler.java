@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -42,15 +43,18 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     private final IMessageHandler messageHandler;
     private final ThreadPoolExecutor executorGroup;
     private final HttpResponseStatus responseStatus;
+    private final InternalEndpointUrlConfig internalEndpointUrlConfig;
 
     public HttpServerHandler(
             IMessageHandler messageHandler,
             ThreadPoolExecutor executorGroup,
-            HttpResponseStatus responseStatus
+            HttpResponseStatus responseStatus,
+            InternalEndpointUrlConfig internalEndpointUrlConfig
     ) {
         this.messageHandler = messageHandler;
         this.executorGroup = executorGroup;
         this.responseStatus = responseStatus;
+        this.internalEndpointUrlConfig = internalEndpointUrlConfig;
     }
 
     @Override
@@ -62,7 +66,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 msg,
                 remoteAddress,
                 messageHandler,
-                responseStatus
+                responseStatus,
+                internalEndpointUrlConfig
         );
         executorGroup.execute(messageProcessor);
     }

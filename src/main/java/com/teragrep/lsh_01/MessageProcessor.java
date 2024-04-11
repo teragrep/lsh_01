@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
 import com.teragrep.rlo_14.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -47,6 +48,7 @@ public class MessageProcessor implements RejectableRunnable {
     private final String remoteAddress;
     private final IMessageHandler messageHandler;
     private final HttpResponseStatus responseStatus;
+    private final InternalEndpointUrlConfig internalEndpointUrlConfig;
 
     private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
     private final static Logger LOGGER = LogManager.getLogger(MessageProcessor.class);
@@ -56,13 +58,15 @@ public class MessageProcessor implements RejectableRunnable {
             FullHttpRequest req,
             String remoteAddress,
             IMessageHandler messageHandler,
-            HttpResponseStatus responseStatus
+            HttpResponseStatus responseStatus,
+            InternalEndpointUrlConfig internalEndpointUrlConfig
     ) {
         this.ctx = ctx;
         this.req = req;
         this.remoteAddress = remoteAddress;
         this.messageHandler = messageHandler;
         this.responseStatus = responseStatus;
+        this.internalEndpointUrlConfig = internalEndpointUrlConfig;
     }
 
     public void onRejection() {
@@ -79,32 +83,38 @@ public class MessageProcessor implements RejectableRunnable {
     public void run() {
         try {
             final HttpResponse response;
-            if (!messageHandler.requiresToken()) {
+            if (isInternalEndpoint()) {
+                LOGGER.debug("Healthcheck endpoint called");
+                response = generateResponse(messageHandler.responseHeaders());
+            }
+            else if (isTokenOk()) {
+                LOGGER.debug("Processing message");
                 response = processMessage();
             }
-            else {
-                if (!req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
-                    LOGGER.debug("Required authorization not provided; requesting authentication.");
-                    response = generateAuthenticationRequestResponse();
-                }
-                else {
-                    final String token = req.headers().get(HttpHeaderNames.AUTHORIZATION);
-                    req.headers().remove(HttpHeaderNames.AUTHORIZATION);
-                    if (messageHandler.validatesToken(token)) {
-                        LOGGER.debug("Valid authorization; processing request.");
-                        response = processMessage();
-                    }
-                    else {
-                        LOGGER.debug("Invalid authorization; rejecting request.");
-                        response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
-                    }
-                }
+            else if (!req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
+                LOGGER.debug("Required authorization not provided; requesting authentication.");
+                response = generateAuthenticationRequestResponse();
             }
+            else {
+                LOGGER.debug("Invalid authorization; rejecting request.");
+                response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+            }
+
             ctx.writeAndFlush(response);
         }
         finally {
             req.release();
         }
+    }
+
+    private boolean isInternalEndpoint() {
+        return internalEndpointUrlConfig.healthcheckEnabled
+                && internalEndpointUrlConfig.healthcheckUrl.equals(req.uri());
+    }
+
+    private boolean isTokenOk() {
+        return !messageHandler.requiresToken()
+                || messageHandler.validatesToken(req.headers().get(HttpHeaderNames.AUTHORIZATION));
     }
 
     private FullHttpResponse processMessage() {
