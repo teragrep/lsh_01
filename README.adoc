@@ -27,6 +27,8 @@ relp.appName,lsh_01,Appname to use in RELP records
 relp.hostname,localhost,Hostname to use in RELP records
 security.tokenRequired,true,Sets whether "Authorization: SomeSecretToken" headers are required
 security.token,SomeSecretToken,A token every request must contain if security.tokenRequired is enabled.
+healthcheck.enabled,true,Sets if an internal healthcheck endpoint is enabled.
+healthcheck.url,/healthcheck,An internal healthcheck endpoint that will always reply 200 ok regardless of security settings. Accessing this url won't generate any events.
 |===
 
 == Limitations
