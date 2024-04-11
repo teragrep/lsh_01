@@ -45,7 +45,9 @@ Run maven on java 11
 
 Mount configurations to `/config/` and run.
 
-Expected files are `/config/config.properties` and `/config/log4j2.xml`
+Configuration is expected to be in `/config/config.properties`
+
+Custom `log4j2.xml` can be provided by placing it in `/config/log4j2.xml`, otherwise default settings will be used.
 
 For example
 
