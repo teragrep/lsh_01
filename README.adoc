@@ -8,13 +8,17 @@ Listens to HTTP requests and sends them forward using RELP
 
 == Documentation
 
-Example configuration can be found link:etc/config.properties[here]
+Example configuration can be found link:etc/config.properties[here].
+
+By default, the configuration file is expected to be in `etc/config.properties`. That path can be changed with `properties.file` system property.
+
+Properties can be overwritten on demand by setting them with `property.name=value`.
 
 Currently supported configurations:
 
 [%header,format=csv]
 |===
-Key,Default Value,Notes
+Property,Default Value,Notes
 server.listenAddress,127.0.0.1,Address the server will listen to
 server.listenPort,8080,Port the server will listen to
 server.threads,1,How many threads the server will use
