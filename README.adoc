@@ -58,7 +58,7 @@ Expected files are:
 
  - `/config/credentials.json`
 
- - Optional: `/config/log4j2.xml`
+ - Optional: Custom `log4j2.xml` can be provided by placing it in `/config/log4j2.xml`, otherwise default settings will be used.
 
 For example
 
