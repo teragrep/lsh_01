@@ -17,8 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01.util;
-
+import com.teragrep.lsh_01.BasicAuthentication;
 import com.teragrep.lsh_01.RelpConversion;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
@@ -34,7 +33,8 @@ public class CredentialsTest {
         System.setProperty("security.authRequired", "false");
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertFalse(relpConversion.requiresToken());
     }
 
@@ -42,9 +42,9 @@ public class CredentialsTest {
     public void testCredentialsFileExist() {
         System.setProperty("security.authRequired", "true");
         System.setProperty("credentials.file", "path/doesnt/exist.json");
-        Assertions.assertThrows(IllegalArgumentException.class, SecurityConfig::new);
+        Assertions.assertThrows(IllegalArgumentException.class, BasicAuthentication::new);
         System.setProperty("credentials.file", credentialsFile);
-        Assertions.assertDoesNotThrow(SecurityConfig::new);
+        Assertions.assertDoesNotThrow(BasicAuthentication::new);
     }
 
     @Test
@@ -53,7 +53,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser:VeryFirstPassword
         Assertions.assertTrue(relpConversion.validatesToken("Basic Rmlyc3RVc2VyOlZlcnlGaXJzdFBhc3N3b3Jk"));
@@ -67,7 +68,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // Shady:Hacker
         Assertions.assertFalse(relpConversion.validatesToken("Basic U2hhZHk6SGFja2Vy"));
@@ -79,7 +81,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // Test
         Assertions.assertFalse(relpConversion.validatesToken("Basic VGVzdA=="));
@@ -91,7 +94,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // UserWithColons:My:Password:Yay
         Assertions.assertTrue(relpConversion.validatesToken("Basic VXNlcldpdGhDb2xvbnM6TXk6UGFzc3dvcmQ6WWF5"));
@@ -103,7 +107,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         Assertions.assertFalse(relpConversion.validatesToken("Basic BasicButNotBase64"));
     }
@@ -114,7 +119,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         Assertions.assertFalse(relpConversion.validatesToken("I am not basic auth"));
     }
@@ -125,7 +131,8 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // SecondUser:WrongPassword -> Right user
         Assertions.assertFalse(relpConversion.validatesToken("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk"));
@@ -133,5 +140,31 @@ public class CredentialsTest {
         Assertions.assertFalse(relpConversion.validatesToken("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA=="));
         // SecondUser:AlreadySecondPassword -> Right user and right password
         Assertions.assertTrue(relpConversion.validatesToken("Basic U2Vjb25kVXNlcjpBbHJlYWR5U2Vjb25kUGFzc3dvcmQ="));
+    }
+
+    @Test
+    public void testEmptyUsername() {
+        System.setProperty("security.authRequired", "true");
+        System.setProperty("credentials.file", credentialsFile);
+        RelpConfig relpConfig = new RelpConfig();
+        SecurityConfig securityConfig = new SecurityConfig();
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        Assertions.assertTrue(relpConversion.requiresToken());
+        // :VeryFirstPassword -> Valid password, null username
+        Assertions.assertFalse(relpConversion.validatesToken("Basic OlZlcnlGaXJzdFBhc3N3b3Jk"));
+    }
+
+    @Test
+    public void testEmptyPassword() {
+        System.setProperty("security.authRequired", "true");
+        System.setProperty("credentials.file", credentialsFile);
+        RelpConfig relpConfig = new RelpConfig();
+        SecurityConfig securityConfig = new SecurityConfig();
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        Assertions.assertTrue(relpConversion.requiresToken());
+        // FirstUser: -> Valid username, null password
+        Assertions.assertFalse(relpConversion.validatesToken("Basic Rmlyc3RVc2VyOg=="));
     }
 }

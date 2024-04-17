@@ -19,10 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
-import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
-import com.teragrep.lsh_01.config.NettyConfig;
-import com.teragrep.lsh_01.config.RelpConfig;
-import com.teragrep.lsh_01.config.SecurityConfig;
+import com.teragrep.lsh_01.config.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,6 +31,7 @@ public class Main {
         NettyConfig nettyConfig = new NettyConfig();
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
+        BasicAuthentication basicAuthentication = new BasicAuthentication();
         InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
         try {
             nettyConfig.validate();
@@ -49,7 +47,7 @@ public class Main {
         LOGGER.info("Got relp config: <[{}]>", relpConfig);
         LOGGER.info("Got internal endpoint config: <[{}]>", internalEndpointUrlConfig);
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig);
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         try (
                 NettyHttpServer server = new NettyHttpServer(
                         nettyConfig,

@@ -41,11 +41,17 @@ public class RelpConversion implements IMessageHandler {
     private boolean isConnected = false;
     private final RelpConfig relpConfig;
     private final SecurityConfig securityConfig;
+    private final BasicAuthentication basicAuthentication;
 
-    public RelpConversion(RelpConfig relpConfig, SecurityConfig securityConfig) {
+    public RelpConversion(
+            RelpConfig relpConfig,
+            SecurityConfig securityConfig,
+            BasicAuthentication basicAuthentication
+    ) {
         this.relpConfig = relpConfig;
         this.securityConfig = securityConfig;
         this.relpConnection = new RelpConnection();
+        this.basicAuthentication = basicAuthentication;
     }
 
     public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
@@ -60,7 +66,7 @@ public class RelpConversion implements IMessageHandler {
     }
 
     public boolean validatesToken(String token) {
-        return securityConfig.isCredentialOk(token);
+        return basicAuthentication.isCredentialOk(token);
     }
 
     public boolean requiresToken() {
@@ -69,7 +75,7 @@ public class RelpConversion implements IMessageHandler {
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConfig, securityConfig);
+        return new RelpConversion(relpConfig, securityConfig, basicAuthentication);
     }
 
     public Map<String, String> responseHeaders() {
