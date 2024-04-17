@@ -29,7 +29,11 @@ public class BasicAuthentication {
     private final CredentialLookup credentialLookup;
 
     public BasicAuthentication(CredentialLookup credentialLookup) {
-        this.decoder = Base64.getDecoder();
+        this(Base64.getDecoder(), credentialLookup);
+    }
+
+    public BasicAuthentication(Base64.Decoder decoder, CredentialLookup credentialLookup) {
+        this.decoder = decoder;
         this.credentialLookup = credentialLookup;
     }
 
