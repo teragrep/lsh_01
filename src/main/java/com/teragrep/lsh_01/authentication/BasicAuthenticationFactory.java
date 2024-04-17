@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01.authentication;
 
+import com.teragrep.jai_02.CredentialLookup;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -37,6 +39,6 @@ public class BasicAuthenticationFactory {
                     e
             );
         }
-        return new BasicAuthentication(br);
+        return new BasicAuthentication(new CredentialLookup(br));
     }
 }

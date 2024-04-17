@@ -21,7 +21,6 @@ package com.teragrep.lsh_01.authentication;
 
 import com.teragrep.jai_02.CredentialLookup;
 
-import java.io.BufferedReader;
 import java.util.Base64;
 
 public class BasicAuthentication {
@@ -29,9 +28,9 @@ public class BasicAuthentication {
     private final Base64.Decoder decoder;
     private final CredentialLookup credentialLookup;
 
-    public BasicAuthentication(BufferedReader bufferedReader) {
+    public BasicAuthentication(CredentialLookup credentialLookup) {
         this.decoder = Base64.getDecoder();
-        this.credentialLookup = new CredentialLookup(bufferedReader);
+        this.credentialLookup = credentialLookup;
     }
 
     public boolean isCredentialOk(String token) {
