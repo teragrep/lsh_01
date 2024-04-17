@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.authentication.BasicAuthentication;
+import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +33,7 @@ public class Main {
         NettyConfig nettyConfig = new NettyConfig();
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
         try {
             nettyConfig.validate();

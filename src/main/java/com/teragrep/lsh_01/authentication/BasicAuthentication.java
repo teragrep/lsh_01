@@ -17,33 +17,21 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.authentication;
 
 import com.teragrep.jai_02.CredentialLookup;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Base64;
 
 public class BasicAuthentication {
 
-    Base64.Decoder decoder = Base64.getDecoder();
-    CredentialLookup credentialLookup;
+    private final Base64.Decoder decoder;
+    private final CredentialLookup credentialLookup;
 
-    public BasicAuthentication() {
-        BufferedReader br;
-        String credentialsFile = System.getProperty("credentials.file", "etc/credentials.json");
-        try {
-            br = new BufferedReader(new FileReader(credentialsFile));
-        }
-        catch (FileNotFoundException e) {
-            throw new IllegalArgumentException(
-                    "Can't find credentials.json from path <[" + credentialsFile + "]>: ",
-                    e
-            );
-        }
-        credentialLookup = new CredentialLookup(br);
+    public BasicAuthentication(BufferedReader bufferedReader) {
+        this.decoder = Base64.getDecoder();
+        this.credentialLookup = new CredentialLookup(bufferedReader);
     }
 
     public boolean isCredentialOk(String token) {

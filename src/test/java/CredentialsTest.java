@@ -17,8 +17,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-import com.teragrep.lsh_01.BasicAuthentication;
+import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.RelpConversion;
+import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +34,7 @@ public class CredentialsTest {
         System.setProperty("security.authRequired", "false");
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertFalse(relpConversion.requiresToken());
     }
@@ -42,9 +43,9 @@ public class CredentialsTest {
     public void testCredentialsFileExist() {
         System.setProperty("security.authRequired", "true");
         System.setProperty("credentials.file", "path/doesnt/exist.json");
-        Assertions.assertThrows(IllegalArgumentException.class, BasicAuthentication::new);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new BasicAuthenticationFactory().create());
         System.setProperty("credentials.file", credentialsFile);
-        Assertions.assertDoesNotThrow(BasicAuthentication::new);
+        Assertions.assertDoesNotThrow(() -> new BasicAuthenticationFactory().create());
     }
 
     @Test
@@ -53,7 +54,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser:VeryFirstPassword
@@ -68,7 +69,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // Shady:Hacker
@@ -81,7 +82,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // Test
@@ -94,7 +95,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // UserWithColons:My:Password:Yay
@@ -107,7 +108,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         Assertions.assertFalse(relpConversion.validatesToken("Basic BasicButNotBase64"));
@@ -119,7 +120,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         Assertions.assertFalse(relpConversion.validatesToken("I am not basic auth"));
@@ -131,7 +132,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // SecondUser:WrongPassword -> Right user
@@ -148,7 +149,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // :VeryFirstPassword -> Valid password, null username
@@ -161,7 +162,7 @@ public class CredentialsTest {
         System.setProperty("credentials.file", credentialsFile);
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthentication();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser: -> Valid username, null password
