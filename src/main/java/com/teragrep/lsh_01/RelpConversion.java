@@ -60,11 +60,11 @@ public class RelpConversion implements IMessageHandler {
     }
 
     public boolean validatesToken(String token) {
-        return securityConfig.token.equals(token);
+        return securityConfig.isCredentialOk(token);
     }
 
     public boolean requiresToken() {
-        return securityConfig.tokenRequired;
+        return securityConfig.authRequired;
     }
 
     public RelpConversion copy() {

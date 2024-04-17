@@ -19,17 +19,58 @@
 */
 package com.teragrep.lsh_01.config;
 
+import com.teragrep.jai_02.CredentialLookup;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Base64;
+
 public class SecurityConfig implements Validateable {
 
-    public final boolean tokenRequired;
-    public final String token;
+    public final boolean authRequired;
+    CredentialLookup credentialLookup;
+    Base64.Decoder decoder = Base64.getDecoder();
 
     public SecurityConfig() {
         PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
                 System.getProperty("properties.file", "etc/config.properties")
         );
-        tokenRequired = propertiesReader.getBooleanProperty("security.tokenRequired");
-        token = propertiesReader.getStringProperty("security.token");
+        authRequired = propertiesReader.getBooleanProperty("security.authRequired");
+        if (authRequired) {
+            BufferedReader br;
+            String credentialsFile = System.getProperty("credentials.file", "etc/credentials.json");
+            try {
+                br = new BufferedReader(new FileReader(credentialsFile));
+            }
+            catch (FileNotFoundException e) {
+                throw new IllegalArgumentException("Can't find <[" + credentialsFile + "]>: ", e);
+            }
+            credentialLookup = new CredentialLookup(br);
+        }
+    }
+
+    public boolean isCredentialOk(String token) {
+        if (!authRequired) {
+            return true;
+        }
+        if (!token.startsWith("Basic ")) {
+            return false;
+        }
+        try {
+            String tokenString = new String(decoder.decode(token.substring("Basic".length()).trim()));
+            if (!tokenString.contains(":")) {
+                return false;
+            }
+            String[] credentialPair = tokenString.split(":", 2);
+            if (credentialPair[0] == null || credentialPair[1] == null) {
+                return false;
+            }
+            return credentialPair[1].equals(credentialLookup.getCredential(credentialPair[0]));
+        }
+        catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @Override
