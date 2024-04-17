@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.rlo_14.*;
@@ -41,11 +42,17 @@ public class RelpConversion implements IMessageHandler {
     private boolean isConnected = false;
     private final RelpConfig relpConfig;
     private final SecurityConfig securityConfig;
+    private final BasicAuthentication basicAuthentication;
 
-    public RelpConversion(RelpConfig relpConfig, SecurityConfig securityConfig) {
+    public RelpConversion(
+            RelpConfig relpConfig,
+            SecurityConfig securityConfig,
+            BasicAuthentication basicAuthentication
+    ) {
         this.relpConfig = relpConfig;
         this.securityConfig = securityConfig;
         this.relpConnection = new RelpConnection();
+        this.basicAuthentication = basicAuthentication;
     }
 
     public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
@@ -60,16 +67,16 @@ public class RelpConversion implements IMessageHandler {
     }
 
     public boolean validatesToken(String token) {
-        return securityConfig.token.equals(token);
+        return basicAuthentication.isCredentialOk(token);
     }
 
     public boolean requiresToken() {
-        return securityConfig.tokenRequired;
+        return securityConfig.authRequired;
     }
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConfig, securityConfig);
+        return new RelpConversion(relpConfig, securityConfig, basicAuthentication);
     }
 
     public Map<String, String> responseHeaders() {

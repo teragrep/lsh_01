@@ -29,10 +29,11 @@ relp.port,601,RELP server port
 relp.reconnectInterval,10000,How long to wait before reconnecting in milliseconds
 relp.appName,lsh_01,Appname to use in RELP records
 relp.hostname,localhost,Hostname to use in RELP records
-security.tokenRequired,true,Sets whether "Authorization: SomeSecretToken" headers are required
-security.token,SomeSecretToken,A token every request must contain if security.tokenRequired is enabled.
 healthcheck.enabled,true,Sets if an internal healthcheck endpoint is enabled.
 healthcheck.url,/healthcheck,An internal healthcheck endpoint that will always reply 200 ok regardless of security settings. Accessing this url won't generate any events.
+security.authRequired,true,Sets whether Basic HTTP Authorization headers are required.
+credentials.file,etc/credentials.json,A json file with array of identity:credential mappings
+
 |===
 
 == Limitations
@@ -51,9 +52,13 @@ Run maven on java 11
 
 Mount configurations to `/config/` and run.
 
-Configuration is expected to be in `/config/config.properties`
+Expected files are:
 
-Custom `log4j2.xml` can be provided by placing it in `/config/log4j2.xml`, otherwise default settings will be used.
+ - `/config/config.properties`
+
+ - `/config/credentials.json`
+
+ - Optional: Custom `log4j2.xml` can be provided by placing it in `/config/log4j2.xml`, otherwise default settings will be used.
 
 For example
 
