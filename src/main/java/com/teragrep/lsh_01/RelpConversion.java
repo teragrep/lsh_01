@@ -69,7 +69,7 @@ public class RelpConversion implements IMessageHandler {
     public boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body) {
         try {
             sendMessage(
-                    body, headers, hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
+                    body, headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
             );
         }
         catch (Exception e) {
@@ -144,16 +144,24 @@ public class RelpConversion implements IMessageHandler {
         isConnected = false;
     }
 
-    private void sendMessage(String message, Map<String, String> headers, String hostname, String appName) {
+    private void sendMessage(
+            String message,
+            Map<String, String> headers,
+            String subject,
+            String hostname,
+            String appName
+    ) {
         if (!isConnected) {
             connect();
         }
         final RelpBatch relpBatch = new RelpBatch();
         Instant time = Instant.now();
-        SDElement sdElement = new SDElement("lsh_01@48577");
+        SDElement headerSDElement = new SDElement("lsh_01_headers@48577");
         for (Map.Entry<String, String> header : headers.entrySet()) {
-            sdElement.addSDParam(new SDParam(header.getKey(), header.getValue()));
+            headerSDElement.addSDParam(new SDParam(header.getKey(), header.getValue()));
         }
+        SDElement sdElement = new SDElement("lsh_01@48577");
+        sdElement.addSDParam("subject", subject);
         SyslogMessage syslogMessage = new SyslogMessage()
                 .withTimestamp(time.toEpochMilli())
                 .withAppName(appName)
@@ -161,6 +169,7 @@ public class RelpConversion implements IMessageHandler {
                 .withFacility(Facility.USER)
                 .withSeverity(Severity.INFORMATIONAL)
                 .withMsg(message)
+                .withSDElement(headerSDElement)
                 .withSDElement(sdElement);
         relpBatch.insert(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
         boolean notSent = true;
