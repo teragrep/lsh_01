@@ -1,0 +1,10 @@
+{
+  "nomatch": "fallback-appname",
+  "type": "array",
+  "table": [
+    {
+      "index": "ExampleUser",
+      "value": "ExampleUsers-ExampleApp"
+    }
+  ]
+}

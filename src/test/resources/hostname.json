@@ -1,0 +1,18 @@
+{
+  "nomatch": "fallback-hostname.example.com",
+  "type": "array",
+  "table": [
+    {
+      "index": "FirstUser",
+      "value": "host-one.example.com"
+    },
+    {
+      "index": "SecondUser",
+      "value": "host-two.example.com"
+    },
+    {
+      "index": "MissingAppName",
+      "value": "host-four.example.com"
+    }
+  ]
+}

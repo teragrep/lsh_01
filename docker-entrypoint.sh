@@ -1,13 +1,10 @@
 #!/bin/bash
-if [ ! -f /config/config.properties ]; then
-    echo "ERROR: Missing '/config/config.properties', refusing to continue";
+for file in config.properties credentials.json hostname.json appname.json; do
+  if [ ! -f "/config/${file}" ]; then
+    echo "ERROR: Missing '/config/${file}', refusing to continue";
     exit 1;
-fi;
-
-if [ ! -f /config/credentials.json ]; then
-    echo "ERROR: Missing '/config/credentials.json', refusing to continue";
-    exit 1;
-fi;
+  fi;
+done;
 
 if [ -f /config/log4j2.xml ]; then
     LOG4J_FILE="/config/log4j2.xml";

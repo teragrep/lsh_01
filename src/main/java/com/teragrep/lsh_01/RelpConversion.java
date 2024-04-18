@@ -19,10 +19,13 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.jlt_01.StringLookupTable;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.Subject;
+import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
+import com.teragrep.lsh_01.lookup.LookupTableFactory;
 import com.teragrep.rlo_14.*;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
@@ -44,23 +47,30 @@ public class RelpConversion implements IMessageHandler {
     private final RelpConfig relpConfig;
     private final SecurityConfig securityConfig;
     private final BasicAuthentication basicAuthentication;
+    private final LookupConfig lookupConfig;
+    private final StringLookupTable hostnameLookup;
+    private final StringLookupTable appnameLookup;
 
     public RelpConversion(
             RelpConfig relpConfig,
             SecurityConfig securityConfig,
-            BasicAuthentication basicAuthentication
+            BasicAuthentication basicAuthentication,
+            LookupConfig lookupConfig
     ) {
         this.relpConfig = relpConfig;
         this.securityConfig = securityConfig;
         this.relpConnection = new RelpConnection();
         this.basicAuthentication = basicAuthentication;
+        this.lookupConfig = lookupConfig;
+        this.hostnameLookup = new LookupTableFactory().create(lookupConfig.hostnamePath);
+        this.appnameLookup = new LookupTableFactory().create(lookupConfig.appNamePath);
     }
 
     public boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body) {
-        String hostname = "abc";
-        String appName = "xyz";
         try {
-            sendMessage(body, headers, hostname, appName);
+            sendMessage(
+                    body, headers, hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
+            );
         }
         catch (Exception e) {
             LOGGER.error("Unexpected error when sending a message: <{}>", e.getMessage(), e);
@@ -79,7 +89,7 @@ public class RelpConversion implements IMessageHandler {
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        return new RelpConversion(relpConfig, securityConfig, basicAuthentication, lookupConfig);
     }
 
     public Map<String, String> responseHeaders() {

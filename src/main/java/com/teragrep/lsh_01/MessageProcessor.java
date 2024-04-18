@@ -21,7 +21,6 @@ package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.authentication.*;
 import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
-import com.teragrep.rlo_14.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -91,14 +90,19 @@ public class MessageProcessor implements RejectableRunnable {
             else {
                 if (messageHandler.requiresToken()) {
                     if (req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
-                        Subject subject = messageHandler.asSubject(req.headers().get(HttpHeaderNames.AUTHORIZATION));
-                        if (subject.isStub()) {
-                            LOGGER.debug("Invalid authorization; rejecting request.");
-                            response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
-                        } else {
+                        HttpResponse response1;
+                        try {
+                            Subject subject = messageHandler
+                                    .asSubject(req.headers().get(HttpHeaderNames.AUTHORIZATION));
+                            req.headers().remove(HttpHeaderNames.AUTHORIZATION);
                             LOGGER.debug("Processing message");
-                            response = processMessage(subject);
+                            response1 = processMessage(subject);
                         }
+                        catch (Exception e) {
+                            LOGGER.debug("Invalid authorization; rejecting request.");
+                            response1 = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                        }
+                        response = response1;
                     }
                     else {
                         LOGGER.debug("Required authorization not provided; requesting authentication.");

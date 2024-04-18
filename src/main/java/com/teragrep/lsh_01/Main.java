@@ -35,11 +35,13 @@ public class Main {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
+        LookupConfig lookupConfig = new LookupConfig();
         try {
             nettyConfig.validate();
             relpConfig.validate();
             securityConfig.validate();
             internalEndpointUrlConfig.validate();
+            lookupConfig.validate();
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("Can't parse config properly: {}", e.getMessage());
@@ -48,8 +50,14 @@ public class Main {
         LOGGER.info("Got server config: <[{}]>", nettyConfig);
         LOGGER.info("Got relp config: <[{}]>", relpConfig);
         LOGGER.info("Got internal endpoint config: <[{}]>", internalEndpointUrlConfig);
+        LOGGER.info("Got lookup table config: <[{}]>", lookupConfig);
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                lookupConfig
+        );
         try (
                 NettyHttpServer server = new NettyHttpServer(
                         nettyConfig,

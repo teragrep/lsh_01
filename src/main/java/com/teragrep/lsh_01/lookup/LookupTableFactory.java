@@ -17,17 +17,24 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01.authentication;
+package com.teragrep.lsh_01.lookup;
 
-public class SubjectStub implements Subject {
+import com.teragrep.jlt_01.StringLookupTable;
 
-    @Override
-    public String subject() {
-        throw new IllegalStateException("Stub Subject does not implement this");
-    }
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
-    @Override
-    public boolean isStub() {
-        return true;
+public class LookupTableFactory {
+
+    public StringLookupTable create(String path) {
+        BufferedReader bufferedReader;
+        try {
+            bufferedReader = new BufferedReader(new FileReader(path));
+        }
+        catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("Can't find lookup table from path <[" + path + "]>: ", e);
+        }
+        return new StringLookupTable(bufferedReader);
     }
 }

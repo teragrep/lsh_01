@@ -1,0 +1,10 @@
+{
+  "nomatch": "fallback-hostname.example.com",
+  "type": "array",
+  "table": [
+    {
+      "index": "ExampleUser",
+      "value": "example-user-host.example.com"
+    }
+  ]
+}

@@ -43,30 +43,29 @@ public class BasicAuthentication {
     }
 
     public Subject asSubject(String token) {
-        if(token == null || token.isEmpty()) {
-            LOGGER.debug("Got null or empty token, returning stub");
-            return subjectStub;
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Got null or empty token");
         }
         if (!token.startsWith("Basic ")) {
-            LOGGER.debug("Got invalid token, doesn't start with Basic, returning stub");
-            return subjectStub;
+            throw new IllegalArgumentException("Got invalid token, doesn't start with Basic");
         }
         String tokenString = new String(decoder.decode(token.substring("Basic".length()).trim()));
         if (!tokenString.contains(":")) {
-            LOGGER.debug("Got invalid token, doesn't include colon, returning stub");
-            return subjectStub;
+            throw new IllegalArgumentException("Got invalid token, doesn't include colon");
         }
         String[] credentialPair = tokenString.split(":", 2);
         String username = credentialPair[0];
         String password = credentialPair[1];
         if ("".equals(username) || "".equals(password)) {
-            LOGGER.debug("Got invalid token, username or password is not present, returning stub");
-            return subjectStub;
+            throw new IllegalArgumentException("Got invalid token, username or password is not present");
         }
-        if(password.equals(credentialLookup.getCredential(username))) {
+        if (password.equals(credentialLookup.getCredential(username))) {
+            LOGGER.debug("Authentication ok");
             return new SubjectImpl(username);
-        } else {
-            return subjectStub;
+        }
+        else {
+            LOGGER.debug("Authentication failed, credential mismatch");
+            throw new IllegalArgumentException("Authentication failed, credential mismatch");
         }
     }
 }
