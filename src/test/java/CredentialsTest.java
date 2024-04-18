@@ -184,19 +184,9 @@ public class CredentialsTest {
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // SecondUser:WrongPassword -> Right user
-        IllegalArgumentException e1 = Assertions
-                .assertThrows(
-                        IllegalArgumentException.class,
-                        () -> relpConversion.asSubject("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk").isStub()
-                );
-        Assertions.assertEquals("Authentication failed, credential mismatch", e1.getMessage());
+        Assertions.assertTrue(relpConversion.asSubject("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk").isStub());
         // WrongUser:AlreadySecondPassword -> Right password
-        IllegalArgumentException e2 = Assertions
-                .assertThrows(
-                        IllegalArgumentException.class,
-                        () -> relpConversion.asSubject("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA==").isStub()
-                );
-        Assertions.assertEquals("Authentication failed, credential mismatch", e2.getMessage());
+        Assertions.assertTrue(relpConversion.asSubject("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA==").isStub());
         // SecondUser:AlreadySecondPassword -> Right user and right password
         Assertions.assertFalse(relpConversion.asSubject("Basic U2Vjb25kVXNlcjpBbHJlYWR5U2Vjb25kUGFzc3dvcmQ=").isStub());
     }

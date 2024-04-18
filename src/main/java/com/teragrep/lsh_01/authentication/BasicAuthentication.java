@@ -64,8 +64,7 @@ public class BasicAuthentication {
             return new SubjectImpl(username);
         }
         else {
-            LOGGER.debug("Authentication failed, credential mismatch");
-            throw new IllegalArgumentException("Authentication failed, credential mismatch");
+            return subjectStub;
         }
     }
 }

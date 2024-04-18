@@ -95,12 +95,18 @@ public class MessageProcessor implements RejectableRunnable {
                             Subject subject = messageHandler
                                     .asSubject(req.headers().get(HttpHeaderNames.AUTHORIZATION));
                             req.headers().remove(HttpHeaderNames.AUTHORIZATION);
-                            LOGGER.debug("Processing message");
-                            response1 = processMessage(subject);
+                            if (subject.isStub()) {
+                                LOGGER.debug("Authentication failed; rejecting request.");
+                                response1 = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                            }
+                            else {
+                                LOGGER.debug("Processing message");
+                                response1 = processMessage(subject);
+                            }
                         }
                         catch (Exception e) {
                             LOGGER.debug("Invalid authorization; rejecting request.");
-                            response1 = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                            response1 = generateFailedResponse(HttpResponseStatus.BAD_REQUEST);
                         }
                         response = response1;
                     }
