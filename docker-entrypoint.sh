@@ -13,4 +13,10 @@ else
     LOG4J_FILE="/opt/teragrep/lsh_01/etc/log4j2.xml";
 fi;
 
-exec /usr/bin/java -Dproperties.file=/config/config.properties -Dcredentials.file=/config/credentials.json -Dlog4j2.configurationFile=file:"${LOG4J_FILE}" -jar /opt/teragrep/lsh_01/share/lsh_01.jar
+exec /usr/bin/java \
+ -Dproperties.file=/config/config.properties \
+ -Dcredentials.file=/config/credentials.json \
+ -Dlookups.hostname.file=/config/hostname.json \
+ -Dlookups.appname.file=/config/appname.json \
+ -Dlog4j2.configurationFile=file:"${LOG4J_FILE}" \
+ -jar /opt/teragrep/lsh_01/share/lsh_01.jar
