@@ -46,6 +46,18 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- lookups -->
+    <dependency>
+      <groupId>com.teragrep</groupId>
+      <artifactId>jlt_01</artifactId>
+      <version>1.0.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- netty -->
     <dependency>
       <groupId>io.netty</groupId>

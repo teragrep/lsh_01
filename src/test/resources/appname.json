@@ -1,0 +1,18 @@
+{
+  "nomatch": "fallback-appname",
+  "type": "array",
+  "table": [
+    {
+      "index": "FirstUser",
+      "value": "users-first-magnificent-app"
+    },
+    {
+      "index": "SecondUser",
+      "value": "users-second-magnificent-app"
+    },
+    {
+      "index": "MissingHostname",
+      "value": "users-third-magnificent-app"
+    }
+  ]
+}

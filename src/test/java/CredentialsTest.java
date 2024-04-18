@@ -20,14 +20,31 @@
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.RelpConversion;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
+import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class CredentialsTest {
 
     private final String credentialsFile = "src/test/resources/credentials.json";
+
+    @BeforeEach
+    public void addProperties() {
+        System.setProperty("lookups.hostname.file", "src/test/resources/hostname.json");
+        System.setProperty("lookups.appname.file", "src/test/resources/appname.json");
+    }
+
+    @AfterEach
+    public void cleanProperties() {
+        System.clearProperty("security.authRequired");
+        System.clearProperty("credentials.file");
+        System.clearProperty("lookups.hostname.file");
+        System.clearProperty("lookups.appname.file");
+    }
 
     @Test
     public void testNoAuthRequired() {
@@ -35,7 +52,12 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertFalse(relpConversion.requiresToken());
     }
 
@@ -55,25 +77,17 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser:VeryFirstPassword
-        Assertions.assertTrue(relpConversion.validatesToken("Basic Rmlyc3RVc2VyOlZlcnlGaXJzdFBhc3N3b3Jk"));
+        Assertions.assertFalse(relpConversion.asSubject("Basic Rmlyc3RVc2VyOlZlcnlGaXJzdFBhc3N3b3Jk").isStub());
         // ThirdUser:PasswordIsThree!
-        Assertions.assertTrue(relpConversion.validatesToken("Basic VGhpcmRVc2VyOlBhc3N3b3JkSXNUaHJlZSE="));
-    }
-
-    @Test
-    public void testInvalidAuths() {
-        System.setProperty("security.authRequired", "true");
-        System.setProperty("credentials.file", credentialsFile);
-        RelpConfig relpConfig = new RelpConfig();
-        SecurityConfig securityConfig = new SecurityConfig();
-        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
-        Assertions.assertTrue(relpConversion.requiresToken());
-        // Shady:Hacker
-        Assertions.assertFalse(relpConversion.validatesToken("Basic U2hhZHk6SGFja2Vy"));
+        Assertions.assertFalse(relpConversion.asSubject("Basic VGhpcmRVc2VyOlBhc3N3b3JkSXNUaHJlZSE=").isStub());
     }
 
     @Test
@@ -83,10 +97,17 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
         // Test
-        Assertions.assertFalse(relpConversion.validatesToken("Basic VGVzdA=="));
+        IllegalArgumentException e = Assertions
+                .assertThrows(IllegalArgumentException.class, () -> relpConversion.asSubject("Basic VGVzdA==").isStub());
+        Assertions.assertEquals("Got invalid token, doesn't include colon", e.getMessage());
     }
 
     @Test
@@ -96,10 +117,15 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
         // UserWithColons:My:Password:Yay
-        Assertions.assertTrue(relpConversion.validatesToken("Basic VXNlcldpdGhDb2xvbnM6TXk6UGFzc3dvcmQ6WWF5"));
+        Assertions.assertFalse(relpConversion.asSubject("Basic VXNlcldpdGhDb2xvbnM6TXk6UGFzc3dvcmQ6WWF5").isStub());
     }
 
     @Test
@@ -109,9 +135,16 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
-        Assertions.assertFalse(relpConversion.validatesToken("Basic BasicButNotBase64"));
+        IllegalArgumentException e = Assertions
+                .assertThrows(IllegalArgumentException.class, () -> relpConversion.asSubject("Basic BasicButNotBase64").isStub());
+        Assertions.assertEquals("Last unit does not have enough valid bits", e.getMessage());
     }
 
     @Test
@@ -121,9 +154,19 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
-        Assertions.assertFalse(relpConversion.validatesToken("I am not basic auth"));
+        IllegalArgumentException e = Assertions
+                .assertThrows(
+                        IllegalArgumentException.class,
+                        () -> Assertions.assertTrue(relpConversion.asSubject("I am not basic auth").isStub())
+                );
+        Assertions.assertEquals("Got invalid token, doesn't start with Basic", e.getMessage());
     }
 
     @Test
@@ -133,14 +176,19 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
         // SecondUser:WrongPassword -> Right user
-        Assertions.assertFalse(relpConversion.validatesToken("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk"));
+        Assertions.assertTrue(relpConversion.asSubject("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk").isStub());
         // WrongUser:AlreadySecondPassword -> Right password
-        Assertions.assertFalse(relpConversion.validatesToken("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA=="));
+        Assertions.assertTrue(relpConversion.asSubject("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA==").isStub());
         // SecondUser:AlreadySecondPassword -> Right user and right password
-        Assertions.assertTrue(relpConversion.validatesToken("Basic U2Vjb25kVXNlcjpBbHJlYWR5U2Vjb25kUGFzc3dvcmQ="));
+        Assertions.assertFalse(relpConversion.asSubject("Basic U2Vjb25kVXNlcjpBbHJlYWR5U2Vjb25kUGFzc3dvcmQ=").isStub());
     }
 
     @Test
@@ -150,10 +198,19 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
         // :VeryFirstPassword -> Valid password, null username
-        Assertions.assertFalse(relpConversion.validatesToken("Basic OlZlcnlGaXJzdFBhc3N3b3Jk"));
+        IllegalArgumentException e = Assertions
+                .assertThrows(
+                        IllegalArgumentException.class, () -> relpConversion.asSubject("Basic OlZlcnlGaXJzdFBhc3N3b3Jk").isStub()
+                );
+        Assertions.assertEquals("Got invalid token, username or password is not present", e.getMessage());
     }
 
     @Test
@@ -163,9 +220,35 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser: -> Valid username, null password
-        Assertions.assertFalse(relpConversion.validatesToken("Basic Rmlyc3RVc2VyOg=="));
+        IllegalArgumentException e = Assertions
+                .assertThrows(IllegalArgumentException.class, () -> relpConversion.asSubject("Basic Rmlyc3RVc2VyOg==").isStub());
+        Assertions.assertEquals("Got invalid token, username or password is not present", e.getMessage());
+    }
+
+    @Test
+    public void testNullToken() {
+        System.setProperty("security.authRequired", "true");
+        System.setProperty("credentials.file", credentialsFile);
+        RelpConfig relpConfig = new RelpConfig();
+        SecurityConfig securityConfig = new SecurityConfig();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
+        RelpConversion relpConversion = new RelpConversion(
+                relpConfig,
+                securityConfig,
+                basicAuthentication,
+                new LookupConfig()
+        );
+        Assertions.assertTrue(relpConversion.requiresToken());
+        IllegalArgumentException e = Assertions
+                .assertThrows(IllegalArgumentException.class, () -> relpConversion.asSubject(null).isStub());
+        Assertions.assertEquals("Got null or empty token", e.getMessage());
     }
 }

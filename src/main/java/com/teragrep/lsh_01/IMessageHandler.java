@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.authentication.Subject;
+
 import java.util.Map;
 
 /**
@@ -33,13 +35,13 @@ public interface IMessageHandler {
      * @param headers
      * @param body
      */
-    boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body);
+    boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body);
 
     /**
      * @param token
      * @return
      */
-    boolean validatesToken(String token);
+    Subject asSubject(String token);
 
     boolean requiresToken();
 

@@ -19,9 +19,13 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.jlt_01.StringLookupTable;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
+import com.teragrep.lsh_01.authentication.Subject;
+import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
+import com.teragrep.lsh_01.lookup.LookupTableFactory;
 import com.teragrep.rlo_14.*;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
@@ -43,21 +47,30 @@ public class RelpConversion implements IMessageHandler {
     private final RelpConfig relpConfig;
     private final SecurityConfig securityConfig;
     private final BasicAuthentication basicAuthentication;
+    private final LookupConfig lookupConfig;
+    private final StringLookupTable hostnameLookup;
+    private final StringLookupTable appnameLookup;
 
     public RelpConversion(
             RelpConfig relpConfig,
             SecurityConfig securityConfig,
-            BasicAuthentication basicAuthentication
+            BasicAuthentication basicAuthentication,
+            LookupConfig lookupConfig
     ) {
         this.relpConfig = relpConfig;
         this.securityConfig = securityConfig;
         this.relpConnection = new RelpConnection();
         this.basicAuthentication = basicAuthentication;
+        this.lookupConfig = lookupConfig;
+        this.hostnameLookup = new LookupTableFactory().create(lookupConfig.hostnamePath);
+        this.appnameLookup = new LookupTableFactory().create(lookupConfig.appNamePath);
     }
 
-    public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
+    public boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body) {
         try {
-            sendMessage(body, headers);
+            sendMessage(
+                    body, headers, hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
+            );
         }
         catch (Exception e) {
             LOGGER.error("Unexpected error when sending a message: <{}>", e.getMessage(), e);
@@ -66,8 +79,8 @@ public class RelpConversion implements IMessageHandler {
         return true;
     }
 
-    public boolean validatesToken(String token) {
-        return basicAuthentication.isCredentialOk(token);
+    public Subject asSubject(String token) {
+        return basicAuthentication.asSubject(token);
     }
 
     public boolean requiresToken() {
@@ -76,7 +89,7 @@ public class RelpConversion implements IMessageHandler {
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        return new RelpConversion(relpConfig, securityConfig, basicAuthentication, lookupConfig);
     }
 
     public Map<String, String> responseHeaders() {
@@ -131,7 +144,7 @@ public class RelpConversion implements IMessageHandler {
         isConnected = false;
     }
 
-    private void sendMessage(String message, Map<String, String> headers) {
+    private void sendMessage(String message, Map<String, String> headers, String hostname, String appName) {
         if (!isConnected) {
             connect();
         }
@@ -143,8 +156,8 @@ public class RelpConversion implements IMessageHandler {
         }
         SyslogMessage syslogMessage = new SyslogMessage()
                 .withTimestamp(time.toEpochMilli())
-                .withAppName(relpConfig.relpAppName)
-                .withHostname(relpConfig.relpHostname)
+                .withAppName(appName)
+                .withHostname(hostname)
                 .withFacility(Facility.USER)
                 .withSeverity(Severity.INFORMATIONAL)
                 .withMsg(message)

@@ -27,14 +27,21 @@ server.maxContentLength,262144,How big requests are allowed in bytes
 relp.target,127.0.0.1,RELP server address
 relp.port,601,RELP server port
 relp.reconnectInterval,10000,How long to wait before reconnecting in milliseconds
-relp.appName,lsh_01,Appname to use in RELP records
-relp.hostname,localhost,Hostname to use in RELP records
 healthcheck.enabled,true,Sets if an internal healthcheck endpoint is enabled.
 healthcheck.url,/healthcheck,An internal healthcheck endpoint that will always reply 200 ok regardless of security settings. Accessing this url won't generate any events.
-security.authRequired,true,Sets whether Basic HTTP Authorization headers are required.
+security.authRequired,true,Sets whether Basic HTTP Authorization headers are required. Username for lookups will be empty string '' if set to false.
 credentials.file,etc/credentials.json,A json file with array of identity:credential mappings
-
+lookups.hostname.file,etc/hostname.json,Path to username-to-hostname lookup table
+lookups.appname.file,etc/appname.json,Path to username-to-appname lookup table
 |===
+
+=== Lookup tables
+
+By default, the appname and hostname lookup tables are expected to be in `etc/appname.json` and `etc/hostname.json` respectively.
+
+Empty string '' will be used for looking up values when authentication is not required, otherwise it will use one extracted from Authorization header.
+
+The index is the username and value is what it should map the values to. The value of 'nomatch' will be used if lookup fails.
 
 == Limitations
 
@@ -56,7 +63,11 @@ Expected files are:
 
  - `/config/config.properties`
 
- - `/config/credentials.json`
+- `/config/credentials.json`
+
+- `/config/hostname.json`
+
+- `/config/appname.json`
 
  - Optional: Custom `log4j2.xml` can be provided by placing it in `/config/log4j2.xml`, otherwise default settings will be used.
 

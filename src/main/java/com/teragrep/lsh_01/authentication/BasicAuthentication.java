@@ -20,6 +20,8 @@
 package com.teragrep.lsh_01.authentication;
 
 import com.teragrep.jai_02.CredentialLookup;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Base64;
 
@@ -27,33 +29,42 @@ public class BasicAuthentication {
 
     private final Base64.Decoder decoder;
     private final CredentialLookup credentialLookup;
+    private final Subject subjectStub;
+    private final static Logger LOGGER = LogManager.getLogger(BasicAuthentication.class);
 
     public BasicAuthentication(CredentialLookup credentialLookup) {
-        this(Base64.getDecoder(), credentialLookup);
+        this(Base64.getDecoder(), new SubjectStub(), credentialLookup);
     }
 
-    public BasicAuthentication(Base64.Decoder decoder, CredentialLookup credentialLookup) {
+    public BasicAuthentication(Base64.Decoder decoder, SubjectStub subjectStub, CredentialLookup credentialLookup) {
         this.decoder = decoder;
         this.credentialLookup = credentialLookup;
+        this.subjectStub = subjectStub;
     }
 
-    public boolean isCredentialOk(String token) {
+    public Subject asSubject(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Got null or empty token");
+        }
         if (!token.startsWith("Basic ")) {
-            return false;
+            throw new IllegalArgumentException("Got invalid token, doesn't start with Basic");
         }
-        try {
-            String tokenString = new String(decoder.decode(token.substring("Basic".length()).trim()));
-            if (!tokenString.contains(":")) {
-                return false;
-            }
-            String[] credentialPair = tokenString.split(":", 2);
-            if (credentialPair[0] == null || credentialPair[1] == null) {
-                return false;
-            }
-            return credentialPair[1].equals(credentialLookup.getCredential(credentialPair[0]));
+        String tokenString = new String(decoder.decode(token.substring("Basic".length()).trim()));
+        if (!tokenString.contains(":")) {
+            throw new IllegalArgumentException("Got invalid token, doesn't include colon");
         }
-        catch (IllegalArgumentException e) {
-            return false;
+        String[] credentialPair = tokenString.split(":", 2);
+        String username = credentialPair[0];
+        String password = credentialPair[1];
+        if ("".equals(username) || "".equals(password)) {
+            throw new IllegalArgumentException("Got invalid token, username or password is not present");
+        }
+        if (password.equals(credentialLookup.getCredential(username))) {
+            LOGGER.debug("Authentication ok");
+            return new SubjectImpl(username);
+        }
+        else {
+            return subjectStub;
         }
     }
 }
