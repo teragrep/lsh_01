@@ -94,6 +94,7 @@ public class MessageProcessor implements RejectableRunnable {
                         try {
                             Subject subject = messageHandler
                                     .asSubject(req.headers().get(HttpHeaderNames.AUTHORIZATION));
+                            // Headers are inserted to structured data so remove it to prevent credentials leaking
                             req.headers().remove(HttpHeaderNames.AUTHORIZATION);
                             if (subject.isStub()) {
                                 LOGGER.debug("Authentication failed; rejecting request.");
