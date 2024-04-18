@@ -58,9 +58,9 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser:VeryFirstPassword
-        Assertions.assertTrue(relpConversion.validatesToken("Basic Rmlyc3RVc2VyOlZlcnlGaXJzdFBhc3N3b3Jk"));
+        Assertions.assertFalse(relpConversion.asSubject("Basic Rmlyc3RVc2VyOlZlcnlGaXJzdFBhc3N3b3Jk").isStub());
         // ThirdUser:PasswordIsThree!
-        Assertions.assertTrue(relpConversion.validatesToken("Basic VGhpcmRVc2VyOlBhc3N3b3JkSXNUaHJlZSE="));
+        Assertions.assertFalse(relpConversion.asSubject("Basic VGhpcmRVc2VyOlBhc3N3b3JkSXNUaHJlZSE=").isStub());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // Shady:Hacker
-        Assertions.assertFalse(relpConversion.validatesToken("Basic U2hhZHk6SGFja2Vy"));
+        Assertions.assertTrue(relpConversion.asSubject("Basic U2hhZHk6SGFja2Vy").isStub());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // Test
-        Assertions.assertFalse(relpConversion.validatesToken("Basic VGVzdA=="));
+        Assertions.assertTrue(relpConversion.asSubject("Basic VGVzdA==").isStub());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // UserWithColons:My:Password:Yay
-        Assertions.assertTrue(relpConversion.validatesToken("Basic VXNlcldpdGhDb2xvbnM6TXk6UGFzc3dvcmQ6WWF5"));
+        Assertions.assertFalse(relpConversion.asSubject("Basic VXNlcldpdGhDb2xvbnM6TXk6UGFzc3dvcmQ6WWF5").isStub());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class CredentialsTest {
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
-        Assertions.assertFalse(relpConversion.validatesToken("Basic BasicButNotBase64"));
+        Assertions.assertTrue(relpConversion.asSubject("Basic BasicButNotBase64").isStub());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class CredentialsTest {
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
-        Assertions.assertFalse(relpConversion.validatesToken("I am not basic auth"));
+        Assertions.assertTrue(relpConversion.asSubject("I am not basic auth").isStub());
     }
 
     @Test
@@ -136,11 +136,11 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // SecondUser:WrongPassword -> Right user
-        Assertions.assertFalse(relpConversion.validatesToken("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk"));
+        Assertions.assertTrue(relpConversion.asSubject("Basic U2Vjb25kVXNlcjpXcm9uZ1Bhc3N3b3Jk").isStub());
         // WrongUser:AlreadySecondPassword -> Right password
-        Assertions.assertFalse(relpConversion.validatesToken("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA=="));
+        Assertions.assertTrue(relpConversion.asSubject("Basic V3JvbmdVc2VyOkFscmVhZHlTZWNvbmRQYXNzd29yZA==").isStub());
         // SecondUser:AlreadySecondPassword -> Right user and right password
-        Assertions.assertTrue(relpConversion.validatesToken("Basic U2Vjb25kVXNlcjpBbHJlYWR5U2Vjb25kUGFzc3dvcmQ="));
+        Assertions.assertFalse(relpConversion.asSubject("Basic U2Vjb25kVXNlcjpBbHJlYWR5U2Vjb25kUGFzc3dvcmQ=").isStub());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // :VeryFirstPassword -> Valid password, null username
-        Assertions.assertFalse(relpConversion.validatesToken("Basic OlZlcnlGaXJzdFBhc3N3b3Jk"));
+        Assertions.assertTrue(relpConversion.asSubject("Basic OlZlcnlGaXJzdFBhc3N3b3Jk").isStub());
     }
 
     @Test
@@ -166,6 +166,18 @@ public class CredentialsTest {
         RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser: -> Valid username, null password
-        Assertions.assertFalse(relpConversion.validatesToken("Basic Rmlyc3RVc2VyOg=="));
+        Assertions.assertTrue(relpConversion.asSubject("Basic Rmlyc3RVc2VyOg==").isStub());
+    }
+
+    @Test
+    public void testNullToken() {
+        System.setProperty("security.authRequired", "true");
+        System.setProperty("credentials.file", credentialsFile);
+        RelpConfig relpConfig = new RelpConfig();
+        SecurityConfig securityConfig = new SecurityConfig();
+        BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
+        RelpConversion relpConversion = new RelpConversion(relpConfig, securityConfig, basicAuthentication);
+        Assertions.assertTrue(relpConversion.requiresToken());
+        Assertions.assertTrue(relpConversion.asSubject(null).isStub());
     }
 }

@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.authentication.*;
 import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
 import com.teragrep.rlo_14.*;
 import io.netty.buffer.ByteBuf;
@@ -87,19 +88,28 @@ public class MessageProcessor implements RejectableRunnable {
                 LOGGER.debug("Healthcheck endpoint called");
                 response = generateResponse(messageHandler.responseHeaders());
             }
-            else if (isTokenOk()) {
-                LOGGER.debug("Processing message");
-                response = processMessage();
-            }
-            else if (!req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
-                LOGGER.debug("Required authorization not provided; requesting authentication.");
-                response = generateAuthenticationRequestResponse();
-            }
             else {
-                LOGGER.debug("Invalid authorization; rejecting request.");
-                response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                if (messageHandler.requiresToken()) {
+                    if (req.headers().contains(HttpHeaderNames.AUTHORIZATION)) {
+                        Subject subject = messageHandler.asSubject(req.headers().get(HttpHeaderNames.AUTHORIZATION));
+                        if (subject.isStub()) {
+                            LOGGER.debug("Invalid authorization; rejecting request.");
+                            response = generateFailedResponse(HttpResponseStatus.UNAUTHORIZED);
+                        } else {
+                            LOGGER.debug("Processing message");
+                            response = processMessage(subject);
+                        }
+                    }
+                    else {
+                        LOGGER.debug("Required authorization not provided; requesting authentication.");
+                        response = generateAuthenticationRequestResponse();
+                    }
+                }
+                else {
+                    Subject subject = new SubjectAnonymous();
+                    response = processMessage(subject);
+                }
             }
-
             ctx.writeAndFlush(response);
         }
         finally {
@@ -112,15 +122,10 @@ public class MessageProcessor implements RejectableRunnable {
                 && internalEndpointUrlConfig.healthcheckUrl.equals(req.uri());
     }
 
-    private boolean isTokenOk() {
-        return !messageHandler.requiresToken()
-                || messageHandler.validatesToken(req.headers().get(HttpHeaderNames.AUTHORIZATION));
-    }
-
-    private FullHttpResponse processMessage() {
+    private FullHttpResponse processMessage(Subject subject) {
         final Map<String, String> formattedHeaders = formatHeaders(req.headers());
         final String body = req.content().toString(UTF8_CHARSET);
-        if (messageHandler.onNewMessage(remoteAddress, formattedHeaders, body)) {
+        if (messageHandler.onNewMessage(remoteAddress, subject, formattedHeaders, body)) {
             return generateResponse(messageHandler.responseHeaders());
         }
         else {

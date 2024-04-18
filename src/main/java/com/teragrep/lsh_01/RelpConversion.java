@@ -20,6 +20,7 @@
 package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
+import com.teragrep.lsh_01.authentication.Subject;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.rlo_14.*;
@@ -55,9 +56,11 @@ public class RelpConversion implements IMessageHandler {
         this.basicAuthentication = basicAuthentication;
     }
 
-    public boolean onNewMessage(String remoteAddress, Map<String, String> headers, String body) {
+    public boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body) {
+        String hostname = "abc";
+        String appName = "xyz";
         try {
-            sendMessage(body, headers);
+            sendMessage(body, headers, hostname, appName);
         }
         catch (Exception e) {
             LOGGER.error("Unexpected error when sending a message: <{}>", e.getMessage(), e);
@@ -66,8 +69,8 @@ public class RelpConversion implements IMessageHandler {
         return true;
     }
 
-    public boolean validatesToken(String token) {
-        return basicAuthentication.isCredentialOk(token);
+    public Subject asSubject(String token) {
+        return basicAuthentication.asSubject(token);
     }
 
     public boolean requiresToken() {
@@ -131,7 +134,7 @@ public class RelpConversion implements IMessageHandler {
         isConnected = false;
     }
 
-    private void sendMessage(String message, Map<String, String> headers) {
+    private void sendMessage(String message, Map<String, String> headers, String hostname, String appName) {
         if (!isConnected) {
             connect();
         }
@@ -143,8 +146,8 @@ public class RelpConversion implements IMessageHandler {
         }
         SyslogMessage syslogMessage = new SyslogMessage()
                 .withTimestamp(time.toEpochMilli())
-                .withAppName(relpConfig.relpAppName)
-                .withHostname(relpConfig.relpHostname)
+                .withAppName(appName)
+                .withHostname(hostname)
                 .withFacility(Facility.USER)
                 .withSeverity(Severity.INFORMATIONAL)
                 .withMsg(message)
