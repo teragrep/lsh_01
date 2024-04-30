@@ -44,10 +44,16 @@ final public class Payload {
 
     /**
      * Splits the payload into multiple payloads if there is a defined split regex in the body.
+     * Only works if the payload.splitEnabled is set to true.
      * @return list of Payloads
      */
     public List<Payload> split() {
         ArrayList<Payload> payloads = new ArrayList<>();
+
+        if (!payloadConfig.splitEnabled) {
+            payloads.add(this);
+            return payloads;
+        }
 
         try {
             String[] messages = body.split(payloadConfig.splitRegex);

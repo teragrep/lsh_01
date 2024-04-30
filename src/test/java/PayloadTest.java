@@ -32,15 +32,19 @@ public class PayloadTest {
     @BeforeEach
     public void addProperties() {
         System.setProperty("payload.splitRegex", "\\n");
+        System.setProperty("payload.splitEnabled", "false");
     }
 
     @AfterEach
     public void cleanProperties() {
         System.clearProperty("payload.splitRegex");
+        System.clearProperty("payload.splitEnabled");
     }
 
     @Test
     public void testDefaultSplitRegex() {
+        System.setProperty("payload.splitEnabled", "true");
+
         String body = "foo\nbar\nfoobar";
         PayloadConfig payloadConfig = new PayloadConfig();
         Payload payload = new Payload(payloadConfig, body);
@@ -55,6 +59,7 @@ public class PayloadTest {
     @Test
     public void testCustomSplitRegex() {
         System.setProperty("payload.splitRegex", ",");
+        System.setProperty("payload.splitEnabled", "true");
 
         String body = "foo,bar,foobar";
         PayloadConfig payloadConfig = new PayloadConfig();
@@ -69,6 +74,8 @@ public class PayloadTest {
 
     @Test
     public void testNoSplittingRequired() {
+        System.setProperty("payload.splitEnabled", "true");
+
         String body = "foobar";
         PayloadConfig payloadConfig = new PayloadConfig();
         Payload payload = new Payload(payloadConfig, body);
@@ -76,5 +83,17 @@ public class PayloadTest {
 
         Assertions.assertEquals(1, payloads.size());
         Assertions.assertEquals("foobar", payloads.get(0).take());
+    }
+
+    @Test
+    public void testSplitDisabled() {
+        // disabled by default
+        String body = "foo\nbar\nfoobar";
+        PayloadConfig payloadConfig = new PayloadConfig();
+        Payload payload = new Payload(payloadConfig, body);
+        List<Payload> payloads = payload.split();
+
+        Assertions.assertEquals(1, payloads.size());
+        Assertions.assertEquals(body, payloads.get(0).take());
     }
 }

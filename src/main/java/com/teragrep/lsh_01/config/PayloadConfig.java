@@ -23,12 +23,14 @@ package com.teragrep.lsh_01.config;
 public class PayloadConfig implements Validateable {
 
     public final String splitRegex;
+    public final boolean splitEnabled;
 
     public PayloadConfig() {
         PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
                 System.getProperty("properties.file", "etc/config.properties")
         );
         splitRegex = propertiesReader.getStringProperty("payload.splitRegex");
+        splitEnabled = propertiesReader.getBooleanProperty("payload.splitEnabled");
     }
 
     @Override
@@ -38,6 +40,6 @@ public class PayloadConfig implements Validateable {
 
     @Override
     public String toString() {
-        return "PayloadConfig{" + "splitRegex='" + splitRegex + '}';
+        return "PayloadConfig{" + "splitRegex=" + splitRegex + ", splitEnabled=" + splitEnabled + '}';
     }
 }
