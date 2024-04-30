@@ -23,6 +23,7 @@ import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.authentication.Subject;
 import com.teragrep.lsh_01.config.LookupConfig;
+import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
@@ -63,7 +64,8 @@ public class LookupTest {
                 relpConfig,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig()
+                new LookupConfig(),
+                new PayloadConfig()
         );
 
         // FirstUser:VeryFirstPassword!
@@ -85,7 +87,8 @@ public class LookupTest {
                 relpConfig,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig()
+                new LookupConfig(),
+                new PayloadConfig()
         );
 
         // FirstUser:VeryFirstPassword!
@@ -109,7 +112,8 @@ public class LookupTest {
                 relpConfig,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig()
+                new LookupConfig(),
+                new PayloadConfig()
         );
 
         // MissingHostname:MyHostnameIsMissing
