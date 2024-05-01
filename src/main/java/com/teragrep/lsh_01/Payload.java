@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.PayloadConfig;
@@ -43,8 +42,9 @@ final public class Payload {
     }
 
     /**
-     * Splits the payload into multiple payloads if there is a defined split regex in the body.
-     * Only works if the payload.splitEnabled is set to true.
+     * Splits the payload into multiple payloads if there is a defined split regex in the body. Only works if the
+     * payload.splitEnabled is set to true.
+     * 
      * @return list of Payloads
      */
     public List<Payload> split() {
@@ -58,10 +58,11 @@ final public class Payload {
         try {
             String[] messages = body.split(payloadConfig.splitRegex);
 
-            for (String message: messages) {
+            for (String message : messages) {
                 payloads.add(new Payload(payloadConfig, message));
             }
-        } catch (PatternSyntaxException e) {
+        }
+        catch (PatternSyntaxException e) {
             LOGGER.error("Invalid splitRegex in configuration: <{}>", payloadConfig.splitRegex);
             payloads.add(this);
         }
@@ -71,6 +72,7 @@ final public class Payload {
 
     /**
      * Takes the message from the payload.
+     * 
      * @return message body
      */
     public String take() {
