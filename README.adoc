@@ -33,6 +33,8 @@ security.authRequired,true,Sets whether Basic HTTP Authorization headers are req
 credentials.file,etc/credentials.json,A json file with array of identity:credential mappings
 lookups.hostname.file,etc/hostname.json,Path to username-to-hostname lookup table
 lookups.appname.file,etc/appname.json,Path to username-to-appname lookup table
+payload.splitRegex, \n (newline), A regex based on which incoming requests will be split into multiple outgoing messages
+payload.splitEnabled, false, Sets whether splitting incoming messages by splitRegex is enabled
 |===
 
 === Lookup tables
