@@ -19,56 +19,35 @@
 */
 package com.teragrep.lsh_01;
 
-import com.teragrep.lsh_01.config.PayloadConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * A message from a log source
  */
 final public class Payload {
 
-    private final static Logger LOGGER = LogManager.getLogger(Payload.class);
-    private final PayloadConfig payloadConfig;
     private final String body;
     private final Pattern splitPattern;
 
-    public Payload(PayloadConfig payloadConfig, String body) {
-        this.payloadConfig = payloadConfig;
+    public Payload(String body, Pattern splitPattern) {
         this.body = body;
-
-        this.splitPattern = Pattern.compile(payloadConfig.splitRegex);
+        this.splitPattern = splitPattern;
     }
 
     /**
-     * Splits the payload into multiple payloads if there is a defined split regex in the body. Only works if the
-     * payload.splitEnabled is set to true.
+     * Splits the payload into multiple payloads if there is a defined split regex in the body.
      * 
      * @return list of Payloads
      */
     public List<Payload> split() {
         ArrayList<Payload> payloads = new ArrayList<>();
 
-        if (!payloadConfig.splitEnabled) {
-            payloads.add(this);
-            return payloads;
-        }
+        String[] messages = splitPattern.split(body);
 
-        try {
-            String[] messages = splitPattern.split(body);
-
-            for (String message : messages) {
-                payloads.add(new Payload(payloadConfig, message));
-            }
-        }
-        catch (PatternSyntaxException e) {
-            LOGGER.error("Invalid splitRegex in configuration: <{}>", payloadConfig.splitRegex);
-            payloads.add(this);
+        for (String message : messages) {
+            payloads.add(new Payload(message, splitPattern));
         }
 
         return payloads;

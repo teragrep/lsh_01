@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class PayloadTest {
 
@@ -46,7 +47,8 @@ public class PayloadTest {
 
         String body = "foo\nbar\nfoobar";
         PayloadConfig payloadConfig = new PayloadConfig();
-        Payload payload = new Payload(payloadConfig, body);
+        Pattern splitPattern = Pattern.compile(payloadConfig.splitRegex);
+        Payload payload = new Payload(body, splitPattern);
         List<Payload> payloads = payload.split();
 
         Assertions.assertEquals(3, payloads.size());
@@ -56,13 +58,31 @@ public class PayloadTest {
     }
 
     @Test
+    public void testInvalidSplitRegex() {
+        System.setProperty("payload.splitEnabled", "true");
+        System.setProperty("payload.splitRegex", "(a*b{)");
+
+        PayloadConfig payloadConfig = new PayloadConfig();
+        Assertions.assertThrows(IllegalArgumentException.class, payloadConfig::validate);
+    }
+
+    @Test
+    public void testValidSplitRegex() {
+        System.setProperty("payload.splitEnabled", "true");
+
+        PayloadConfig payloadConfig = new PayloadConfig();
+        Assertions.assertDoesNotThrow(payloadConfig::validate);
+    }
+
+    @Test
     public void testCustomSplitRegex() {
         System.setProperty("payload.splitRegex", ",");
         System.setProperty("payload.splitEnabled", "true");
 
         String body = "foo,bar,foobar";
         PayloadConfig payloadConfig = new PayloadConfig();
-        Payload payload = new Payload(payloadConfig, body);
+        Pattern splitPattern = Pattern.compile(payloadConfig.splitRegex);
+        Payload payload = new Payload(body, splitPattern);
         List<Payload> payloads = payload.split();
 
         Assertions.assertEquals(3, payloads.size());
@@ -77,22 +97,11 @@ public class PayloadTest {
 
         String body = "foobar";
         PayloadConfig payloadConfig = new PayloadConfig();
-        Payload payload = new Payload(payloadConfig, body);
+        Pattern splitPattern = Pattern.compile(payloadConfig.splitRegex);
+        Payload payload = new Payload(body, splitPattern);
         List<Payload> payloads = payload.split();
 
         Assertions.assertEquals(1, payloads.size());
         Assertions.assertEquals("foobar", payloads.get(0).take());
-    }
-
-    @Test
-    public void testSplitDisabled() {
-        // disabled by default
-        String body = "foo\nbar\nfoobar";
-        PayloadConfig payloadConfig = new PayloadConfig();
-        Payload payload = new Payload(payloadConfig, body);
-        List<Payload> payloads = payload.split();
-
-        Assertions.assertEquals(1, payloads.size());
-        Assertions.assertEquals(body, payloads.get(0).take());
     }
 }
