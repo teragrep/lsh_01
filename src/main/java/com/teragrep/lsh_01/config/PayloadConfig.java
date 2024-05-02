@@ -19,6 +19,9 @@
 */
 package com.teragrep.lsh_01.config;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class PayloadConfig implements Validateable {
 
     public final String splitRegex;
@@ -34,7 +37,16 @@ public class PayloadConfig implements Validateable {
 
     @Override
     public void validate() {
-
+        if (splitEnabled) {
+            try {
+                Pattern splitPattern = Pattern.compile(splitRegex);
+            }
+            catch (PatternSyntaxException e) {
+                throw new IllegalArgumentException(
+                        "Configuration has an invalid regex (payload.splitRegex): " + splitRegex
+                );
+            }
+        }
     }
 
     @Override

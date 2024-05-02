@@ -39,6 +39,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 
 public class RelpConversion implements IMessageHandler {
 
@@ -72,11 +73,19 @@ public class RelpConversion implements IMessageHandler {
 
     public boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body) {
         try {
-            Payload originalPayload = new Payload(payloadConfig, body);
+            if (payloadConfig.splitEnabled) {
+                Pattern splitPattern = Pattern.compile(payloadConfig.splitRegex);
+                Payload originalPayload = new Payload(body, splitPattern);
 
-            for (Payload payload : originalPayload.split()) {
+                for (Payload payload : originalPayload.split()) {
+                    sendMessage(
+                            payload.take(), headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
+                    );
+                }
+            }
+            else {
                 sendMessage(
-                        payload.take(), headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
+                        body, headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
                 );
             }
         }
