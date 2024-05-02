@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
@@ -35,10 +36,13 @@ final public class Payload {
     private final static Logger LOGGER = LogManager.getLogger(Payload.class);
     private final PayloadConfig payloadConfig;
     private final String body;
+    private final Pattern splitPattern;
 
     public Payload(PayloadConfig payloadConfig, String body) {
         this.payloadConfig = payloadConfig;
         this.body = body;
+
+        this.splitPattern = Pattern.compile(payloadConfig.splitRegex);
     }
 
     /**
@@ -56,7 +60,7 @@ final public class Payload {
         }
 
         try {
-            String[] messages = body.split(payloadConfig.splitRegex);
+            String[] messages = splitPattern.split(body);
 
             for (String message : messages) {
                 payloads.add(new Payload(payloadConfig, message));
