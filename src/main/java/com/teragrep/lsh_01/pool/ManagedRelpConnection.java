@@ -35,7 +35,7 @@ public class ManagedRelpConnection {
         this.relpConnection = relpConnection;
     }
 
-    private void connect() {
+    void connect() {
         boolean notConnected = true;
         while (notConnected) {
             boolean connected = false;
@@ -91,7 +91,7 @@ public class ManagedRelpConnection {
                 relpConnection.commit(relpBatch);
             }
             catch (IllegalStateException | IOException | TimeoutException e) {
-                LOGGER.error("Failed to send relp message: <{}>", e.getMessage());
+                LOGGER.error("Exception <{}> while sending relpBatch. Will retry", e.getMessage());
             }
             if (!relpBatch.verifyTransactionAll()) {
                 relpBatch.retryAllFailed();
