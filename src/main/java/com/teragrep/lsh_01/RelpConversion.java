@@ -24,29 +24,25 @@ import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.Subject;
 import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.PayloadConfig;
-import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
+import com.teragrep.lsh_01.pool.IRelpConnection;
+import com.teragrep.lsh_01.pool.ManagedRelpConnection;
+import com.teragrep.lsh_01.pool.RelpConnectionPool;
 import com.teragrep.rlo_14.*;
-import com.teragrep.rlp_01.RelpBatch;
-import com.teragrep.rlp_01.RelpConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 public class RelpConversion implements IMessageHandler {
 
     private final static Logger LOGGER = LogManager.getLogger(RelpConversion.class);
-    private final RelpConnection relpConnection;
-    private boolean isConnected = false;
-    private final RelpConfig relpConfig;
+    private final RelpConnectionPool relpConnectionPool;
     private final SecurityConfig securityConfig;
     private final BasicAuthentication basicAuthentication;
     private final LookupConfig lookupConfig;
@@ -55,15 +51,14 @@ public class RelpConversion implements IMessageHandler {
     private final StringLookupTable appnameLookup;
 
     public RelpConversion(
-            RelpConfig relpConfig,
+            RelpConnectionPool relpConnectionPool,
             SecurityConfig securityConfig,
             BasicAuthentication basicAuthentication,
             LookupConfig lookupConfig,
             PayloadConfig payloadConfig
     ) {
-        this.relpConfig = relpConfig;
+        this.relpConnectionPool = relpConnectionPool;
         this.securityConfig = securityConfig;
-        this.relpConnection = new RelpConnection();
         this.basicAuthentication = basicAuthentication;
         this.lookupConfig = lookupConfig;
         this.hostnameLookup = new LookupTableFactory().create(lookupConfig.hostnamePath);
@@ -106,59 +101,11 @@ public class RelpConversion implements IMessageHandler {
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConfig, securityConfig, basicAuthentication, lookupConfig, payloadConfig);
+        return new RelpConversion(relpConnectionPool, securityConfig, basicAuthentication, lookupConfig, payloadConfig);
     }
 
     public Map<String, String> responseHeaders() {
         return new HashMap<String, String>();
-    }
-
-    private void connect() {
-        boolean notConnected = true;
-        while (notConnected) {
-            boolean connected = false;
-            try {
-                String realHostname = java.net.InetAddress.getLocalHost().getHostName();
-                connected = relpConnection.connect(relpConfig.relpTarget, relpConfig.relpPort);
-            }
-            catch (Exception e) {
-                LOGGER
-                        .error(
-                                "Failed to connect to relp server <[{}]>:<[{}]>: {}", relpConfig.relpTarget,
-                                relpConfig.relpPort, e.getMessage()
-                        );
-            }
-            if (connected) {
-                notConnected = false;
-            }
-            else {
-                try {
-                    Thread.sleep(relpConfig.relpReconnectInterval);
-                }
-                catch (InterruptedException e) {
-                    LOGGER.error("Reconnect timer interrupted, reconnecting now");
-                }
-            }
-        }
-        isConnected = true;
-    }
-
-    private void tearDown() {
-        relpConnection.tearDown();
-    }
-
-    private void disconnect() {
-        boolean disconnected = false;
-        try {
-            disconnected = relpConnection.disconnect();
-        }
-        catch (IllegalStateException | IOException | TimeoutException e) {
-            LOGGER.error("Forcefully closing connection due to exception <{}>", e.getMessage());
-        }
-        finally {
-            this.tearDown();
-        }
-        isConnected = false;
     }
 
     private void sendMessage(
@@ -168,11 +115,10 @@ public class RelpConversion implements IMessageHandler {
             String hostname,
             String appName
     ) {
-        if (!isConnected) {
-            connect();
-        }
-        final RelpBatch relpBatch = new RelpBatch();
         Instant time = Instant.now();
+
+        // FIXME add origin sd-element: String realHostname = java.net.InetAddress.getLocalHost().getHostName();
+
         SDElement headerSDElement = new SDElement("lsh_01_headers@48577");
         for (Map.Entry<String, String> header : headers.entrySet()) {
             headerSDElement.addSDParam(new SDParam(header.getKey(), header.getValue()));
@@ -188,23 +134,10 @@ public class RelpConversion implements IMessageHandler {
                 .withMsg(message)
                 .withSDElement(headerSDElement)
                 .withSDElement(sdElement);
-        relpBatch.insert(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
-        boolean notSent = true;
-        while (notSent) {
-            try {
-                relpConnection.commit(relpBatch);
-            }
-            catch (IllegalStateException | IOException | TimeoutException e) {
-                LOGGER.error("Failed to send relp message: <{}>", e.getMessage());
-            }
-            if (!relpBatch.verifyTransactionAll()) {
-                relpBatch.retryAllFailed();
-                this.tearDown();
-                this.connect();
-            }
-            else {
-                notSent = false;
-            }
-        }
+
+        IRelpConnection relpConnection = relpConnectionPool.take();
+        ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection);
+        managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+        relpConnectionPool.offer(relpConnection);
     }
 }
