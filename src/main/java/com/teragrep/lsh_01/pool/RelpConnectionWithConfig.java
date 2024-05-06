@@ -26,12 +26,12 @@ import com.teragrep.rlp_01.RelpConnection;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class RelpConnectionWrap implements IRelpConnection {
+public class RelpConnectionWithConfig implements IRelpConnection {
 
     private final RelpConnection relpConnection;
     private final RelpConfig relpConfig;
 
-    public RelpConnectionWrap(RelpConnection relpConnection, RelpConfig relpConfig) {
+    public RelpConnectionWithConfig(RelpConnection relpConnection, RelpConfig relpConfig) {
         this.relpConnection = relpConnection;
         this.relpConfig = relpConfig;
     }
