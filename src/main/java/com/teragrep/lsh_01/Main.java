@@ -22,6 +22,8 @@ package com.teragrep.lsh_01;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
+import com.teragrep.lsh_01.pool.RelpConnectionFactory;
+import com.teragrep.lsh_01.pool.RelpConnectionPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,13 +57,18 @@ public class Main {
         LOGGER.info("Got lookup table config: <[{}]>", lookupConfig);
         LOGGER.info("Got payload config: <[{}]>", payloadConfig);
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(relpConnectionFactory);
+
         RelpConversion relpConversion = new RelpConversion(
-                relpConfig,
+                relpConnectionPool,
                 securityConfig,
                 basicAuthentication,
                 lookupConfig,
                 payloadConfig
         );
+
         try (
                 NettyHttpServer server = new NettyHttpServer(
                         nettyConfig,
@@ -72,6 +79,9 @@ public class Main {
                 )
         ) {
             server.run();
+        }
+        finally {
+            relpConnectionPool.close();
         }
     }
 }
