@@ -72,6 +72,7 @@ public class MessageProcessor implements RejectableRunnable {
     public void onRejection() {
         try {
             final FullHttpResponse response = generateFailedResponse(HttpResponseStatus.TOO_MANY_REQUESTS);
+            LOGGER.warn("Too many requests, returning code <{}>", response.status().code());
             ctx.writeAndFlush(response);
         }
         finally {
@@ -140,7 +141,9 @@ public class MessageProcessor implements RejectableRunnable {
             return generateResponse(messageHandler.responseHeaders());
         }
         else {
-            return generateFailedResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            FullHttpResponse response = generateFailedResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.warn("Processing failed, returning code <{}>", response.status().code());
+            return response;
         }
     }
 
