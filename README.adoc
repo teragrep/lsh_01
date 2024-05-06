@@ -77,6 +77,22 @@ For example
 
 `docker run -ti -v /path/to/config:/config ghcr.io/teragrep/lsh_01:latest`
 
+== How to run and use in development
+
+Run maven on java 11:
+
+`mvn clean package`
+
+Run the .jar file (example with default properties):
+
+`java -Dproperties.file=etc/config.properties -Dcredentials.file=etc/credentials.json -Dlookups.hostname.file=etc/hostname.json -Dlookups.appname.file=etc/appname.json -Dlog4j2.configurationFile=file:rpm/src/main/resources/log4j2.xml -jar target/lsh_01-jar-with-dependencies.jar`
+
+A RELP-server has to be in place. A server and documentation for setting it up can be found in https://github.com/teragrep/rlp_07[rlp_07]. Make sure that you set `relp.port` in `configuration.properties` to the same port that you are using with the RELP-server.
+
+Example for sending messages from command line:
+
+`curl localhost:8080 -d "foo foo"`
+
 == Contributing
 
 You can involve yourself with our project by https://github.com/teragrep/lsh_01/issues/new/choose[opening an issue] or submitting a pull request.
