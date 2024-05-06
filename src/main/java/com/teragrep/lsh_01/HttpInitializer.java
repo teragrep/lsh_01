@@ -20,12 +20,12 @@
 package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
+import com.teragrep.lsh_01.util.LoggingHttpObjectAggregator;
 import com.teragrep.lsh_01.util.SslHandlerProvider;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpContentDecompressor;
-import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.ssl.SslHandler;
@@ -67,7 +67,7 @@ public class HttpInitializer extends ChannelInitializer<SocketChannel> {
         }
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpContentDecompressor());
-        pipeline.addLast(new HttpObjectAggregator(maxContentLength));
+        pipeline.addLast(new LoggingHttpObjectAggregator(maxContentLength));
         pipeline
                 .addLast(
                         new HttpServerHandler(
