@@ -121,7 +121,11 @@ public class RelpConversion implements IMessageHandler {
 
         SDElement headerSDElement = new SDElement("lsh_01_headers@48577");
         for (Map.Entry<String, String> header : headers.entrySet()) {
-            headerSDElement.addSDParam(new SDParam(header.getKey(), header.getValue()));
+            String headerValue = header.getValue();
+            if (headerValue == null) {
+                headerValue = "";
+            }
+            headerSDElement.addSDParam(new SDParam(header.getKey(), headerValue));
         }
         SDElement sdElement = new SDElement("lsh_01@48577");
         sdElement.addSDParam("subject", subject);
