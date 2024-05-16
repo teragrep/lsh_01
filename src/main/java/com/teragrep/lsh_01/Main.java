@@ -59,7 +59,11 @@ public class Main {
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
-        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(relpConnectionFactory);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
+                relpConnectionFactory,
+                relpConfig.rebindRequestAmount,
+                relpConfig.rebindEnabled
+        );
 
         RelpConversion relpConversion = new RelpConversion(
                 relpConnectionPool,

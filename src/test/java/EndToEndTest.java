@@ -46,7 +46,7 @@ public class EndToEndTest {
         System.setProperty("security.authRequired", "false");
 
         // Start listening to HTTP-requests
-        Thread program = new Thread(() -> Main.main(new String[]{}));
+        Thread program = new Thread(() -> Main.main(new String[] {}));
         program.start();
 
         Thread.sleep(3000); // wait for netty to start up

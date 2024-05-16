@@ -27,6 +27,8 @@ server.maxContentLength,262144,How big requests are allowed in bytes
 relp.target,127.0.0.1,RELP server address
 relp.port,601,RELP server port
 relp.reconnectInterval,10000,How long to wait before reconnecting in milliseconds
+relp.rebindRequestAmount, 1000000, How many requests from a RELP connection until rebinding it
+relp.rebindEnabled, false, Sets whether rebinding RELP connections is enabled
 healthcheck.enabled,true,Sets if an internal healthcheck endpoint is enabled.
 healthcheck.url,/healthcheck,An internal healthcheck endpoint that will always reply 200 ok regardless of security settings. Accessing this url won't generate any events.
 security.authRequired,true,Sets whether Basic HTTP Authorization headers are required. Username for lookups will be empty string '' if set to false.

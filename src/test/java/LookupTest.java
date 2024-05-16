@@ -63,7 +63,11 @@ public class LookupTest {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
-        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(relpConnectionFactory);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
+                relpConnectionFactory,
+                relpConfig.rebindRequestAmount,
+                relpConfig.rebindEnabled
+        );
         RelpConversion relpConversion = new RelpConversion(
                 relpConnectionPool,
                 securityConfig,
@@ -88,7 +92,11 @@ public class LookupTest {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
-        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(relpConnectionFactory);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
+                relpConnectionFactory,
+                relpConfig.rebindRequestAmount,
+                relpConfig.rebindEnabled
+        );
         RelpConversion relpConversion = new RelpConversion(
                 relpConnectionPool,
                 securityConfig,
@@ -115,7 +123,11 @@ public class LookupTest {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
-        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(relpConnectionFactory);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
+                relpConnectionFactory,
+                relpConfig.rebindRequestAmount,
+                relpConfig.rebindEnabled
+        );
         RelpConversion relpConversion = new RelpConversion(
                 relpConnectionPool,
                 securityConfig,

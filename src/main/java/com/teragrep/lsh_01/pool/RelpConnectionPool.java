@@ -22,6 +22,7 @@ package com.teragrep.lsh_01.pool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -35,7 +36,14 @@ public class RelpConnectionPool implements AutoCloseable {
 
     private final Supplier<IRelpConnection> relpConnectionWrapSupplier;
 
+    private final int rebindRequestAmount;
+
+    private final boolean rebindEnabled;
+
     private final ConcurrentLinkedQueue<IRelpConnection> queue;
+
+    // connection, how many times it has been used
+    private final HashMap<IRelpConnection, Integer> connectionsTaken;
 
     private final RelpConnectionStub relpConnectionStub;
 
@@ -43,9 +51,16 @@ public class RelpConnectionPool implements AutoCloseable {
 
     private final AtomicBoolean close;
 
-    public RelpConnectionPool(final Supplier<IRelpConnection> relpConnectionWrapSupplier) {
+    public RelpConnectionPool(
+            final Supplier<IRelpConnection> relpConnectionWrapSupplier,
+            int rebindRequestAmount,
+            boolean rebindEnabled
+    ) {
         this.relpConnectionWrapSupplier = relpConnectionWrapSupplier;
+        this.rebindRequestAmount = rebindRequestAmount;
+        this.rebindEnabled = rebindEnabled;
         this.queue = new ConcurrentLinkedQueue<>();
+        this.connectionsTaken = new HashMap<>();
         this.relpConnectionStub = new RelpConnectionStub();
         this.close = new AtomicBoolean();
 
@@ -62,6 +77,17 @@ public class RelpConnectionPool implements AutoCloseable {
             frameDelegate = queue.poll();
             if (frameDelegate == null) {
                 frameDelegate = relpConnectionWrapSupplier.get();
+                connectionsTaken.put(frameDelegate, 1);
+            }
+            else if (connectionsTaken.get(frameDelegate) >= rebindRequestAmount && rebindEnabled) {
+                // Rebind
+                this.connectionTearDown(frameDelegate);
+                frameDelegate = relpConnectionWrapSupplier.get();
+                connectionsTaken.put(frameDelegate, 1);
+            }
+            else {
+                // Reuse
+                connectionsTaken.put(frameDelegate, connectionsTaken.get(frameDelegate) + 1);
             }
         }
 
@@ -82,21 +108,7 @@ public class RelpConnectionPool implements AutoCloseable {
                             break;
                         }
                         else {
-                            try {
-                                LOGGER.debug("Closing frameDelegate <{}>", queuedConnection);
-                                queuedConnection.disconnect();
-                                LOGGER.debug("Closed frameDelegate <{}>", queuedConnection);
-                            }
-                            catch (Exception exception) {
-                                LOGGER
-                                        .warn(
-                                                "Exception <{}> while closing frameDelegate <{}>",
-                                                exception.getMessage(), queuedConnection
-                                        );
-                            }
-                            finally {
-                                queuedConnection.tearDown();
-                            }
+                            this.connectionTearDown(queuedConnection);
                         }
                     }
                     lock.unlock();
@@ -113,5 +125,19 @@ public class RelpConnectionPool implements AutoCloseable {
 
         // close all that are in the pool right now
         offer(relpConnectionStub);
+    }
+
+    private void connectionTearDown(IRelpConnection connection) {
+        try {
+            LOGGER.debug("Closing frameDelegate <{}>", connection);
+            connection.disconnect();
+            LOGGER.debug("Closed frameDelegate <{}>", connection);
+        }
+        catch (Exception exception) {
+            LOGGER.warn("Exception <{}> while closing frameDelegate <{}>", exception.getMessage(), connection);
+        }
+        finally {
+            connection.tearDown();
+        }
     }
 }
