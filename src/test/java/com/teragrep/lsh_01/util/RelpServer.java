@@ -41,7 +41,6 @@ public class RelpServer {
 
     private EventLoop eventLoop;
     private Thread eventLoopThread;
-    private DefaultFrameDelegate frameDelegate;
     private final int listenPort;
     private final ExecutorService executorService;
 
@@ -72,12 +71,7 @@ public class RelpServer {
         /*
          * DefaultFrameDelegate accepts Consumer<FrameContext> for processing syslog frames
          */
-        frameDelegate = new DefaultFrameDelegate(syslogConsumer);
-
-        /*
-         * Same instance of the frameDelegate is shared with every connection
-         */
-        Supplier<FrameDelegate> frameDelegateSupplier = () -> frameDelegate;
+        Supplier<FrameDelegate> frameDelegateSupplier = () -> new DefaultFrameDelegate(syslogConsumer);
 
         /*
          * EventLoop is used to notice any events from the connections
@@ -133,15 +127,6 @@ public class RelpServer {
             throw new RuntimeException(interruptedException);
         }
 
-        /*
-         * Close the frameDelegate
-         */
-        try {
-            frameDelegate.close();
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         executorService.shutdown();
     }
 
