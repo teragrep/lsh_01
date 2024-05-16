@@ -64,8 +64,8 @@ public class EndToEndTest {
 
     @AfterAll
     void tearDown() {
-        System.setProperty("payload.splitEnabled", "false");
-        System.setProperty("security.authRequired", "true");
+        System.clearProperty("payload.splitEnabled");
+        System.clearProperty("security.authRequired");
         this.relpServer.tearDown();
     }
 
