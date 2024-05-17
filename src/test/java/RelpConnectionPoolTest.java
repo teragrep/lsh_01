@@ -26,6 +26,7 @@ import com.teragrep.rlp_01.RelpBatch;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -96,6 +97,81 @@ public class RelpConnectionPoolTest {
             // after rebindRequestAmount of requests, there should be a new connection
             Assertions.assertNotEquals(initialRelpConnection, newRelpConnection);
             initialRelpConnection = newRelpConnection;
+        }
+    }
+
+    @Test
+    public void rebindDisabledTest() throws IOException, TimeoutException {
+        System.setProperty("relp.rebindRequestAmount", "1000");
+
+        RelpConfig relpConfig = new RelpConfig();
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
+                relpConnectionFactory,
+                relpConfig.rebindRequestAmount,
+                relpConfig.rebindEnabled
+        );
+
+        IRelpConnection initialRelpConnection = relpConnectionPool.take();
+        initialRelpConnection.commit(new RelpBatch());
+        relpConnectionPool.offer(initialRelpConnection);
+        IRelpConnection newRelpConnection;
+
+        for (int i = 0; i < relpConfig.rebindRequestAmount * 4; i++) {
+            newRelpConnection = relpConnectionPool.take();
+            Assertions.assertEquals(initialRelpConnection, newRelpConnection); // always the same connection (rebind disabled)
+
+            newRelpConnection.commit(new RelpBatch()); // send empty batch to RELP server
+
+            relpConnectionPool.offer(newRelpConnection);
+        }
+    }
+
+    @Test
+    public void multipleConnectionsRebindTest() throws IOException, TimeoutException {
+        System.setProperty("relp.rebindEnabled", "true");
+        System.setProperty("relp.rebindRequestAmount", "1000");
+
+        RelpConfig relpConfig = new RelpConfig();
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
+                relpConnectionFactory,
+                relpConfig.rebindRequestAmount,
+                relpConfig.rebindEnabled
+        );
+
+        // get three connections
+        ArrayList<IRelpConnection> connections = new ArrayList<>();
+        connections.add(relpConnectionPool.take());
+        connections.add(relpConnectionPool.take());
+        connections.add(relpConnectionPool.take());
+
+        for (IRelpConnection connection : connections) {
+            connection.commit(new RelpBatch());
+            relpConnectionPool.offer(connection);
+        }
+
+        for (int i = 0; i < 3; i++) { // three rebinds
+            for (int j = 0; j < relpConfig.rebindRequestAmount - 1; j++) { // run until rebind
+                for (IRelpConnection connection : connections) { // assert same connection for each
+                    IRelpConnection takenConnection = relpConnectionPool.take();
+
+                    Assertions.assertEquals(connection, takenConnection); // reuse the connection
+
+                    takenConnection.commit(new RelpBatch()); // send empty batch to RELP server
+                    relpConnectionPool.offer(takenConnection);
+                }
+            }
+
+            for (IRelpConnection connection : connections) { // assert new connection for each
+                IRelpConnection newRelpConnection = relpConnectionPool.take();
+                newRelpConnection.commit(new RelpBatch());
+                relpConnectionPool.offer(newRelpConnection);
+
+                // after rebindRequestAmount of requests, there should be a new connection
+                Assertions.assertNotEquals(connection, newRelpConnection);
+                connections.set(connections.indexOf(connection), newRelpConnection);
+            }
         }
     }
 }
