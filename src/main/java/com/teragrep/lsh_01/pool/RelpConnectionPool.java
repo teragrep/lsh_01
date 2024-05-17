@@ -22,7 +22,6 @@ package com.teragrep.lsh_01.pool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -42,9 +41,6 @@ public class RelpConnectionPool implements AutoCloseable {
 
     private final ConcurrentLinkedQueue<IRelpConnection> queue;
 
-    // connection, how many times it has been used
-    private final HashMap<IRelpConnection, Integer> connectionsTaken;
-
     private final RelpConnectionStub relpConnectionStub;
 
     private final Lock lock = new ReentrantLock();
@@ -60,7 +56,6 @@ public class RelpConnectionPool implements AutoCloseable {
         this.rebindRequestAmount = rebindRequestAmount;
         this.rebindEnabled = rebindEnabled;
         this.queue = new ConcurrentLinkedQueue<>();
-        this.connectionsTaken = new HashMap<>();
         this.relpConnectionStub = new RelpConnectionStub();
         this.close = new AtomicBoolean();
 
@@ -77,17 +72,11 @@ public class RelpConnectionPool implements AutoCloseable {
             frameDelegate = queue.poll();
             if (frameDelegate == null) {
                 frameDelegate = relpConnectionWrapSupplier.get();
-                connectionsTaken.put(frameDelegate, 1);
             }
-            else if (connectionsTaken.get(frameDelegate) >= rebindRequestAmount && rebindEnabled) {
+            else if (frameDelegate.recordsSent() >= rebindRequestAmount && rebindEnabled) {
                 // Rebind
                 this.connectionTearDown(frameDelegate);
                 frameDelegate = relpConnectionWrapSupplier.get();
-                connectionsTaken.put(frameDelegate, 1);
-            }
-            else {
-                // Reuse
-                connectionsTaken.put(frameDelegate, connectionsTaken.get(frameDelegate) + 1);
             }
         }
 

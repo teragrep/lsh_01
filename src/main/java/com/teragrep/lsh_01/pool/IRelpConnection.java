@@ -49,7 +49,9 @@ public interface IRelpConnection {
 
     void setTxBufferSize(int size);
 
-    boolean connect(String hostname, int port) throws IOException, IllegalStateException, TimeoutException;
+    int recordsSent();
+
+    boolean connect() throws IOException, IllegalStateException, TimeoutException;
 
     void tearDown();
 

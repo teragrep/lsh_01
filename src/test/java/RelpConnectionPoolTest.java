@@ -22,7 +22,11 @@ import com.teragrep.lsh_01.pool.IRelpConnection;
 import com.teragrep.lsh_01.pool.RelpConnectionFactory;
 import com.teragrep.lsh_01.pool.RelpConnectionPool;
 import com.teragrep.lsh_01.util.RelpServer;
+import com.teragrep.rlp_01.RelpBatch;
 import org.junit.jupiter.api.*;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RelpConnectionPoolTest {
@@ -31,6 +35,8 @@ public class RelpConnectionPoolTest {
 
     @BeforeAll
     void setUp() {
+        System.setProperty("relp.reconnectInterval", "1000");
+
         this.relpServer = new RelpServer();
         this.relpServer.setUp();
     }
@@ -51,11 +57,12 @@ public class RelpConnectionPoolTest {
 
     @AfterAll
     void tearDown() {
+        System.clearProperty("relp.reconnectInterval");
         this.relpServer.tearDown();
     }
 
     @Test
-    public void multipleRebindsTest() {
+    public void multipleRebindsTest() throws IOException, TimeoutException {
         System.setProperty("relp.rebindEnabled", "true");
         System.setProperty("relp.rebindRequestAmount", "1000");
 
@@ -68,6 +75,7 @@ public class RelpConnectionPoolTest {
         );
 
         IRelpConnection initialRelpConnection = relpConnectionPool.take();
+        initialRelpConnection.commit(new RelpBatch());
         relpConnectionPool.offer(initialRelpConnection);
         IRelpConnection newRelpConnection;
 
@@ -76,10 +84,13 @@ public class RelpConnectionPoolTest {
                 newRelpConnection = relpConnectionPool.take();
                 Assertions.assertEquals(initialRelpConnection, newRelpConnection); // reuse the same connection
 
+                newRelpConnection.commit(new RelpBatch()); // send empty batch to RELP server
+
                 relpConnectionPool.offer(newRelpConnection);
             }
 
             newRelpConnection = relpConnectionPool.take();
+            newRelpConnection.commit(new RelpBatch());
             relpConnectionPool.offer(newRelpConnection);
 
             // after rebindRequestAmount of requests, there should be a new connection

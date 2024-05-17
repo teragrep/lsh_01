@@ -87,7 +87,12 @@ public class RelpConnectionStub implements IRelpConnection {
     }
 
     @Override
-    public boolean connect(String hostname, int port) throws IOException, IllegalStateException, TimeoutException {
+    public int recordsSent() {
+        return 0;
+    }
+
+    @Override
+    public boolean connect() throws IOException, IllegalStateException, TimeoutException {
         throw new IllegalStateException("RelpConnectionStub does not support this");
     }
 

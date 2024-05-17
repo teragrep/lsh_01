@@ -36,12 +36,10 @@ public class ManagedRelpConnection {
     }
 
     void connect() {
-        boolean notConnected = true;
-        while (notConnected) {
-            boolean connected = false;
+        boolean connected = false;
+        while (!connected) {
             try {
-                connected = relpConnection
-                        .connect(relpConnection.relpConfig().relpTarget, relpConnection.relpConfig().relpPort);
+                connected = relpConnection.connect();
             }
             catch (Exception e) {
                 LOGGER
@@ -51,16 +49,12 @@ public class ManagedRelpConnection {
                                 e.getMessage()
                         );
             }
-            if (connected) {
-                notConnected = false;
+
+            try {
+                Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
             }
-            else {
-                try {
-                    Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
-                }
-                catch (InterruptedException e) {
-                    LOGGER.error("Reconnect timer interrupted, reconnecting now");
-                }
+            catch (InterruptedException e) {
+                LOGGER.error("Reconnect timer interrupted, reconnecting now");
             }
         }
     }

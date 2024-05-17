@@ -30,10 +30,12 @@ public class RelpConnectionWithConfig implements IRelpConnection {
 
     private final RelpConnection relpConnection;
     private final RelpConfig relpConfig;
+    private int recordsSent;
 
     public RelpConnectionWithConfig(RelpConnection relpConnection, RelpConfig relpConfig) {
         this.relpConnection = relpConnection;
         this.relpConfig = relpConfig;
+        this.recordsSent = 0;
     }
 
     @Override
@@ -92,8 +94,13 @@ public class RelpConnectionWithConfig implements IRelpConnection {
     }
 
     @Override
-    public boolean connect(String hostname, int port) throws IOException, IllegalStateException, TimeoutException {
-        return relpConnection.connect(hostname, port);
+    public int recordsSent() {
+        return recordsSent;
+    }
+
+    @Override
+    public boolean connect() throws IOException, IllegalStateException, TimeoutException {
+        return relpConnection.connect(relpConfig.relpTarget, relpConfig().relpPort);
     }
 
     @Override
@@ -109,6 +116,7 @@ public class RelpConnectionWithConfig implements IRelpConnection {
     @Override
     public void commit(RelpBatch relpBatch) throws IOException, IllegalStateException, TimeoutException {
         relpConnection.commit(relpBatch);
+        recordsSent++;
     }
 
     @Override
