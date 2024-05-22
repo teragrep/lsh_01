@@ -28,6 +28,4 @@ public interface IManagedRelpConnection extends Poolable {
     void disconnect();
 
     void tearDown();
-
-    boolean isStub();
 }

@@ -19,8 +19,6 @@
 */
 package com.teragrep.lsh_01.pool;
 
-import java.io.IOException;
-
 public class ManagedRelpConnectionStub implements IManagedRelpConnection {
 
     @Override
