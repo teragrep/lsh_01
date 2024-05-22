@@ -43,6 +43,8 @@ public class RelpServer {
     private Thread eventLoopThread;
     private final int listenPort;
     private final ExecutorService executorService;
+    private final Consumer<FrameContext> syslogConsumer;
+    private final List<CountingFrameDelegate> frameDelegates;
 
     private final List<String> payloads;
 
@@ -50,16 +52,12 @@ public class RelpServer {
         RelpConfig relpConfig = new RelpConfig();
         this.listenPort = relpConfig.relpPort;
         this.payloads = new ArrayList<>();
+        this.frameDelegates = new ArrayList<>();
 
         int threads = 1;
         this.executorService = Executors.newFixedThreadPool(threads);
-    }
 
-    /**
-     * Set up the server before running end-to-end tests.
-     */
-    public void setUp() {
-        Consumer<FrameContext> syslogConsumer = new Consumer<>() {
+        this.syslogConsumer = new Consumer<>() {
 
             // NOTE: synchronized because frameDelegateSupplier returns this instance for all the parallel connections
             @Override
@@ -67,12 +65,28 @@ public class RelpServer {
                 payloads.add(frameContext.relpFrame().payload().toString());
             }
         };
+    }
 
-        /*
-         * DefaultFrameDelegate accepts Consumer<FrameContext> for processing syslog frames
-         */
-        Supplier<FrameDelegate> frameDelegateSupplier = () -> new DefaultFrameDelegate(syslogConsumer);
+    /**
+     * Set up the server before running end-to-end tests. Uses DefaultFrameDelegate.
+     */
+    public void setUpDefault() {
+        setUp(() -> new DefaultFrameDelegate(this.syslogConsumer));
+    }
 
+    /**
+     * Set up the server before running end-to-end tests. Uses CountingFrameDelegate.
+     */
+    public void setUpCounting() {
+        setUp(this::addCountingFrameDelegate);
+    }
+
+    /**
+     * Set up the server before running end-to-end tests.
+     *
+     * @param frameDelegateSupplier custom FrameDelegateSupplier
+     */
+    private void setUp(Supplier<FrameDelegate> frameDelegateSupplier) {
         /*
          * EventLoop is used to notice any events from the connections
          */
@@ -139,5 +153,15 @@ public class RelpServer {
 
     public List<String> payloads() {
         return payloads;
+    }
+
+    public List<CountingFrameDelegate> frameDelegates() {
+        return frameDelegates;
+    }
+
+    private FrameDelegate addCountingFrameDelegate() {
+        CountingFrameDelegate frameDelegate = new CountingFrameDelegate();
+        frameDelegates.add(frameDelegate);
+        return frameDelegate;
     }
 }

@@ -53,7 +53,7 @@ public class EndToEndTest {
         Thread.sleep(3000); // wait for netty to start up
 
         this.relpServer = new RelpServer();
-        this.relpServer.setUp();
+        this.relpServer.setUpDefault();
 
         this.nettyConfig = new NettyConfig();
     }
