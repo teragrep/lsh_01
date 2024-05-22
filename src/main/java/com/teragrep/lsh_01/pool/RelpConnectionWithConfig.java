@@ -22,20 +22,21 @@ package com.teragrep.lsh_01.pool;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class RelpConnectionWithConfig implements IRelpConnection {
 
+    private final static Logger LOGGER = LogManager.getLogger(RelpConnectionWithConfig.class);
     private final RelpConnection relpConnection;
     private final RelpConfig relpConfig;
-    private int recordsSent;
 
     public RelpConnectionWithConfig(RelpConnection relpConnection, RelpConfig relpConfig) {
         this.relpConnection = relpConnection;
         this.relpConfig = relpConfig;
-        this.recordsSent = 0;
     }
 
     @Override
@@ -94,13 +95,8 @@ public class RelpConnectionWithConfig implements IRelpConnection {
     }
 
     @Override
-    public int recordsSent() {
-        return recordsSent;
-    }
-
-    @Override
-    public boolean connect() throws IOException, IllegalStateException, TimeoutException {
-        return relpConnection.connect(relpConfig.relpTarget, relpConfig().relpPort);
+    public boolean connect(String hostname, int port) throws IOException, IllegalStateException, TimeoutException {
+        return relpConnection.connect(hostname, port);
     }
 
     @Override
@@ -116,12 +112,6 @@ public class RelpConnectionWithConfig implements IRelpConnection {
     @Override
     public void commit(RelpBatch relpBatch) throws IOException, IllegalStateException, TimeoutException {
         relpConnection.commit(relpBatch);
-        recordsSent++;
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
     }
 
     @Override

@@ -49,17 +49,13 @@ public interface IRelpConnection {
 
     void setTxBufferSize(int size);
 
-    int recordsSent();
-
-    boolean connect() throws IOException, IllegalStateException, TimeoutException;
+    boolean connect(String hostname, int port) throws IOException, IllegalStateException, TimeoutException;
 
     void tearDown();
 
     boolean disconnect() throws IOException, IllegalStateException, TimeoutException;
 
     void commit(RelpBatch relpBatch) throws IOException, IllegalStateException, TimeoutException;
-
-    boolean isStub();
 
     RelpConfig relpConfig();
 }

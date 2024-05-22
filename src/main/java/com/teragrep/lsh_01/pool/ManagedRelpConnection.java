@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class ManagedRelpConnection {
+public class ManagedRelpConnection implements IManagedRelpConnection {
 
     private static final Logger LOGGER = LogManager.getLogger(ManagedRelpConnection.class);
     private final IRelpConnection relpConnection;
@@ -35,11 +35,13 @@ public class ManagedRelpConnection {
         this.relpConnection = relpConnection;
     }
 
-    void connect() {
+    @Override
+    public void connect() {
         boolean connected = false;
         while (!connected) {
             try {
-                connected = relpConnection.connect();
+                connected = relpConnection
+                        .connect(relpConnection.relpConfig().relpTarget, relpConnection.relpConfig().relpPort);
             }
             catch (Exception e) {
                 LOGGER
@@ -59,11 +61,13 @@ public class ManagedRelpConnection {
         }
     }
 
-    private void tearDown() {
+    @Override
+    public void tearDown() {
         relpConnection.tearDown();
     }
 
-    private void disconnect() {
+    @Override
+    public void disconnect() {
         boolean disconnected = false;
         try {
             disconnected = relpConnection.disconnect();
@@ -76,6 +80,7 @@ public class ManagedRelpConnection {
         }
     }
 
+    @Override
     public void ensureSent(byte[] bytes) {
         final RelpBatch relpBatch = new RelpBatch();
         relpBatch.insert(bytes);
@@ -95,6 +100,24 @@ public class ManagedRelpConnection {
             else {
                 notSent = false;
             }
+        }
+    }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
+
+    @Override
+    public void close() {
+        try {
+            this.relpConnection.disconnect();
+        }
+        catch (IllegalStateException | IOException | TimeoutException e) {
+            LOGGER.error("Forcefully closing connection due to exception <{}>", e.getMessage());
+        }
+        finally {
+            this.relpConnection.tearDown();
         }
     }
 }

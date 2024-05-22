@@ -22,8 +22,7 @@ package com.teragrep.lsh_01;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
-import com.teragrep.lsh_01.pool.RelpConnectionFactory;
-import com.teragrep.lsh_01.pool.RelpConnectionPool;
+import com.teragrep.lsh_01.pool.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,14 +58,10 @@ public class Main {
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
-        RelpConnectionPool relpConnectionPool = new RelpConnectionPool(
-                relpConnectionFactory,
-                relpConfig.rebindRequestAmount,
-                relpConfig.rebindEnabled
-        );
+        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         RelpConversion relpConversion = new RelpConversion(
-                relpConnectionPool,
+                pool,
                 securityConfig,
                 basicAuthentication,
                 lookupConfig,
@@ -85,7 +80,7 @@ public class Main {
             server.run();
         }
         finally {
-            relpConnectionPool.close();
+            pool.close();
         }
     }
 }
