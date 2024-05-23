@@ -152,4 +152,12 @@ public class RebindTest {
         Assertions
                 .assertEquals(relpConfig.rebindRequestAmount + 1, relpServer.frameDelegates().get(0).recordsReceived());
     }
+
+    @Test
+    public void testCloseWithoutConnecting() {
+        ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(
+                new RelpConnectionWithConfig(new RelpConnection(), new RelpConfig())
+        );
+        Assertions.assertDoesNotThrow(managedRelpConnection::close);
+    }
 }

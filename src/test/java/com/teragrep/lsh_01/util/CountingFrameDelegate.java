@@ -23,6 +23,7 @@ import com.teragrep.rlp_03.frame.delegate.DefaultFrameDelegate;
 import com.teragrep.rlp_03.frame.delegate.FrameContext;
 import com.teragrep.rlp_03.frame.delegate.FrameDelegate;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -31,7 +32,7 @@ import java.util.function.Consumer;
 public class CountingFrameDelegate implements FrameDelegate {
 
     private final DefaultFrameDelegate frameDelegate;
-    private int recordsReceived = 0;
+    private final AtomicInteger recordsReceived = new AtomicInteger();
 
     public CountingFrameDelegate() {
         Consumer<FrameContext> countingConsumer = new Consumer<>() {
@@ -39,7 +40,7 @@ public class CountingFrameDelegate implements FrameDelegate {
             // NOTE: synchronized because frameDelegateSupplier returns this instance for all the parallel connections
             @Override
             public synchronized void accept(FrameContext frameContext) {
-                recordsReceived++;
+                recordsReceived.getAndIncrement();
             }
         };
 
@@ -47,7 +48,7 @@ public class CountingFrameDelegate implements FrameDelegate {
     }
 
     public int recordsReceived() {
-        return recordsReceived;
+        return recordsReceived.get();
     }
 
     @Override

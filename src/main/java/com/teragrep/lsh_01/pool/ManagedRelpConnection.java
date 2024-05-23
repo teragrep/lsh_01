@@ -30,14 +30,15 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
 
     private static final Logger LOGGER = LogManager.getLogger(ManagedRelpConnection.class);
     private final IRelpConnection relpConnection;
-    private boolean connected;
+    private boolean hasConnected;
 
     public ManagedRelpConnection(IRelpConnection relpConnection) {
         this.relpConnection = relpConnection;
-        this.connected = false;
+        this.hasConnected = false;
     }
 
     private void connect() {
+        boolean connected = false;
         while (!connected) {
             try {
                 connected = relpConnection
@@ -59,25 +60,21 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
                 LOGGER.error("Reconnect timer interrupted, reconnecting now");
             }
         }
+        this.hasConnected = true;
     }
 
     private void tearDown() {
         /*
-         TODO remove: wouldn't need a check but there is a bug in RLP-01 tearDown()
+         TODO remove: wouldn't need a check hasConnected but there is a bug in RLP-01 tearDown()
          see https://github.com/teragrep/rlp_01/issues/63 for further info
          */
-        if (connected) {
+        if (hasConnected) {
             relpConnection.tearDown();
         }
-        connected = false;
     }
 
     @Override
     public void ensureSent(byte[] bytes) {
-        if (!connected) {
-            connect();
-        }
-
         final RelpBatch relpBatch = new RelpBatch();
         relpBatch.insert(bytes);
         boolean notSent = true;
@@ -113,7 +110,7 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
             LOGGER.error("Forcefully closing connection due to exception <{}>", e.getMessage());
         }
         finally {
-            this.relpConnection.tearDown();
+            tearDown();
         }
     }
 }
