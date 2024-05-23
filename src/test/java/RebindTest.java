@@ -160,4 +160,18 @@ public class RebindTest {
         );
         Assertions.assertDoesNotThrow(managedRelpConnection::close);
     }
+
+    @Test
+    public void testThrowsWithInvalidRebindRequestAmount_negative() {
+        System.setProperty("relp.rebindRequestAmount", "-1");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new RelpConfig().validate());
+    }
+
+    @Test
+    public void testThrowsWithInvalidRebindRequestAmount_zero() {
+        System.setProperty("relp.rebindRequestAmount", "0");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new RelpConfig().validate());
+    }
 }
