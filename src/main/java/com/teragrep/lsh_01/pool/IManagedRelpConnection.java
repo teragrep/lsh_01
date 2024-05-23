@@ -22,10 +22,4 @@ package com.teragrep.lsh_01.pool;
 public interface IManagedRelpConnection extends Poolable {
 
     void ensureSent(byte[] bytes);
-
-    void connect();
-
-    void disconnect();
-
-    void tearDown();
 }

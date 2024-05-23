@@ -43,12 +43,6 @@ public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
             managedRelpConnection = new RebindableRelpConnection(managedRelpConnection, relpConfig.rebindRequestAmount);
         }
 
-        /*
-         TODO remove: shouldn't be here, but there is a bug in tearDown, so we initialize connection here
-         see https://github.com/teragrep/rlp_01/issues/63 for further info
-         */
-        managedRelpConnection.connect();
-
         return managedRelpConnection;
     }
 

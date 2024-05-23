@@ -27,21 +27,6 @@ public class ManagedRelpConnectionStub implements IManagedRelpConnection {
     }
 
     @Override
-    public void connect() {
-        throw new IllegalStateException("ManagedRelpConnectionStub does not support this");
-    }
-
-    @Override
-    public void disconnect() {
-        throw new IllegalStateException("ManagedRelpConnectionStub does not support this");
-    }
-
-    @Override
-    public void tearDown() {
-        throw new IllegalStateException("ManagedRelpConnectionStub does not support this");
-    }
-
-    @Override
     public boolean isStub() {
         return true;
     }

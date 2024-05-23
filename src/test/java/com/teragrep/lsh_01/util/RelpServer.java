@@ -149,6 +149,7 @@ public class RelpServer {
      */
     public void clear() {
         payloads.clear();
+        frameDelegates.clear();
     }
 
     public List<String> payloads() {

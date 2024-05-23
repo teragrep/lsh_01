@@ -18,9 +18,7 @@
   limitations under the License.
 */
 import com.teragrep.lsh_01.config.RelpConfig;
-import com.teragrep.lsh_01.pool.ManagedRelpConnection;
-import com.teragrep.lsh_01.pool.RebindableRelpConnection;
-import com.teragrep.lsh_01.pool.RelpConnectionWithConfig;
+import com.teragrep.lsh_01.pool.*;
 import com.teragrep.lsh_01.util.CountingFrameDelegate;
 import com.teragrep.lsh_01.util.RelpServer;
 import com.teragrep.rlo_14.Facility;
@@ -39,12 +37,15 @@ public class RebindTest {
 
     @BeforeAll
     void setUp() {
-        System.setProperty("relp.rebindEnabled", "true");
-        System.setProperty("relp.rebindRequestAmount", "5");
-        System.setProperty("relp.reconnectInterval", "1000");
-
         this.relpServer = new RelpServer();
         this.relpServer.setUpCounting();
+    }
+
+    @BeforeEach
+    void setProperties() {
+        System.setProperty("relp.rebindEnabled", "true");
+        System.setProperty("relp.rebindRequestAmount", "5");
+        System.setProperty("relp.reconnectInterval", "500");
     }
 
     @AfterEach
@@ -67,7 +68,6 @@ public class RebindTest {
                 new ManagedRelpConnection(new RelpConnectionWithConfig(new RelpConnection(), relpConfig)),
                 relpConfig.rebindRequestAmount
         );
-        connection.connect();
 
         SyslogMessage syslogMessage = new SyslogMessage()
                 .withFacility(Facility.USER)
@@ -85,5 +85,71 @@ public class RebindTest {
         Assertions.assertEquals(relpConfig.rebindRequestAmount, frameDelegates.get(1).recordsReceived());
         Assertions.assertEquals(relpConfig.rebindRequestAmount, frameDelegates.get(2).recordsReceived());
         Assertions.assertEquals(1, frameDelegates.get(3).recordsReceived()); // last one receives only 1 message
+    }
+
+    @Test
+    public void testRebindMultipleConnections() {
+        RelpConfig relpConfig = new RelpConfig();
+
+        // Multiple connections together using the RelpConnectionFactory and the Pool
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+
+        IManagedRelpConnection firstConnection = pool.get();
+        IManagedRelpConnection secondConnection = pool.get();
+        IManagedRelpConnection thirdConnection = pool.get();
+
+        SyslogMessage syslogMessage = new SyslogMessage()
+                .withFacility(Facility.USER)
+                .withSeverity(Severity.INFORMATIONAL)
+                .withMsg("foobar");
+
+        byte[] bytes = syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8);
+
+        for (int i = 0; i <= relpConfig.rebindRequestAmount * 3; i++) { // 3 rebinds
+            firstConnection.ensureSent(bytes);
+            pool.offer(firstConnection);
+            secondConnection.ensureSent(bytes);
+            pool.offer(secondConnection);
+            thirdConnection.ensureSent(bytes);
+            pool.offer(thirdConnection);
+        }
+
+        List<CountingFrameDelegate> frameDelegates = relpServer.frameDelegates();
+        Assertions.assertEquals(12, frameDelegates.size());
+
+        for (int i = 0; i < 9; i++) {
+            Assertions.assertEquals(relpConfig.rebindRequestAmount, frameDelegates.get(i).recordsReceived());
+        }
+
+        for (int i = 9; i < 12; i++) {
+            Assertions.assertEquals(1, frameDelegates.get(i).recordsReceived()); // last one receives only 1 message
+        }
+    }
+
+    @Test
+    public void testRebindDisabled() {
+        System.setProperty("relp.rebindEnabled", "false");
+
+        RelpConfig relpConfig = new RelpConfig();
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+
+        IManagedRelpConnection connection = pool.get();
+
+        SyslogMessage syslogMessage = new SyslogMessage()
+                .withFacility(Facility.USER)
+                .withSeverity(Severity.INFORMATIONAL)
+                .withMsg("foobar");
+
+        for (int i = 0; i <= relpConfig.rebindRequestAmount; i++) { // rebind + 1
+            connection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+        }
+
+        // Only one connection should have been used with rebindEnabled = false
+        Assertions.assertEquals(1, relpServer.frameDelegates().size());
+        Assertions
+                .assertEquals(relpConfig.rebindRequestAmount + 1, relpServer.frameDelegates().get(0).recordsReceived());
     }
 }

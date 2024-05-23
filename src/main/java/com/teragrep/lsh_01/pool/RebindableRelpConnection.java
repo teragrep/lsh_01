@@ -41,26 +41,21 @@ public class RebindableRelpConnection implements IManagedRelpConnection {
     @Override
     public void ensureSent(byte[] bytes) {
         if (recordsSent >= rebindRequestAmount) {
-            rebind();
+            LOGGER.debug("Rebinding ManagedRelpConnection <{}>", managedRelpConnection);
+            try {
+                close();
+            }
+            catch (Exception exception) {
+                LOGGER
+                        .warn(
+                                "Exception <{}> while closing ManagedRelpConnection <{}>", exception.getMessage(),
+                                managedRelpConnection
+                        );
+            }
             recordsSent = 0;
         }
         managedRelpConnection.ensureSent(bytes);
         recordsSent++;
-    }
-
-    @Override
-    public void connect() {
-        managedRelpConnection.connect();
-    }
-
-    @Override
-    public void disconnect() {
-        managedRelpConnection.disconnect();
-    }
-
-    @Override
-    public void tearDown() {
-        managedRelpConnection.tearDown();
     }
 
     @Override
@@ -71,13 +66,5 @@ public class RebindableRelpConnection implements IManagedRelpConnection {
     @Override
     public void close() throws IOException {
         managedRelpConnection.close();
-    }
-
-    private void rebind() {
-        LOGGER.debug("Starting to rebind ManagedRelpConnection <{}>", managedRelpConnection);
-        managedRelpConnection.disconnect();
-        managedRelpConnection.tearDown();
-        managedRelpConnection.connect();
-        LOGGER.debug("Done rebinding ManagedRelpConnection <{}>", managedRelpConnection);
     }
 }
