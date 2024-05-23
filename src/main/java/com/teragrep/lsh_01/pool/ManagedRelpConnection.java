@@ -41,6 +41,7 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
         boolean connected = false;
         while (!connected) {
             try {
+                this.hasConnected = true;
                 connected = relpConnection
                         .connect(relpConnection.relpConfig().relpTarget, relpConnection.relpConfig().relpPort);
             }
@@ -60,7 +61,6 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
                 LOGGER.error("Reconnect timer interrupted, reconnecting now");
             }
         }
-        this.hasConnected = true;
     }
 
     private void tearDown() {
