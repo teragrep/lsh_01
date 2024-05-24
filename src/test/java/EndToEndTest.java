@@ -45,6 +45,7 @@ public class EndToEndTest {
         System.setProperty("payload.splitEnabled", "true");
         System.setProperty("security.authRequired", "false");
         System.setProperty("relp.reconnectInterval", "1000");
+        System.setProperty("relp.port", "1601");
 
         // Start listening to HTTP-requests
         Thread program = new Thread(() -> Main.main(new String[] {}));
@@ -68,6 +69,7 @@ public class EndToEndTest {
         System.clearProperty("payload.splitEnabled");
         System.clearProperty("security.authRequired");
         System.clearProperty("relp.reconnectInterval");
+        System.clearProperty("relp.port");
         this.relpServer.tearDown();
     }
 

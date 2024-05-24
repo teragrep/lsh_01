@@ -37,6 +37,8 @@ public class RebindTest {
 
     @BeforeAll
     void setUp() {
+        System.setProperty("relp.port", "1601");
+
         this.relpServer = new RelpServer();
         this.relpServer.setUpCounting();
     }
@@ -58,6 +60,7 @@ public class RebindTest {
         System.clearProperty("relp.rebindEnabled");
         System.clearProperty("relp.rebindRequestAmount");
         System.clearProperty("relp.reconnectInterval");
+        System.clearProperty("relp.port");
         this.relpServer.tearDown();
     }
 
