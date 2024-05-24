@@ -44,15 +44,16 @@ public class EndToEndTest {
     void setUp() throws InterruptedException {
         System.setProperty("payload.splitEnabled", "true");
         System.setProperty("security.authRequired", "false");
+        System.setProperty("relp.reconnectInterval", "1000");
 
         // Start listening to HTTP-requests
-        Thread program = new Thread(() -> Main.main(new String[]{}));
+        Thread program = new Thread(() -> Main.main(new String[] {}));
         program.start();
 
         Thread.sleep(3000); // wait for netty to start up
 
         this.relpServer = new RelpServer();
-        this.relpServer.setUp();
+        this.relpServer.setUpDefault();
 
         this.nettyConfig = new NettyConfig();
     }
@@ -66,6 +67,7 @@ public class EndToEndTest {
     void tearDown() {
         System.clearProperty("payload.splitEnabled");
         System.clearProperty("security.authRequired");
+        System.clearProperty("relp.reconnectInterval");
         this.relpServer.tearDown();
     }
 

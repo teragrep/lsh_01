@@ -26,9 +26,7 @@ import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
-import com.teragrep.lsh_01.pool.IRelpConnection;
-import com.teragrep.lsh_01.pool.ManagedRelpConnection;
-import com.teragrep.lsh_01.pool.RelpConnectionPool;
+import com.teragrep.lsh_01.pool.*;
 import com.teragrep.rlo_14.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +40,7 @@ import java.util.regex.Pattern;
 public class RelpConversion implements IMessageHandler {
 
     private final static Logger LOGGER = LogManager.getLogger(RelpConversion.class);
-    private final RelpConnectionPool relpConnectionPool;
+    private final Pool<IManagedRelpConnection> relpConnectionPool;
     private final SecurityConfig securityConfig;
     private final BasicAuthentication basicAuthentication;
     private final LookupConfig lookupConfig;
@@ -51,7 +49,7 @@ public class RelpConversion implements IMessageHandler {
     private final StringLookupTable appnameLookup;
 
     public RelpConversion(
-            RelpConnectionPool relpConnectionPool,
+            Pool<IManagedRelpConnection> relpConnectionPool,
             SecurityConfig securityConfig,
             BasicAuthentication basicAuthentication,
             LookupConfig lookupConfig,
@@ -139,9 +137,8 @@ public class RelpConversion implements IMessageHandler {
                 .withSDElement(headerSDElement)
                 .withSDElement(sdElement);
 
-        IRelpConnection relpConnection = relpConnectionPool.take();
-        ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection);
-        managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+        IManagedRelpConnection relpConnection = relpConnectionPool.get();
+        relpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
         relpConnectionPool.offer(relpConnection);
     }
 }

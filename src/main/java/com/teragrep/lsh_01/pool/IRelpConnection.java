@@ -57,7 +57,5 @@ public interface IRelpConnection {
 
     void commit(RelpBatch relpBatch) throws IOException, IllegalStateException, TimeoutException;
 
-    boolean isStub();
-
     RelpConfig relpConfig();
 }

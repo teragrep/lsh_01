@@ -22,12 +22,15 @@ package com.teragrep.lsh_01.pool;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class RelpConnectionWithConfig implements IRelpConnection {
 
+    private final static Logger LOGGER = LogManager.getLogger(RelpConnectionWithConfig.class);
     private final RelpConnection relpConnection;
     private final RelpConfig relpConfig;
 
@@ -109,11 +112,6 @@ public class RelpConnectionWithConfig implements IRelpConnection {
     @Override
     public void commit(RelpBatch relpBatch) throws IOException, IllegalStateException, TimeoutException {
         relpConnection.commit(relpBatch);
-    }
-
-    @Override
-    public boolean isStub() {
-        return false;
     }
 
     @Override

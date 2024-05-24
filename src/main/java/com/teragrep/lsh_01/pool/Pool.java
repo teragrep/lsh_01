@@ -28,74 +28,68 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-// TODO create test cases
-public class RelpConnectionPool implements AutoCloseable {
+public class Pool<T extends Poolable> implements AutoCloseable, Supplier<T> {
 
-    private static final Logger LOGGER = LogManager.getLogger(RelpConnectionPool.class);
+    private static final Logger LOGGER = LogManager.getLogger(com.teragrep.lsh_01.pool.Pool.class);
 
-    private final Supplier<IRelpConnection> relpConnectionWrapSupplier;
+    private final Supplier<T> supplier;
 
-    private final ConcurrentLinkedQueue<IRelpConnection> queue;
+    private final ConcurrentLinkedQueue<T> queue;
 
-    private final RelpConnectionStub relpConnectionStub;
+    private final T stub;
 
     private final Lock lock = new ReentrantLock();
 
     private final AtomicBoolean close;
 
-    public RelpConnectionPool(final Supplier<IRelpConnection> relpConnectionWrapSupplier) {
-        this.relpConnectionWrapSupplier = relpConnectionWrapSupplier;
+    public Pool(final Supplier<T> supplier, T stub) {
+        this.supplier = supplier;
         this.queue = new ConcurrentLinkedQueue<>();
-        this.relpConnectionStub = new RelpConnectionStub();
+        this.stub = stub;
         this.close = new AtomicBoolean();
-
-        // TODO maximum number of available connections should be perhaps limited?
     }
 
-    public IRelpConnection take() {
-        IRelpConnection frameDelegate;
+    public T get() {
+        T object;
         if (close.get()) {
-            frameDelegate = relpConnectionStub;
+            object = stub;
         }
         else {
             // get or create
-            frameDelegate = queue.poll();
-            if (frameDelegate == null) {
-                frameDelegate = relpConnectionWrapSupplier.get();
+            object = queue.poll();
+            if (object == null) {
+                object = supplier.get();
             }
         }
 
-        return frameDelegate;
+        return object;
     }
 
-    public void offer(IRelpConnection iRelpConnection) {
-        if (!iRelpConnection.isStub()) {
-            queue.add(iRelpConnection);
+    public void offer(T object) {
+        if (!object.isStub()) {
+            queue.add(object);
         }
 
         if (close.get()) {
             while (queue.peek() != null) {
                 if (lock.tryLock()) {
                     while (true) {
-                        IRelpConnection queuedConnection = queue.poll();
-                        if (queuedConnection == null) {
+                        T pooled = queue.poll();
+                        if (pooled == null) {
                             break;
                         }
                         else {
                             try {
-                                LOGGER.debug("Closing frameDelegate <{}>", queuedConnection);
-                                queuedConnection.disconnect();
-                                LOGGER.debug("Closed frameDelegate <{}>", queuedConnection);
+                                LOGGER.debug("Closing poolable <{}>", pooled);
+                                pooled.close();
+                                LOGGER.debug("Closed poolable <{}>", pooled);
                             }
                             catch (Exception exception) {
                                 LOGGER
                                         .warn(
-                                                "Exception <{}> while closing frameDelegate <{}>",
-                                                exception.getMessage(), queuedConnection
+                                                "Exception <{}> while closing poolable <{}>", exception.getMessage(),
+                                                pooled
                                         );
-                            }
-                            finally {
-                                queuedConnection.tearDown();
                             }
                         }
                     }
@@ -112,6 +106,7 @@ public class RelpConnectionPool implements AutoCloseable {
         close.set(true);
 
         // close all that are in the pool right now
-        offer(relpConnectionStub);
+        offer(stub);
     }
+
 }

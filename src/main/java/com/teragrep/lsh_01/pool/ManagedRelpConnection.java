@@ -26,20 +26,22 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class ManagedRelpConnection {
+public class ManagedRelpConnection implements IManagedRelpConnection {
 
     private static final Logger LOGGER = LogManager.getLogger(ManagedRelpConnection.class);
     private final IRelpConnection relpConnection;
+    private boolean hasConnected;
 
     public ManagedRelpConnection(IRelpConnection relpConnection) {
         this.relpConnection = relpConnection;
+        this.hasConnected = false;
     }
 
-    void connect() {
-        boolean notConnected = true;
-        while (notConnected) {
-            boolean connected = false;
+    private void connect() {
+        boolean connected = false;
+        while (!connected) {
             try {
+                this.hasConnected = true;
                 connected = relpConnection
                         .connect(relpConnection.relpConfig().relpTarget, relpConnection.relpConfig().relpPort);
             }
@@ -51,37 +53,27 @@ public class ManagedRelpConnection {
                                 e.getMessage()
                         );
             }
-            if (connected) {
-                notConnected = false;
+
+            try {
+                Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
             }
-            else {
-                try {
-                    Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
-                }
-                catch (InterruptedException e) {
-                    LOGGER.error("Reconnect timer interrupted, reconnecting now");
-                }
+            catch (InterruptedException e) {
+                LOGGER.error("Reconnect timer interrupted, reconnecting now");
             }
         }
     }
 
     private void tearDown() {
-        relpConnection.tearDown();
-    }
-
-    private void disconnect() {
-        boolean disconnected = false;
-        try {
-            disconnected = relpConnection.disconnect();
-        }
-        catch (IllegalStateException | IOException | TimeoutException e) {
-            LOGGER.error("Forcefully closing connection due to exception <{}>", e.getMessage());
-        }
-        finally {
-            this.tearDown();
+        /*
+         TODO remove: wouldn't need a check hasConnected but there is a bug in RLP-01 tearDown()
+         see https://github.com/teragrep/rlp_01/issues/63 for further info
+         */
+        if (hasConnected) {
+            relpConnection.tearDown();
         }
     }
 
+    @Override
     public void ensureSent(byte[] bytes) {
         final RelpBatch relpBatch = new RelpBatch();
         relpBatch.insert(bytes);
@@ -101,6 +93,24 @@ public class ManagedRelpConnection {
             else {
                 notSent = false;
             }
+        }
+    }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
+
+    @Override
+    public void close() {
+        try {
+            this.relpConnection.disconnect();
+        }
+        catch (IllegalStateException | IOException | TimeoutException e) {
+            LOGGER.error("Forcefully closing connection due to exception <{}>", e.getMessage());
+        }
+        finally {
+            tearDown();
         }
     }
 }

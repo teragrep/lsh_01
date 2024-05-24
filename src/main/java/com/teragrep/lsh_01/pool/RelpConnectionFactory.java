@@ -24,7 +24,7 @@ import com.teragrep.rlp_01.RelpConnection;
 
 import java.util.function.Supplier;
 
-public class RelpConnectionFactory implements Supplier<IRelpConnection> {
+public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
 
     private final RelpConfig relpConfig;
 
@@ -33,18 +33,17 @@ public class RelpConnectionFactory implements Supplier<IRelpConnection> {
     }
 
     @Override
-    public IRelpConnection get() {
+    public IManagedRelpConnection get() {
         RelpConnection relpConnection = new RelpConnection();
 
         RelpConnectionWithConfig relpConnectionWithConfig = new RelpConnectionWithConfig(relpConnection, relpConfig);
+        IManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnectionWithConfig);
 
-        /*
-         TODO remove: shouldn't be here, but there is a bug in tearDown, so we initialize connection here
-         see https://github.com/teragrep/rlp_01/issues/63 for further info
-         */
-        new ManagedRelpConnection(relpConnectionWithConfig).connect();
+        if (relpConfig.rebindEnabled) {
+            managedRelpConnection = new RebindableRelpConnection(managedRelpConnection, relpConfig.rebindRequestAmount);
+        }
 
-        return relpConnectionWithConfig;
+        return managedRelpConnection;
     }
 
 }

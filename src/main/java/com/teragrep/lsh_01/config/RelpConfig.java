@@ -24,6 +24,8 @@ public class RelpConfig implements Validateable {
     public final String relpTarget;
     public final int relpPort;
     public final int relpReconnectInterval;
+    public final int rebindRequestAmount;
+    public final boolean rebindEnabled;
 
     public RelpConfig() {
         PropertiesReaderUtilityClass propertiesReader = new PropertiesReaderUtilityClass(
@@ -32,16 +34,21 @@ public class RelpConfig implements Validateable {
         relpTarget = propertiesReader.getStringProperty("relp.target");
         relpPort = propertiesReader.getIntProperty("relp.port");
         relpReconnectInterval = propertiesReader.getIntProperty("relp.reconnectInterval");
+        rebindRequestAmount = propertiesReader.getIntProperty("relp.rebindRequestAmount");
+        rebindEnabled = propertiesReader.getBooleanProperty("relp.rebindEnabled");
     }
 
     @Override
     public void validate() {
-
+        if (rebindEnabled && rebindRequestAmount < 1) {
+            throw new IllegalArgumentException("relp.rebindRequestAmount has to be a positive number");
+        }
     }
 
     @Override
     public String toString() {
         return "RelpConfig{" + "relpTarget='" + relpTarget + '\'' + ", relpPort=" + relpPort
-                + ", relpReconnectInterval=" + relpReconnectInterval + '}';
+                + ", relpReconnectInterval=" + relpReconnectInterval + ", rebindRequestAmount=" + rebindRequestAmount
+                + ", rebindEnabled=" + rebindEnabled + '}';
     }
 }
