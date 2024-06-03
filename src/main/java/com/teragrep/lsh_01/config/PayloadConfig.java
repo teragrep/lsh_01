@@ -39,7 +39,7 @@ public class PayloadConfig implements Validateable {
     public void validate() {
         if (splitEnabled) {
             try {
-                Pattern splitPattern = Pattern.compile(splitRegex);
+                Pattern.compile(splitRegex);
             }
             catch (PatternSyntaxException e) {
                 throw new IllegalArgumentException(
