@@ -47,7 +47,6 @@ public class RebindTest {
     void setProperties() {
         System.setProperty("relp.rebindEnabled", "true");
         System.setProperty("relp.rebindRequestAmount", "5");
-        System.setProperty("relp.reconnectInterval", "500");
     }
 
     @AfterEach
@@ -59,7 +58,6 @@ public class RebindTest {
     void tearDown() {
         System.clearProperty("relp.rebindEnabled");
         System.clearProperty("relp.rebindRequestAmount");
-        System.clearProperty("relp.reconnectInterval");
         System.clearProperty("relp.port");
         this.relpServer.tearDown();
     }
