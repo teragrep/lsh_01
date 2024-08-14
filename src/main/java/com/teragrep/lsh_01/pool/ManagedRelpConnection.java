@@ -52,13 +52,13 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
                                 relpConnection.relpConfig().relpTarget, relpConnection.relpConfig().relpPort,
                                 e.getMessage()
                         );
-            }
 
-            try {
-                Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
-            }
-            catch (InterruptedException e) {
-                LOGGER.error("Reconnect timer interrupted, reconnecting now");
+                try {
+                    Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
+                }
+                catch (InterruptedException exception) {
+                    LOGGER.error("Reconnection timer interrupted, reconnecting now");
+                }
             }
         }
     }
