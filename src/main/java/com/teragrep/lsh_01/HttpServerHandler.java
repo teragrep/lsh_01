@@ -63,7 +63,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
         if (!ctx.channel().isActive()) {
-            LOGGER.error("The channel bound to ChannelHandlerContext is not connected, can't handle the message.");
+            LOGGER.error("The channel bound to the ChannelHandlerContext is not connected, can't handle the message.");
             return;
         }
 
