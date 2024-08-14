@@ -57,7 +57,7 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
                     Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
                 }
                 catch (InterruptedException exception) {
-                    LOGGER.error("Reconnect timer interrupted, reconnecting now");
+                    LOGGER.error("Reconnection timer interrupted, reconnecting now");
                 }
             }
         }
