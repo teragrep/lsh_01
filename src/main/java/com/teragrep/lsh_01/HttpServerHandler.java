@@ -63,12 +63,15 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-        if (!ctx.channel().isActive()) {
-            LOGGER.error("The channel bound to the ChannelHandlerContext is not connected, can't handle the message.");
+        final String remoteAddress;
+        try {
+            remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
+        }
+        catch (NullPointerException e) {
+            LOGGER.error("Couldn't get the remote address, returning.");
             return;
         }
 
-        final String remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
         msg.retain();
         final MessageProcessor messageProcessor = new MessageProcessor(
                 ctx,
