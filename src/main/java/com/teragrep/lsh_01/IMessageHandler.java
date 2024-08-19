@@ -31,11 +31,10 @@ public interface IMessageHandler {
     /**
      * This is triggered on every new message parsed by the http handler and should be executed in the ruby world.
      *
-     * @param remoteAddress
      * @param headers
      * @param body
      */
-    boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body);
+    boolean onNewMessage(Subject subject, Map<String, String> headers, String body);
 
     /**
      * @param token
