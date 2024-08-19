@@ -64,7 +64,7 @@ public class RelpConversion implements IMessageHandler {
         this.payloadConfig = payloadConfig;
     }
 
-    public boolean onNewMessage(String remoteAddress, Subject subject, Map<String, String> headers, String body) {
+    public boolean onNewMessage(Subject subject, Map<String, String> headers, String body) {
         try {
             if (payloadConfig.splitEnabled) {
                 Pattern splitPattern = Pattern.compile(payloadConfig.splitRegex);

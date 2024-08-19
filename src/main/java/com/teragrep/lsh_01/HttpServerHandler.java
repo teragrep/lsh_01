@@ -32,7 +32,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
@@ -63,20 +62,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-        final String remoteAddress;
-        try {
-            remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
-        }
-        catch (NullPointerException e) {
-            LOGGER.error("Couldn't get the remote address, returning.");
-            return;
-        }
-
         msg.retain();
         final MessageProcessor messageProcessor = new MessageProcessor(
                 ctx,
                 msg,
-                remoteAddress,
                 messageHandler,
                 responseStatus,
                 internalEndpointUrlConfig

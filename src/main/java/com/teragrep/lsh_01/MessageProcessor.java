@@ -45,7 +45,6 @@ public class MessageProcessor implements RejectableRunnable {
 
     private final ChannelHandlerContext ctx;
     private final FullHttpRequest req;
-    private final String remoteAddress;
     private final IMessageHandler messageHandler;
     private final HttpResponseStatus responseStatus;
     private final InternalEndpointUrlConfig internalEndpointUrlConfig;
@@ -56,14 +55,12 @@ public class MessageProcessor implements RejectableRunnable {
     MessageProcessor(
             ChannelHandlerContext ctx,
             FullHttpRequest req,
-            String remoteAddress,
             IMessageHandler messageHandler,
             HttpResponseStatus responseStatus,
             InternalEndpointUrlConfig internalEndpointUrlConfig
     ) {
         this.ctx = ctx;
         this.req = req;
-        this.remoteAddress = remoteAddress;
         this.messageHandler = messageHandler;
         this.responseStatus = responseStatus;
         this.internalEndpointUrlConfig = internalEndpointUrlConfig;
@@ -137,7 +134,7 @@ public class MessageProcessor implements RejectableRunnable {
     private FullHttpResponse processMessage(Subject subject) {
         final Map<String, String> formattedHeaders = formatHeaders(req.headers());
         final String body = req.content().toString(UTF8_CHARSET);
-        if (messageHandler.onNewMessage(remoteAddress, subject, formattedHeaders, body)) {
+        if (messageHandler.onNewMessage(subject, formattedHeaders, body)) {
             return generateResponse(messageHandler.responseHeaders());
         }
         else {
