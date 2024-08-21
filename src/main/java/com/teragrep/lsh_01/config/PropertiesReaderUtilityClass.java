@@ -26,18 +26,23 @@ import java.util.Properties;
 
 public class PropertiesReaderUtilityClass {
 
+    private final String file;
     private final Properties properties = new Properties();
 
     public PropertiesReaderUtilityClass(String file) {
-        try (InputStream input = new FileInputStream(file)) {
-            properties.load(input);
-        }
-        catch (IOException ex) {
-            throw new IllegalArgumentException("Can't find properties file: ", ex);
-        }
+        this.file = file;
     }
 
     public String getStringProperty(String key) throws IllegalArgumentException {
+        if (properties.isEmpty()) { // read from file just once
+            try (InputStream input = new FileInputStream(file)) {
+                properties.load(input);
+            }
+            catch (IOException ex) {
+                throw new IllegalArgumentException("Can't find properties file: " + file, ex);
+            }
+        }
+
         String property = System.getProperty(key, properties.getProperty(key));
         if (property == null) {
             throw new IllegalArgumentException("Missing property: " + key);
