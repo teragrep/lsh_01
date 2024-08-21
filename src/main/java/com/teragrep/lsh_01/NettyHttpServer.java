@@ -46,12 +46,9 @@ public class NettyHttpServer implements Runnable, Closeable {
     private final ServerBootstrap serverBootstrap;
     private final String host;
     private final int port;
-    private final int connectionBacklog = 128;
 
     private final EventLoopGroup processorGroup;
     private final ThreadPoolExecutor executorGroup;
-    private final HttpResponseStatus responseStatus;
-    private final InternalEndpointUrlConfig internalEndpointUrlConfig;
 
     public NettyHttpServer(
             NettyConfig nettyConfig,
@@ -62,8 +59,6 @@ public class NettyHttpServer implements Runnable, Closeable {
     ) {
         this.host = nettyConfig.listenAddress;
         this.port = nettyConfig.listenPort;
-        this.internalEndpointUrlConfig = internalEndpointUrlConfig;
-        this.responseStatus = HttpResponseStatus.valueOf(responseCode);
         processorGroup = new NioEventLoopGroup(nettyConfig.threads, daemonThreadFactory("http-input-processor"));
 
         executorGroup = new ThreadPoolExecutor(
@@ -80,7 +75,7 @@ public class NettyHttpServer implements Runnable, Closeable {
                 messageHandler,
                 executorGroup,
                 nettyConfig.maxContentLength,
-                responseStatus,
+                HttpResponseStatus.valueOf(responseCode),
                 internalEndpointUrlConfig
         );
 
@@ -88,6 +83,7 @@ public class NettyHttpServer implements Runnable, Closeable {
             httpInitializer.enableSSL(sslHandlerProvider);
         }
 
+        int connectionBacklog = 128;
         serverBootstrap = new ServerBootstrap()
                 .group(processorGroup)
                 .channel(NioServerSocketChannel.class)
