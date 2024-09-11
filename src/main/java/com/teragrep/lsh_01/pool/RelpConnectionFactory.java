@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01.pool;
 
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.rlp_01.RelpConnection;
 
@@ -27,9 +28,11 @@ import java.util.function.Supplier;
 public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
 
     private final RelpConfig relpConfig;
+    private final MetricRegistry metricRegistry;
 
-    public RelpConnectionFactory(RelpConfig relpConfig) {
+    public RelpConnectionFactory(RelpConfig relpConfig, MetricRegistry metricRegistry) {
         this.relpConfig = relpConfig;
+        this.metricRegistry = metricRegistry;
     }
 
     @Override
@@ -37,7 +40,10 @@ public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
         RelpConnection relpConnection = new RelpConnection();
 
         RelpConnectionWithConfig relpConnectionWithConfig = new RelpConnectionWithConfig(relpConnection, relpConfig);
-        IManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnectionWithConfig);
+        IManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(
+                relpConnectionWithConfig,
+                metricRegistry
+        );
 
         if (relpConfig.rebindEnabled) {
             managedRelpConnection = new RebindableRelpConnection(managedRelpConnection, relpConfig.rebindRequestAmount);

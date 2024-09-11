@@ -17,6 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.pool.*;
 import com.teragrep.lsh_01.util.CountingFrameDelegate;
@@ -66,8 +67,7 @@ public class RebindTest {
     public void testRebind() {
         RelpConfig relpConfig = new RelpConfig();
         RebindableRelpConnection connection = new RebindableRelpConnection(
-                new ManagedRelpConnection(new RelpConnectionWithConfig(new RelpConnection(), relpConfig)),
-                relpConfig.rebindRequestAmount
+                new ManagedRelpConnection(new RelpConnectionWithConfig(new RelpConnection(), relpConfig), new MetricRegistry()), relpConfig.rebindRequestAmount
         );
 
         SyslogMessage syslogMessage = new SyslogMessage()
@@ -93,7 +93,7 @@ public class RebindTest {
         RelpConfig relpConfig = new RelpConfig();
 
         // Multiple connections together using the RelpConnectionFactory and the Pool
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         IManagedRelpConnection firstConnection = pool.get();
@@ -134,7 +134,7 @@ public class RebindTest {
 
         RelpConfig relpConfig = new RelpConfig();
 
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         IManagedRelpConnection connection = pool.get();
@@ -157,7 +157,8 @@ public class RebindTest {
     @Test
     public void testCloseWithoutConnecting() {
         ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(
-                new RelpConnectionWithConfig(new RelpConnection(), new RelpConfig())
+                new RelpConnectionWithConfig(new RelpConnection(), new RelpConfig()),
+                new MetricRegistry()
         );
         Assertions.assertDoesNotThrow(managedRelpConnection::close);
     }

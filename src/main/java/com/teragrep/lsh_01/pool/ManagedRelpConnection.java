@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01.pool;
 
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.rlp_01.RelpBatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +33,7 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
     private final IRelpConnection relpConnection;
     private boolean hasConnected;
 
-    public ManagedRelpConnection(IRelpConnection relpConnection) {
+    public ManagedRelpConnection(IRelpConnection relpConnection, MetricRegistry metricRegistry) {
         this.relpConnection = relpConnection;
         this.hasConnected = false;
     }

@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
@@ -38,6 +39,7 @@ public class Main {
         InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
         LookupConfig lookupConfig = new LookupConfig();
         PayloadConfig payloadConfig = new PayloadConfig();
+        MetricsConfig metricsConfig = new MetricsConfig();
         try {
             nettyConfig.validate();
             relpConfig.validate();
@@ -45,6 +47,7 @@ public class Main {
             internalEndpointUrlConfig.validate();
             lookupConfig.validate();
             payloadConfig.validate();
+            metricsConfig.validate();
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("Can't parse config properly: {}", e.getMessage());
@@ -57,7 +60,10 @@ public class Main {
         LOGGER.info("Got payload config: <[{}]>", payloadConfig);
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
 
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        // metrics
+        MetricRegistry metricRegistry = new MetricRegistry();
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         RelpConversion relpConversion = new RelpConversion(
@@ -75,9 +81,13 @@ public class Main {
                         null,
                         200,
                         internalEndpointUrlConfig
-                )
+                ); Metrics metrics = new Metrics(metricsConfig.prometheusPort, metricRegistry)
         ) {
+            metrics.start();
             server.run();
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Couldn't close DropWizard metrics: " + e.getMessage());
         }
         finally {
             pool.close();

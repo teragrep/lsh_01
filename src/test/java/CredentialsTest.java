@@ -17,6 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.RelpConversion;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
@@ -54,7 +55,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -82,7 +83,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -105,7 +106,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -128,7 +129,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -149,7 +150,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -171,7 +172,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -196,7 +197,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -221,7 +222,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -246,7 +247,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
@@ -269,7 +270,7 @@ public class CredentialsTest {
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
