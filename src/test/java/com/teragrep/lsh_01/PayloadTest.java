@@ -17,7 +17,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-import com.teragrep.lsh_01.Payload;
+package com.teragrep.lsh_01;
+
 import com.teragrep.lsh_01.config.PayloadConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

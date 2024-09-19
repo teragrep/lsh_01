@@ -17,9 +17,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+package com.teragrep.lsh_01;
+
 import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
-import com.teragrep.lsh_01.RelpConversion;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.PayloadConfig;

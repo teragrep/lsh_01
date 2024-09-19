@@ -17,23 +17,25 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+package com.teragrep.lsh_01;
+
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.teragrep.lsh_01.IMessageHandler;
-import com.teragrep.lsh_01.MetricRelpConversion;
-import com.teragrep.lsh_01.RelpConversion;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.authentication.SubjectAnonymous;
 import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
+import com.teragrep.lsh_01.fakes.RelpConnectionFactoryFake;
+import com.teragrep.lsh_01.fakes.RelpConnectionFake;
+import com.teragrep.lsh_01.fakes.ResendingRelpConnectionFake;
+import com.teragrep.lsh_01.fakes.ThrowingRelpConnectionFake;
 import com.teragrep.lsh_01.pool.*;
 import com.teragrep.rlo_14.Facility;
 import com.teragrep.rlo_14.Severity;
 import com.teragrep.rlo_14.SyslogMessage;
-import fakes.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
