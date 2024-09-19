@@ -179,7 +179,9 @@ public class MetricTest {
             }
         }
 
+        System.clearProperty("relp.reconnectInterval");
         Counter retriedConnectsCounter = registry.counter(name(ManagedRelpConnection.class, "retriedConnects"));
+
         Assertions.assertEquals(reconnects, retriedConnectsCounter.getCount());
     }
 
