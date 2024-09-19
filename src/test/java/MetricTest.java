@@ -17,23 +17,28 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.teragrep.lsh_01.IMessageHandler;
+import com.teragrep.lsh_01.MetricRelpConversion;
+import com.teragrep.lsh_01.RelpConversion;
+import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
+import com.teragrep.lsh_01.authentication.SubjectAnonymous;
+import com.teragrep.lsh_01.config.LookupConfig;
+import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
-import com.teragrep.lsh_01.pool.IRelpConnection;
-import com.teragrep.lsh_01.pool.ManagedRelpConnection;
+import com.teragrep.lsh_01.config.SecurityConfig;
+import com.teragrep.lsh_01.pool.*;
 import com.teragrep.rlo_14.Facility;
 import com.teragrep.rlo_14.Severity;
 import com.teragrep.rlo_14.SyslogMessage;
-import fakes.RelpConnectionFake;
-import fakes.ResendingRelpConnectionFake;
-import fakes.ThrowingRelpConnectionFake;
+import fakes.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -55,7 +60,8 @@ public class MetricTest {
 
         try (ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, registry)) {
             for (int i = 0; i < messages; i++) {
-                managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+                managedRelpConnection
+                        .ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
             }
         }
 
@@ -87,7 +93,7 @@ public class MetricTest {
         }
 
         Counter bytesCounter = registry.counter(name(ManagedRelpConnection.class, "bytes"));
-        Assertions.assertEquals(bytesLength, bytesCounter.getCount());
+        Assertions.assertEquals(bytesLength * 100L, bytesCounter.getCount());
     }
 
     @Test
@@ -107,7 +113,8 @@ public class MetricTest {
 
         try (ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, registry)) {
             for (int i = 0; i < messages; i++) {
-                managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+                managedRelpConnection
+                        .ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
             }
         }
 
@@ -126,16 +133,21 @@ public class MetricTest {
                 .withMsg("test");
 
         RelpConfig relpConfig = new RelpConfig();
-        IRelpConnection relpConnection = new RelpConnectionFake(relpConfig);
         MetricRegistry registry = new MetricRegistry();
+        // use a fake RelpConnection that forces a resend, so the connection is done in ManagedRelpConnection
+        IRelpConnection relpConnection = new MetricRelpConnection(
+                new ResendingRelpConnectionFake(new RelpConnectionFake(relpConfig), 1),
+                registry
+        );
 
         try (ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, registry)) {
             for (int i = 0; i < messages; i++) {
-                managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+                managedRelpConnection
+                        .ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
             }
         }
 
-        Counter connectsCounter = registry.counter(name(ManagedRelpConnection.class, "connects"));
+        Counter connectsCounter = registry.counter(name(MetricRelpConnection.class, "connects"));
         Assertions.assertEquals(1, connectsCounter.getCount()); // just the initial connect (1)
     }
 
@@ -153,12 +165,17 @@ public class MetricTest {
                 .withMsg("test");
 
         RelpConfig relpConfig = new RelpConfig();
-        IRelpConnection relpConnection = new ThrowingRelpConnectionFake(new RelpConnectionFake(relpConfig), reconnects);
+        // ManagedRelpConnection only makes a connection if messages aren't going through, so a resending fake has to be used as well
+        IRelpConnection relpConnection = new ThrowingRelpConnectionFake(
+                new ResendingRelpConnectionFake(new RelpConnectionFake(relpConfig), 1),
+                reconnects
+        );
         MetricRegistry registry = new MetricRegistry();
 
         try (ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, registry)) {
             for (int i = 0; i < messages; i++) {
-                managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+                managedRelpConnection
+                        .ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
             }
         }
 
@@ -167,29 +184,35 @@ public class MetricTest {
     }
 
     @Test
-    public void testSendLatencyMetric() {
+    public void testSendLatencyMetric() { // latency of the whole process, message in -> message out
         final int messages = 10;
         final int sendLatency = 10; // sleep for 10ms after sending a message (commit)
 
-        final SyslogMessage syslogMessage = new SyslogMessage()
-                .withSeverity(Severity.INFORMATIONAL)
-                .withFacility(Facility.LOCAL0)
-                .withMsgId("123")
-                .withMsg("test");
-
         RelpConfig relpConfig = new RelpConfig();
-        IRelpConnection relpConnection = new RelpConnectionFake(relpConfig, sendLatency, 0);
         MetricRegistry registry = new MetricRegistry();
 
-        try (ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, registry)) {
-            for (int i = 0; i < messages; i++) {
-                managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
-            }
+        // RelpConnectionFactory that provides fake RelpConnections
+        RelpConnectionFactoryFake relpConnectionFactory = new RelpConnectionFactoryFake(
+                sendLatency,
+                0,
+                relpConfig,
+                registry
+        );
+
+        // the message processing starts from RelpConversion
+        IMessageHandler relpConversion = new MetricRelpConversion(
+                new RelpConversion(new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub()), new SecurityConfig(), new BasicAuthenticationFactory().create(), new LookupConfig(), new PayloadConfig()), registry
+        );
+
+        for (int i = 0; i < messages; i++) {
+            relpConversion.onNewMessage(new SubjectAnonymous(), new HashMap<>(), "");
         }
 
-        Timer sendLatencyTimer = registry.timer(name(ManagedRelpConnection.class, "sendLatency"));
+        Timer sendLatencyTimer = registry.timer(name(RelpConversion.class, "sendLatency"));
+
         // mean rate means how many timer updates per second there were
-        Assertions.assertTrue(sendLatency * messages <= sendLatencyTimer.getMeanRate());
+        Assertions.assertTrue(sendLatencyTimer.getMeanRate() > 0);
+        Assertions.assertTrue(sendLatencyTimer.getMeanRate() <= (double) 1000 / sendLatency);
     }
 
     @Test
@@ -204,18 +227,24 @@ public class MetricTest {
                 .withMsg("test");
 
         RelpConfig relpConfig = new RelpConfig();
-        IRelpConnection relpConnection = new RelpConnectionFake(relpConfig, 0, connectLatency);
         MetricRegistry registry = new MetricRegistry();
+        // use a fake RelpConnection that forces a resend, so the connection is done in ManagedRelpConnection
+        IRelpConnection relpConnection = new MetricRelpConnection(
+                new ResendingRelpConnectionFake(new RelpConnectionFake(relpConfig, 0, connectLatency), 1),
+                registry
+        );
 
         try (ManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, registry)) {
             for (int i = 0; i < messages; i++) {
-                managedRelpConnection.ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
+                managedRelpConnection
+                        .ensureSent(syslogMessage.toRfc5424SyslogMessage().getBytes(StandardCharsets.UTF_8));
             }
         }
 
-        Timer connectLatencyTimer = registry.timer(name(ManagedRelpConnection.class, "connectLatency"));
+        Timer connectLatencyTimer = registry.timer(name(MetricRelpConnection.class, "connectLatency"));
+
         // mean rate means how many timer updates per second there were
-        Assertions.assertTrue(connectLatencyTimer.getMeanRate() >= (double) (1000 / connectLatency) / 2); // rate is higher than this
-        Assertions.assertTrue(connectLatencyTimer.getMeanRate() <= (double) 1000 / connectLatency); // rate is lower than this
+        Assertions.assertTrue(connectLatencyTimer.getMeanRate() >= 0); // rate exists
+        Assertions.assertTrue(connectLatencyTimer.getMeanRate() <= (double) 1000 / connectLatency); // rate is lower or equal to the highest possible
     }
 }

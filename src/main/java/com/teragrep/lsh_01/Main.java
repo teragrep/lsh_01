@@ -66,12 +66,9 @@ public class Main {
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
-        RelpConversion relpConversion = new RelpConversion(
-                pool,
-                securityConfig,
-                basicAuthentication,
-                lookupConfig,
-                payloadConfig
+        IMessageHandler relpConversion = new MetricRelpConversion(
+                new RelpConversion(pool, securityConfig, basicAuthentication, lookupConfig, payloadConfig),
+                metricRegistry
         );
 
         try (

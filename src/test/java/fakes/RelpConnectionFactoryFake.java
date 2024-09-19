@@ -17,38 +17,39 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01.pool;
+package fakes;
 
 import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.config.RelpConfig;
-import com.teragrep.rlp_01.RelpConnection;
+import com.teragrep.lsh_01.pool.IManagedRelpConnection;
+import com.teragrep.lsh_01.pool.ManagedRelpConnection;
+import com.teragrep.lsh_01.pool.MetricRelpConnection;
 
 import java.util.function.Supplier;
 
-public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
+public class RelpConnectionFactoryFake implements Supplier<IManagedRelpConnection> {
 
+    private final int sendLatency;
+    private final int connectLatency;
     private final RelpConfig relpConfig;
     private final MetricRegistry metricRegistry;
 
-    public RelpConnectionFactory(RelpConfig relpConfig, MetricRegistry metricRegistry) {
+    public RelpConnectionFactoryFake(
+            int sendLatency,
+            int connectLatency,
+            RelpConfig relpConfig,
+            MetricRegistry metricRegistry
+    ) {
+        this.sendLatency = sendLatency;
+        this.connectLatency = connectLatency;
         this.relpConfig = relpConfig;
         this.metricRegistry = metricRegistry;
     }
 
     @Override
     public IManagedRelpConnection get() {
-        IRelpConnection relpConnection = new MetricRelpConnection(
-                new RelpConnectionWithConfig(new RelpConnection(), relpConfig),
-                metricRegistry
+        return new ManagedRelpConnection(
+                new MetricRelpConnection(new RelpConnectionFake(relpConfig, sendLatency, connectLatency), metricRegistry), metricRegistry
         );
-
-        IManagedRelpConnection managedRelpConnection = new ManagedRelpConnection(relpConnection, metricRegistry);
-
-        if (relpConfig.rebindEnabled) {
-            managedRelpConnection = new RebindableRelpConnection(managedRelpConnection, relpConfig.rebindRequestAmount);
-        }
-
-        return managedRelpConnection;
     }
-
 }

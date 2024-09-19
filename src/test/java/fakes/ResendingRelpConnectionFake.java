@@ -17,7 +17,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 package fakes;
 
 import com.teragrep.lsh_01.config.RelpConfig;
@@ -31,6 +30,7 @@ import java.util.concurrent.TimeoutException;
  * Fake that resends data until the amount given is reached.
  */
 public class ResendingRelpConnectionFake implements IRelpConnection {
+
     final private IRelpConnection relpConnection;
     final private int commitLimit;
     private int timesCommitted;
@@ -115,7 +115,8 @@ public class ResendingRelpConnectionFake implements IRelpConnection {
         timesCommitted++;
         if (timesCommitted <= commitLimit) {
             // no-op, will lead to verifyTransactionAll to return false
-        } else {
+        }
+        else {
             relpConnection.commit(relpBatch);
         }
     }
