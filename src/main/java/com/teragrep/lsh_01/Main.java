@@ -27,6 +27,8 @@ import com.teragrep.lsh_01.pool.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+
 public class Main {
 
     private final static Logger LOGGER = LogManager.getLogger(Main.class);
@@ -71,22 +73,18 @@ public class Main {
                 metricRegistry
         );
 
-        try (
-                NettyHttpServer server = new NettyHttpServer(
+        Metrics metrics = new Metrics(metricsConfig.prometheusPort, metricRegistry);
+
+        try (HttpServer server = new MetricHttpServer(new NettyHttpServer(
                         nettyConfig,
                         relpConversion,
                         null,
                         200,
-                        internalEndpointUrlConfig
-                ); Metrics metrics = new Metrics(metricsConfig.prometheusPort, metricRegistry)
-        ) {
-            metrics.start();
+                        internalEndpointUrlConfig), metrics)) {
             server.run();
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Couldn't close DropWizard metrics: " + e.getMessage());
-        }
-        finally {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
             pool.close();
         }
     }

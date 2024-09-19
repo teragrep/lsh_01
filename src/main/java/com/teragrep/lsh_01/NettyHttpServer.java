@@ -31,7 +31,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import com.teragrep.lsh_01.util.CustomRejectedExecutionHandler;
 import com.teragrep.lsh_01.util.SslHandlerProvider;
 
-import java.io.Closeable;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +40,7 @@ import static com.teragrep.lsh_01.util.DaemonThreadFactory.daemonThreadFactory;
 /**
  * Created by joaoduarte on 11/10/2017.
  */
-public class NettyHttpServer implements Runnable, Closeable {
+public class NettyHttpServer implements HttpServer {
 
     private final ServerBootstrap serverBootstrap;
     private final String host;
