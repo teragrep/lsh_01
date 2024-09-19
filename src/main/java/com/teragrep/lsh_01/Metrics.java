@@ -30,9 +30,11 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public final class Metrics implements AutoCloseable {
+public final class Metrics implements Closeable {
 
     private final JmxReporter jmxReporter;
     private final Slf4jReporter slf4jReporter;
@@ -77,9 +79,13 @@ public final class Metrics implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         slf4jReporter.close();
         jmxReporter.close();
-        jettyServer.stop();
+        try {
+            jettyServer.stop();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

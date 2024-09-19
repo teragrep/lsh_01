@@ -44,11 +44,9 @@ public class MetricHttpServer implements HttpServer {
     @Override
     public void close() throws IOException {
         try {
-            metrics.close();
-        } catch (Exception e) {
-            throw new IllegalStateException("Could not close the Jetty server of DropWizard metrics: " + e.getMessage());
-        } finally {
             server.close();
+        } finally {
+            metrics.close();
         }
     }
 }
