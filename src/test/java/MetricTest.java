@@ -210,7 +210,7 @@ public class MetricTest {
             relpConversion.onNewMessage(new SubjectAnonymous(), new HashMap<>(), "");
         }
 
-        Timer sendLatencyTimer = registry.timer(name(RelpConversion.class, "sendLatency"));
+        Timer sendLatencyTimer = registry.timer(name(MetricRelpConversion.class, "sendLatency"));
 
         // mean rate means how many timer updates per second there were
         Assertions.assertTrue(sendLatencyTimer.getMeanRate() > 0);

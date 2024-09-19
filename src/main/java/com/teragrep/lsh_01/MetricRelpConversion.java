@@ -41,7 +41,7 @@ public class MetricRelpConversion implements IMessageHandler {
         this.relpConversion = relpConversion;
         this.metricRegistry = metricRegistry;
         this.sendLatency = metricRegistry
-                .timer(name(RelpConversion.class, "sendLatency"), () -> new Timer(new SlidingWindowReservoir(10000)));
+                .timer(name(MetricRelpConversion.class, "sendLatency"), () -> new Timer(new SlidingWindowReservoir(10000)));
     }
 
     @Override
