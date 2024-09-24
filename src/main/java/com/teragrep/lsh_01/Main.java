@@ -27,24 +27,34 @@ import com.teragrep.lsh_01.metrics.HttpReport;
 import com.teragrep.lsh_01.metrics.JmxReport;
 import com.teragrep.lsh_01.metrics.Report;
 import com.teragrep.lsh_01.metrics.Slf4jReport;
+import com.teragrep.lsh_01.conversion.*;
 import com.teragrep.lsh_01.pool.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class Main {
 
     private final static Logger LOGGER = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
+        Map<String, String> propsMap;
+        try {
+            propsMap = new PathProperties(System.getProperty("properties.file", "etc/config.properties"))
+                    .deepCopyAsUnmodifiableMap();
+        }
+        catch (IOException e) {
+            throw new IllegalArgumentException("Can't find properties file: ", e);
+        }
+
         NettyConfig nettyConfig = new NettyConfig();
         RelpConfig relpConfig = new RelpConfig();
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
         LookupConfig lookupConfig = new LookupConfig();
-        PayloadConfig payloadConfig = new PayloadConfig();
         MetricsConfig metricsConfig = new MetricsConfig();
         try {
             nettyConfig.validate();
@@ -52,7 +62,6 @@ public class Main {
             securityConfig.validate();
             internalEndpointUrlConfig.validate();
             lookupConfig.validate();
-            payloadConfig.validate();
             metricsConfig.validate();
         }
         catch (IllegalArgumentException e) {
@@ -63,7 +72,6 @@ public class Main {
         LOGGER.info("Got relp config: <[{}]>", relpConfig);
         LOGGER.info("Got internal endpoint config: <[{}]>", internalEndpointUrlConfig);
         LOGGER.info("Got lookup table config: <[{}]>", lookupConfig);
-        LOGGER.info("Got payload config: <[{}]>", payloadConfig);
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
 
         // metrics
@@ -76,14 +84,18 @@ public class Main {
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
-        IMessageHandler relpConversion = new MetricRelpConversion(
-                new RelpConversion(pool, securityConfig, basicAuthentication, lookupConfig, payloadConfig),
-                metricRegistry
-        );
+        IMessageHandler conversion = new MetricRelpConversion(new ConversionFactory(
+                propsMap,
+                pool,
+                securityConfig,
+                basicAuthentication,
+                lookupConfig
+        ).conversion(),
+                metricRegistry);
 
         try (
                 HttpServer server = new MetricHttpServer(
-                        new NettyHttpServer(nettyConfig, relpConversion, null, 200, internalEndpointUrlConfig),
+                        new NettyHttpServer(nettyConfig, conversion, null, 200, internalEndpointUrlConfig),
                         report
                 )
         ) {

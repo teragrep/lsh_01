@@ -21,9 +21,9 @@ package com.teragrep.lsh_01;
 
 import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
+import com.teragrep.lsh_01.conversion.RelpConversion;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.LookupConfig;
-import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.pool.*;
@@ -62,8 +62,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertFalse(relpConversion.requiresToken());
     }
@@ -90,8 +89,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser:VeryFirstPassword
@@ -113,8 +111,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // Test
@@ -136,8 +133,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // UserWithColons:My:Password:Yay
@@ -157,8 +153,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         IllegalArgumentException e = Assertions
@@ -179,8 +174,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         IllegalArgumentException e = Assertions
@@ -204,8 +198,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // SecondUser:WrongPassword -> Right user
@@ -229,8 +222,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // :VeryFirstPassword -> Valid password, null username
@@ -254,8 +246,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         // FirstUser: -> Valid username, null password
@@ -277,8 +268,7 @@ public class CredentialsTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
         Assertions.assertTrue(relpConversion.requiresToken());
         IllegalArgumentException e = Assertions

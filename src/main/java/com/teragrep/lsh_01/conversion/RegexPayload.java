@@ -17,48 +17,51 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.conversion;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * A message from a log source
+ * Payload splittable with a regex pattern.
  */
-final public class Payload {
+final public class RegexPayload implements Payload {
 
-    private final String body;
+    private final Payload payload;
     private final Pattern splitPattern;
 
-    public Payload(String body, Pattern splitPattern) {
-        this.body = body;
+    public RegexPayload(Payload payload, Pattern splitPattern) {
+        this.payload = payload;
         this.splitPattern = splitPattern;
     }
 
     /**
      * Splits the payload into multiple payloads if there is a defined split regex in the body.
-     * 
+     *
      * @return list of Payloads
      */
-    public List<Payload> split() {
-        ArrayList<Payload> payloads = new ArrayList<>();
+    @Override
+    public List<String> messages() {
+        ArrayList<String> allMessages = new ArrayList<>();
 
-        String[] messages = splitPattern.split(body);
-
-        for (String message : messages) {
-            payloads.add(new Payload(message, splitPattern));
+        for (String message : payload.messages()) {
+            String[] payloadMessages = splitPattern.split(message);
+            allMessages.addAll(List.of(payloadMessages));
         }
 
-        return payloads;
+        return allMessages;
     }
 
-    /**
-     * Takes the message from the payload.
-     * 
-     * @return message body
-     */
-    public String take() {
-        return body;
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object)
+            return true;
+        if (object == null)
+            return false;
+        if (object.getClass() != this.getClass())
+            return false;
+        final RegexPayload cast = (RegexPayload) object;
+        return payload.equals(cast.payload) && splitPattern.equals(cast.splitPattern);
     }
 }
