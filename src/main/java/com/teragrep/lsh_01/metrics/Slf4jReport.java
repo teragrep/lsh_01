@@ -17,38 +17,39 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.metrics;
 
-import com.teragrep.lsh_01.metrics.Report;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Slf4jReporter;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Decorator for a HttpServer that applies metrics.
- */
-public class MetricHttpServer implements HttpServer {
+public final class Slf4jReport implements Report {
 
-    private final HttpServer server;
     private final Report report;
+    private final Slf4jReporter slf4jReporter;
 
-    public MetricHttpServer(HttpServer server, Report report) {
-        this.server = server;
+    public Slf4jReport(Report report, MetricRegistry metricRegistry) {
         this.report = report;
+        this.slf4jReporter = Slf4jReporter
+                .forRegistry(metricRegistry)
+                .outputTo(LoggerFactory.getLogger(Slf4jReport.class))
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .build();
     }
 
     @Override
-    public void run() {
+    public void start() {
+        slf4jReporter.start(1, TimeUnit.MINUTES);
         report.start();
-        server.run();
     }
 
     @Override
     public void close() throws IOException {
-        try {
-            server.close();
-        }
-        finally {
-            report.close();
-        }
+        report.close();
+        slf4jReporter.close();
     }
 }

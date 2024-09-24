@@ -17,38 +17,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.metrics;
 
-import com.teragrep.lsh_01.metrics.Report;
+import java.io.Closeable;
 
-import java.io.IOException;
+public interface Report extends Closeable {
 
-/**
- * Decorator for a HttpServer that applies metrics.
- */
-public class MetricHttpServer implements HttpServer {
-
-    private final HttpServer server;
-    private final Report report;
-
-    public MetricHttpServer(HttpServer server, Report report) {
-        this.server = server;
-        this.report = report;
-    }
-
-    @Override
-    public void run() {
-        report.start();
-        server.run();
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            server.close();
-        }
-        finally {
-            report.close();
-        }
-    }
+    void start();
 }

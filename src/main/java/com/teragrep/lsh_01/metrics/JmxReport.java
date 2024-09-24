@@ -17,38 +17,32 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.metrics;
 
-import com.teragrep.lsh_01.metrics.Report;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jmx.JmxReporter;
 
 import java.io.IOException;
 
-/**
- * Decorator for a HttpServer that applies metrics.
- */
-public class MetricHttpServer implements HttpServer {
+public final class JmxReport implements Report {
 
-    private final HttpServer server;
     private final Report report;
+    private final JmxReporter jmxReporter;
 
-    public MetricHttpServer(HttpServer server, Report report) {
-        this.server = server;
+    public JmxReport(Report report, MetricRegistry metricRegistry) {
         this.report = report;
+        this.jmxReporter = JmxReporter.forRegistry(metricRegistry).build();
     }
 
     @Override
-    public void run() {
+    public void start() {
+        jmxReporter.start();
         report.start();
-        server.run();
     }
 
     @Override
     public void close() throws IOException {
-        try {
-            server.close();
-        }
-        finally {
-            report.close();
-        }
+        report.close();
+        jmxReporter.close();
     }
 }

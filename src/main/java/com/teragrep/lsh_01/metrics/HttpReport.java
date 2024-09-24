@@ -17,47 +17,30 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.metrics;
 
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Slf4jReporter;
-import com.codahale.metrics.jmx.JmxReporter;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-public final class Metrics implements Closeable {
+public final class HttpReport implements Report {
 
-    private final JmxReporter jmxReporter;
-    private final Slf4jReporter slf4jReporter;
     private final Server jettyServer;
     private final MetricRegistry metricRegistry;
 
-    public Metrics(int prometheusPort, MetricRegistry metricRegistry) {
+    public HttpReport(MetricRegistry metricRegistry, int prometheusPort) {
         this.metricRegistry = metricRegistry;
-
-        this.jmxReporter = JmxReporter.forRegistry(metricRegistry).build();
-        this.slf4jReporter = Slf4jReporter
-                .forRegistry(metricRegistry)
-                .outputTo(LoggerFactory.getLogger(Metrics.class))
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();
         jettyServer = new Server(prometheusPort);
     }
 
+    @Override
     public void start() {
-        this.jmxReporter.start();
-        this.slf4jReporter.start(1, TimeUnit.MINUTES);
-
         // prometheus-exporter
         CollectorRegistry.defaultRegistry.register(new DropwizardExports(metricRegistry));
 
@@ -80,12 +63,11 @@ public final class Metrics implements Closeable {
 
     @Override
     public void close() throws IOException {
-        slf4jReporter.close();
-        jmxReporter.close();
         try {
             jettyServer.stop();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }
+        catch (Exception e) {
+            throw new IOException(e);
         }
     }
 }

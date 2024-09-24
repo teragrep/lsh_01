@@ -23,6 +23,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
+import com.teragrep.lsh_01.metrics.HttpReport;
+import com.teragrep.lsh_01.metrics.JmxReport;
+import com.teragrep.lsh_01.metrics.Report;
+import com.teragrep.lsh_01.metrics.Slf4jReport;
 import com.teragrep.lsh_01.pool.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,6 +68,10 @@ public class Main {
 
         // metrics
         MetricRegistry metricRegistry = new MetricRegistry();
+        Report report = new Slf4jReport(
+                new JmxReport(new HttpReport(metricRegistry, metricsConfig.prometheusPort), metricRegistry),
+                metricRegistry
+        );
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
@@ -73,18 +81,18 @@ public class Main {
                 metricRegistry
         );
 
-        Metrics metrics = new Metrics(metricsConfig.prometheusPort, metricRegistry);
-
-        try (HttpServer server = new MetricHttpServer(new NettyHttpServer(
-                        nettyConfig,
-                        relpConversion,
-                        null,
-                        200,
-                        internalEndpointUrlConfig), metrics)) {
+        try (
+                HttpServer server = new MetricHttpServer(
+                        new NettyHttpServer(nettyConfig, relpConversion, null, 200, internalEndpointUrlConfig),
+                        report
+                )
+        ) {
             server.run();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
+        }
+        catch (IOException e) {
+            throw new IllegalArgumentException("Failed to close the server: " + e.getMessage());
+        }
+        finally {
             pool.close();
         }
     }
