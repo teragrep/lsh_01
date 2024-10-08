@@ -37,6 +37,7 @@ lookups.hostname.file,etc/hostname.json,Path to username-to-hostname lookup tabl
 lookups.appname.file,etc/appname.json,Path to username-to-appname lookup table
 payload.splitRegex, \n (newline), A regex based on which incoming requests will be split into multiple outgoing messages
 payload.splitEnabled, false, Sets whether splitting incoming messages by splitRegex is enabled
+prometheus.port, 1234, Port used by the server that provides DropWizard metrics
 |===
 
 === Lookup tables

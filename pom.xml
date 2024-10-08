@@ -15,8 +15,10 @@
     <log4j.version>2.23.1</log4j.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+    <metrics.version>4.2.8</metrics.version>
     <netty.version>4.1.108.Final</netty.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <prometheus-simpleclient.version>0.16.0</prometheus-simpleclient.version>
     <revision>0.0.1</revision>
     <rlo_14.version>1.0.1</rlo_14.version>
     <rlp_01.version>4.0.1</rlp_01.version>
@@ -89,6 +91,43 @@
       <groupId>io.netty</groupId>
       <artifactId>netty-handler</artifactId>
       <version>${netty.version}</version>
+    </dependency>
+    <!-- metrics -->
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>${metrics.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-jmx</artifactId>
+      <version>${metrics.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+      <version>${prometheus-simpleclient.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_dropwizard</artifactId>
+      <version>${prometheus-simpleclient.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_servlet</artifactId>
+      <version>${prometheus-simpleclient.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hotspot</artifactId>
+      <version>${prometheus-simpleclient.version}</version>
+    </dependency>
+    <!-- for exporting prometheus -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>10.0.15</version>
     </dependency>
     <!-- log4j -->
     <dependency>

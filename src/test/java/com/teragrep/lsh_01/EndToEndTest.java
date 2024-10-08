@@ -17,7 +17,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-import com.teragrep.lsh_01.Main;
+package com.teragrep.lsh_01;
+
 import com.teragrep.lsh_01.config.NettyConfig;
 import com.teragrep.lsh_01.util.RelpServer;
 import org.junit.jupiter.api.*;

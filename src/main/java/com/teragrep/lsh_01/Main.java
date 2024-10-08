@@ -19,12 +19,19 @@
 */
 package com.teragrep.lsh_01;
 
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
+import com.teragrep.lsh_01.metrics.HttpReport;
+import com.teragrep.lsh_01.metrics.JmxReport;
+import com.teragrep.lsh_01.metrics.Report;
+import com.teragrep.lsh_01.metrics.Slf4jReport;
 import com.teragrep.lsh_01.pool.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 public class Main {
 
@@ -38,6 +45,7 @@ public class Main {
         InternalEndpointUrlConfig internalEndpointUrlConfig = new InternalEndpointUrlConfig();
         LookupConfig lookupConfig = new LookupConfig();
         PayloadConfig payloadConfig = new PayloadConfig();
+        MetricsConfig metricsConfig = new MetricsConfig();
         try {
             nettyConfig.validate();
             relpConfig.validate();
@@ -45,6 +53,7 @@ public class Main {
             internalEndpointUrlConfig.validate();
             lookupConfig.validate();
             payloadConfig.validate();
+            metricsConfig.validate();
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("Can't parse config properly: {}", e.getMessage());
@@ -57,27 +66,31 @@ public class Main {
         LOGGER.info("Got payload config: <[{}]>", payloadConfig);
         LOGGER.info("Authentication required: <[{}]>", securityConfig.authRequired);
 
-        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig);
+        // metrics
+        MetricRegistry metricRegistry = new MetricRegistry();
+        Report report = new Slf4jReport(
+                new JmxReport(new HttpReport(metricRegistry, metricsConfig.prometheusPort), metricRegistry),
+                metricRegistry
+        );
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
-        RelpConversion relpConversion = new RelpConversion(
-                pool,
-                securityConfig,
-                basicAuthentication,
-                lookupConfig,
-                payloadConfig
+        IMessageHandler relpConversion = new MetricRelpConversion(
+                new RelpConversion(pool, securityConfig, basicAuthentication, lookupConfig, payloadConfig),
+                metricRegistry
         );
 
         try (
-                NettyHttpServer server = new NettyHttpServer(
-                        nettyConfig,
-                        relpConversion,
-                        null,
-                        200,
-                        internalEndpointUrlConfig
+                HttpServer server = new MetricHttpServer(
+                        new NettyHttpServer(nettyConfig, relpConversion, null, 200, internalEndpointUrlConfig),
+                        report
                 )
         ) {
             server.run();
+        }
+        catch (IOException e) {
+            throw new IllegalArgumentException("Failed to close the server: " + e.getMessage());
         }
         finally {
             pool.close();

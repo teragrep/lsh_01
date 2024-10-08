@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01.pool;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.teragrep.rlp_01.RelpBatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,15 +28,28 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class ManagedRelpConnection implements IManagedRelpConnection {
 
     private static final Logger LOGGER = LogManager.getLogger(ManagedRelpConnection.class);
     private final IRelpConnection relpConnection;
     private boolean hasConnected;
 
-    public ManagedRelpConnection(IRelpConnection relpConnection) {
+    // metrics
+    private final Counter records;
+    private final Counter bytes;
+    private final Counter resends;
+    private final Counter retriedConnects;
+
+    public ManagedRelpConnection(IRelpConnection relpConnection, MetricRegistry metricRegistry) {
         this.relpConnection = relpConnection;
         this.hasConnected = false;
+
+        this.records = metricRegistry.counter(name(ManagedRelpConnection.class, "records"));
+        this.bytes = metricRegistry.counter(name(ManagedRelpConnection.class, "bytes"));
+        this.resends = metricRegistry.counter(name(ManagedRelpConnection.class, "resends"));
+        this.retriedConnects = metricRegistry.counter(name(ManagedRelpConnection.class, "retriedConnects"));
     }
 
     private void connect() {
@@ -54,6 +69,7 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
                         );
 
                 try {
+                    retriedConnects.inc();
                     Thread.sleep(relpConnection.relpConfig().relpReconnectInterval);
                 }
                 catch (InterruptedException exception) {
@@ -89,11 +105,14 @@ public class ManagedRelpConnection implements IManagedRelpConnection {
                 relpBatch.retryAllFailed();
                 this.tearDown();
                 this.connect();
+                resends.inc();
             }
             else {
                 notSent = false;
             }
         }
+        records.inc();
+        this.bytes.inc(bytes.length);
     }
 
     @Override
