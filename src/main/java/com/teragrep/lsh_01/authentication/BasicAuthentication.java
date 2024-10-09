@@ -67,4 +67,15 @@ public class BasicAuthentication {
             return subjectStub;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final BasicAuthentication cast = (BasicAuthentication) o;
+        // equality of CredentialLookup can't be checked. It has no equals() function and the Map is only traversable by key.
+        return decoder.equals(cast.decoder);
+    }
 }

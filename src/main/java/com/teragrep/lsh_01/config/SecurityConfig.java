@@ -34,4 +34,14 @@ public class SecurityConfig implements Validateable {
     public void validate() {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final SecurityConfig cast = (SecurityConfig) o;
+        return authRequired == cast.authRequired;
+    }
 }

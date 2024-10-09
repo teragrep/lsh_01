@@ -109,4 +109,14 @@ public class Pool<T extends Poolable> implements AutoCloseable, Supplier<T> {
         offer(stub);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final Pool<?> cast = (Pool<?>) o;
+        return supplier.equals(cast.supplier) && queue.equals(cast.queue) && stub.equals(cast.stub)
+                && lock.equals(cast.lock) && (close.get() == cast.close.get());
+    }
 }

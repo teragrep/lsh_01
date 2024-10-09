@@ -127,4 +127,16 @@ public final class ConversionFactory {
                 );
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final ConversionFactory cast = (ConversionFactory) o;
+        return splitType.equals(cast.splitType) && regexPattern.equals(cast.regexPattern) && pool
+                .equals(cast.pool) && securityConfig.equals(cast.securityConfig)
+                && basicAuthentication.equals(cast.basicAuthentication) && lookupConfig.equals(cast.lookupConfig);
+    }
 }

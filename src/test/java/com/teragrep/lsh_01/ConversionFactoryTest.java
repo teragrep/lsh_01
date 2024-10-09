@@ -143,4 +143,67 @@ public class ConversionFactoryTest {
         );
         Assertions.assertDoesNotThrow(conversionFactory::conversion);
     }
+
+    @Test
+    public void testEqualConversionFactories() {
+        String regexPattern = "";
+        String splitType = "json_array";
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
+        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+
+        ConversionFactory conversionFactory = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                new BasicAuthenticationFactory().create(),
+                new LookupConfig()
+        );
+
+        ConversionFactory conversionFactoryCopy = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                new BasicAuthenticationFactory().create(),
+                new LookupConfig()
+        );
+
+        // calling functions should have no effect on an immutable object
+        conversionFactory.conversion();
+
+        Assertions.assertEquals(conversionFactory, conversionFactoryCopy);
+    }
+
+    @Test
+    public void testNotEqualConversionFactories() {
+        String regexPattern = "";
+        String splitType = "json_array";
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
+        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+
+        ConversionFactory conversionFactory = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                new BasicAuthenticationFactory().create(),
+                new LookupConfig()
+        );
+
+        regexPattern = "\n";
+        splitType = "regex";
+        ConversionFactory conversionFactoryCopy = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                new BasicAuthenticationFactory().create(),
+                new LookupConfig()
+        );
+
+        Assertions.assertNotEquals(conversionFactory, conversionFactoryCopy);
+    }
 }
