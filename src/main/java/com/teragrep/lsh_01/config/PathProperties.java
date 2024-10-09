@@ -20,8 +20,9 @@
 package com.teragrep.lsh_01.config;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -42,7 +43,9 @@ public final class PathProperties implements Configuration {
     @Override
     public Map<String, String> deepCopyAsUnmodifiableMap() throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(file));
+        try (final InputStream in = Files.newInputStream(file.toPath())) {
+            properties.load(in);
+        }
         return Collections
                 .unmodifiableMap(
                         properties
