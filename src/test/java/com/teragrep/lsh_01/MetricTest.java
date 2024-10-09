@@ -25,9 +25,11 @@ import com.codahale.metrics.Timer;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.authentication.SubjectAnonymous;
 import com.teragrep.lsh_01.config.LookupConfig;
-import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
+import com.teragrep.lsh_01.conversion.IMessageHandler;
+import com.teragrep.lsh_01.conversion.MetricRelpConversion;
+import com.teragrep.lsh_01.conversion.RelpConversion;
 import com.teragrep.lsh_01.fakes.RelpConnectionFactoryFake;
 import com.teragrep.lsh_01.fakes.RelpConnectionFake;
 import com.teragrep.lsh_01.fakes.ResendingRelpConnectionFake;
@@ -205,7 +207,7 @@ public class MetricTest {
 
         // the message processing starts from RelpConversion
         IMessageHandler relpConversion = new MetricRelpConversion(
-                new RelpConversion(new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub()), new SecurityConfig(), new BasicAuthenticationFactory().create(), new LookupConfig(), new PayloadConfig()), registry
+                new RelpConversion(new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub()), new SecurityConfig(), new BasicAuthenticationFactory().create(), new LookupConfig()), registry
         );
 
         for (int i = 0; i < messages; i++) {

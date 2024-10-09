@@ -84,14 +84,10 @@ public class Main {
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
-        IMessageHandler conversion = new MetricRelpConversion(new ConversionFactory(
-                propsMap,
-                pool,
-                securityConfig,
-                basicAuthentication,
-                lookupConfig
-        ).conversion(),
-                metricRegistry);
+        IMessageHandler conversion = new MetricRelpConversion(
+                new ConversionFactory(propsMap, pool, securityConfig, basicAuthentication, lookupConfig).conversion(),
+                metricRegistry
+        );
 
         try (
                 HttpServer server = new MetricHttpServer(
