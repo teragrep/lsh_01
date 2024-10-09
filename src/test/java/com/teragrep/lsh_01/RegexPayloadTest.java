@@ -67,20 +67,28 @@ public class RegexPayloadTest {
     }
 
     @Test
-    public void testObjectEquality() {
+    public void testObjectEquals() {
         Pattern splitPattern = Pattern.compile("\\n");
-        Pattern splitPattern2 = Pattern.compile(",");
         String requestBody = "[\n{\"foo\": 1}\n]";
-        String difRequestBody = "[\n{\"bar\": 2}\n]";
         RegexPayload payload = new RegexPayload(new DefaultPayload(requestBody), splitPattern);
         RegexPayload samePayload = new RegexPayload(new DefaultPayload(requestBody), splitPattern);
-        RegexPayload difPayload = new RegexPayload(new DefaultPayload(difRequestBody), splitPattern);
-        RegexPayload difPattern = new RegexPayload(new DefaultPayload(requestBody), splitPattern2);
 
         // public methods of JsonPayload shouldn't affect an immutable object
         payload.messages();
 
         Assertions.assertEquals(payload, samePayload);
+    }
+
+    @Test
+    public void testObjectNotEquals() {
+        Pattern splitPattern = Pattern.compile("\\n");
+        Pattern difSplitPattern = Pattern.compile(",");
+        String requestBody = "[\n{\"foo\": 1}\n]";
+        String difRequestBody = "[\n{\"bar\": 2}\n]";
+        RegexPayload payload = new RegexPayload(new DefaultPayload(requestBody), splitPattern);
+        RegexPayload difPayload = new RegexPayload(new DefaultPayload(difRequestBody), splitPattern);
+        RegexPayload difPattern = new RegexPayload(new DefaultPayload(requestBody), difSplitPattern);
+
         Assertions.assertNotEquals(payload, difPayload);
         Assertions.assertNotEquals(payload, difPattern);
     }
