@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -138,5 +139,10 @@ public final class ConversionFactory {
         return splitType.equals(cast.splitType) && regexPattern.equals(cast.regexPattern) && pool
                 .equals(cast.pool) && securityConfig.equals(cast.securityConfig)
                 && basicAuthentication.equals(cast.basicAuthentication) && lookupConfig.equals(cast.lookupConfig);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(splitType, regexPattern, pool, securityConfig, basicAuthentication, lookupConfig);
     }
 }

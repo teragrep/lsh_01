@@ -208,4 +208,45 @@ public class ConversionFactoryTest {
 
         Assertions.assertNotEquals(conversionFactory, conversionFactoryCopy);
     }
+
+    @Test
+    public void testHashCode() {
+        String regexPattern = "";
+        String splitType = "json_array";
+
+        RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
+        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        BasicAuthentication auth = new BasicAuthenticationFactory().create();
+
+        ConversionFactory conversionFactory1 = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                auth,
+                new LookupConfig()
+        );
+        ConversionFactory conversionFactory2 = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                auth,
+                new LookupConfig()
+        );
+
+        regexPattern = "\n";
+        splitType = "regex";
+        ConversionFactory conversionFactory3 = new ConversionFactory(
+                splitType,
+                regexPattern,
+                pool,
+                new SecurityConfig(),
+                new BasicAuthenticationFactory().create(),
+                new LookupConfig()
+        );
+
+        Assertions.assertEquals(conversionFactory1.hashCode(), conversionFactory2.hashCode());
+        Assertions.assertNotEquals(conversionFactory1.hashCode(), conversionFactory3.hashCode());
+    }
 }
