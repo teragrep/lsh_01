@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Base64;
+import java.util.Objects;
 
 public class BasicAuthentication {
 
@@ -75,7 +76,11 @@ public class BasicAuthentication {
         if (o == null || getClass() != o.getClass())
             return false;
         final BasicAuthentication cast = (BasicAuthentication) o;
-        // equality of CredentialLookup can't be checked. It has no equals() function and the Map is only traversable by key.
-        return decoder.equals(cast.decoder);
+        return decoder.equals(cast.decoder) && credentialLookup.equals(cast.credentialLookup);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(decoder, credentialLookup);
     }
 }

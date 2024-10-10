@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -53,5 +54,20 @@ public final class PathProperties implements Configuration {
                                 .stream()
                                 .collect(Collectors.toMap(k -> k.getKey().toString(), k -> k.getValue().toString()))
                 );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        PathProperties that = (PathProperties) o;
+        return file.equals(that.file);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(file);
     }
 }

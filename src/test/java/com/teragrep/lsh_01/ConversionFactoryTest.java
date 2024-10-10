@@ -19,6 +19,7 @@
 */
 package com.teragrep.lsh_01;
 
+import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
 import com.teragrep.lsh_01.pool.IManagedRelpConnection;
@@ -151,13 +152,14 @@ public class ConversionFactoryTest {
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
         Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        BasicAuthentication auth = new BasicAuthenticationFactory().create();
 
         ConversionFactory conversionFactory = new ConversionFactory(
                 splitType,
                 regexPattern,
                 pool,
                 new SecurityConfig(),
-                new BasicAuthenticationFactory().create(),
+                auth,
                 new LookupConfig()
         );
 
@@ -166,7 +168,7 @@ public class ConversionFactoryTest {
                 regexPattern,
                 pool,
                 new SecurityConfig(),
-                new BasicAuthenticationFactory().create(),
+                auth,
                 new LookupConfig()
         );
 

@@ -242,6 +242,7 @@
             <exclude>src/main/assembly/jar-with-dependencies.xml</exclude>
             <exclude>src/main/resources/*</exclude>
             <exclude>src/test/resources/certificates/*</exclude>
+            <exclude>src/test/resources/properties/*</exclude>
             <!-- readme -->
             <exclude>README.adoc</exclude>
           </excludes>

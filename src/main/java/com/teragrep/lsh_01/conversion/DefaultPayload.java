@@ -21,6 +21,7 @@ package com.teragrep.lsh_01.conversion;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public final class DefaultPayload implements Payload {
 
@@ -45,5 +46,10 @@ public final class DefaultPayload implements Payload {
             return false;
         final DefaultPayload cast = (DefaultPayload) object;
         return message.equals(cast.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(message);
     }
 }

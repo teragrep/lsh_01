@@ -59,18 +59,36 @@ public class JsonPayloadTest {
     }
 
     @Test
-    public void testObjectEquality() {
+    public void testEquals() {
+        String requestBody = "[\n{\"foo\": 1}\n]";
+        JsonPayload payload = new JsonPayload(new DefaultPayload(requestBody));
+        JsonPayload samePayload = new JsonPayload(new DefaultPayload(requestBody));
+
+        // public methods of JsonPayload shouldn't affect an immutable object
+        payload.messages();
+
+        Assertions.assertEquals(payload, samePayload);
+    }
+
+    @Test
+    public void testNotEquals() {
+        String requestBody = "[\n{\"foo\": 1}\n]";
+        String difRequestBody = "[\n{\"bar\": 2}\n]";
+        JsonPayload payload = new JsonPayload(new DefaultPayload(requestBody));
+        JsonPayload difPayload = new JsonPayload(new DefaultPayload(difRequestBody));
+
+        Assertions.assertNotEquals(payload, difPayload);
+    }
+
+    @Test
+    public void testHashCode() {
         String requestBody = "[\n{\"foo\": 1}\n]";
         String difRequestBody = "[\n{\"bar\": 2}\n]";
         JsonPayload payload = new JsonPayload(new DefaultPayload(requestBody));
         JsonPayload samePayload = new JsonPayload(new DefaultPayload(requestBody));
         JsonPayload difPayload = new JsonPayload(new DefaultPayload(difRequestBody));
 
-        // public methods of JsonPayload shouldn't affect an immutable object
-        payload.messages();
-
-        Assertions.assertEquals(payload, samePayload);
-        Assertions.assertNotEquals(payload, difPayload);
-        Assertions.assertNotEquals(samePayload, difPayload);
+        Assertions.assertEquals(payload.hashCode(), samePayload.hashCode());
+        Assertions.assertNotEquals(payload.hashCode(), difPayload.hashCode());
     }
 }

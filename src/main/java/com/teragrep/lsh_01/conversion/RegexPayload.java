@@ -21,6 +21,7 @@ package com.teragrep.lsh_01.conversion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -63,5 +64,10 @@ final public class RegexPayload implements Payload {
             return false;
         final RegexPayload cast = (RegexPayload) object;
         return payload.equals(cast.payload) && splitPattern.equals(cast.splitPattern);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(payload, splitPattern);
     }
 }

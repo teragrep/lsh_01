@@ -92,4 +92,20 @@ public class RegexPayloadTest {
         Assertions.assertNotEquals(payload, difPayload);
         Assertions.assertNotEquals(payload, difPattern);
     }
+
+    @Test
+    public void testHashCode() {
+        Pattern splitPattern = Pattern.compile("\\n");
+        Pattern difSplitPattern = Pattern.compile(",");
+        String requestBody = "[\n{\"foo\": 1}\n]";
+        String difRequestBody = "[\n{\"bar\": 2}\n]";
+        RegexPayload payload1 = new RegexPayload(new DefaultPayload(requestBody), splitPattern);
+        RegexPayload payload2 = new RegexPayload(new DefaultPayload(requestBody), splitPattern);
+        RegexPayload payload3 = new RegexPayload(new DefaultPayload(difRequestBody), splitPattern);
+        RegexPayload payload4 = new RegexPayload(new DefaultPayload(requestBody), difSplitPattern);
+
+        Assertions.assertEquals(payload1.hashCode(), payload2.hashCode());
+        Assertions.assertNotEquals(payload1.hashCode(), payload3.hashCode());
+        Assertions.assertNotEquals(payload1.hashCode(), payload4.hashCode());
+    }
 }

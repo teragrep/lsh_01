@@ -24,6 +24,7 @@ import jakarta.json.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A Json array payload splittable into individual json objects.
@@ -66,5 +67,10 @@ public final class JsonPayload implements Payload {
             return false;
         final JsonPayload cast = (JsonPayload) object;
         return payload.equals(cast.payload);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(payload);
     }
 }

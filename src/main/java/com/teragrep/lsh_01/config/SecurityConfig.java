@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01.config;
 
+import java.util.Objects;
+
 public class SecurityConfig implements Validateable {
 
     public final boolean authRequired;
@@ -43,5 +45,10 @@ public class SecurityConfig implements Validateable {
             return false;
         final SecurityConfig cast = (SecurityConfig) o;
         return authRequired == cast.authRequired;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(authRequired);
     }
 }
