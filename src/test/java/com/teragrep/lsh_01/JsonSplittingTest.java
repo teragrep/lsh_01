@@ -39,9 +39,7 @@ public class JsonSplittingTest {
     @BeforeAll
     void setUp() throws InterruptedException {
         // have to set config here before running Main
-        System.setProperty("payload.splitType", "json_array");
-        System.setProperty("security.authRequired", "false");
-        System.setProperty("relp.port", "1601");
+        System.setProperty("properties.file", "src/test/resources/properties/jsonSplittingTest.properties");
 
         // Start listening to HTTP-requests
         program = new Thread(() -> Main.main(new String[] {}));
@@ -60,9 +58,7 @@ public class JsonSplittingTest {
 
     @AfterAll
     void tearDown() {
-        System.clearProperty("payload.splitType");
-        System.clearProperty("security.authRequired");
-        System.clearProperty("relp.port");
+        System.clearProperty("properties.file");
         this.relpServer.tearDown();
         program.interrupt();
     }

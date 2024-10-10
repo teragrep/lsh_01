@@ -39,9 +39,7 @@ public class RegexSplittingTest {
 
     @BeforeAll
     void setUp() throws InterruptedException {
-        System.setProperty("payload.splitType", "regex");
-        System.setProperty("security.authRequired", "false");
-        System.setProperty("relp.port", "1601");
+        System.setProperty("properties.file", "src/test/resources/properties/regexSplittingTest.properties");
 
         // Start listening to HTTP-requests
         program = new Thread(() -> Main.main(new String[] {}));
@@ -62,9 +60,7 @@ public class RegexSplittingTest {
 
     @AfterAll
     void tearDown() {
-        System.clearProperty("payload.splitType");
-        System.clearProperty("security.authRequired");
-        System.clearProperty("relp.port");
+        System.clearProperty("properties.file");
         this.relpServer.tearDown();
         program.interrupt();
     }

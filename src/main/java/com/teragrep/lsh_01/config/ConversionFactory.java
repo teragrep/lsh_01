@@ -54,11 +54,8 @@ public final class ConversionFactory {
     ) {
         // if system property is not specified, defaults to config file (the Map)
         this(
-                System.getProperty("payload.splitType", configuration.get("payload.splitType")),
-                System
-                        .getProperty(
-                                "payload.splitType.regex.pattern", configuration.get("payload.splitType.regex.pattern")
-                        ),
+                configuration.get("payload.splitType"),
+                configuration.get("payload.splitType.regex.pattern"),
                 pool,
                 securityConfig,
                 basicAuthentication,
