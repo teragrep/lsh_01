@@ -21,6 +21,7 @@ package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.authentication.*;
 import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
+import com.teragrep.lsh_01.conversion.IMessageHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;

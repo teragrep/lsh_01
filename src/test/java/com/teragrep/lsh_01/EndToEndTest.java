@@ -33,96 +33,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EndToEndTest {
 
     private RelpServer relpServer;
     private NettyConfig nettyConfig;
+    private Thread program;
 
     @BeforeAll
     void setUp() throws InterruptedException {
-        System.setProperty("payload.splitEnabled", "true");
+        System.setProperty("payload.splitType", "none");
         System.setProperty("security.authRequired", "false");
         System.setProperty("relp.port", "1601");
 
         // Start listening to HTTP-requests
-        Thread program = new Thread(() -> Main.main(new String[] {}));
+        program = new Thread(() -> Main.main(new String[] {}));
         program.start();
 
         Thread.sleep(3000); // wait for netty to start up
 
-        this.relpServer = new RelpServer();
-        this.relpServer.setUpDefault();
+        relpServer = new RelpServer();
+        relpServer.setUpDefault();
 
-        this.nettyConfig = new NettyConfig();
+        nettyConfig = new NettyConfig();
     }
 
     @AfterEach
     void reset() {
-        this.relpServer.clear();
+        relpServer.clear();
     }
 
     @AfterAll
     void tearDown() {
-        System.clearProperty("payload.splitEnabled");
+        System.clearProperty("payload.splitType");
         System.clearProperty("security.authRequired");
         System.clearProperty("relp.port");
-        this.relpServer.tearDown();
-    }
-
-    @Test
-    public void testSplittingMessage1() throws InterruptedException, ExecutionException {
-        String requestBody = "foofoo\nbar";
-
-        HttpClient httpClient = HttpClient.newHttpClient();
-
-        HttpRequest request = HttpRequest
-                .newBuilder(URI.create("http://" + nettyConfig.listenAddress + ":" + nettyConfig.listenPort))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-
-        CompletableFuture<HttpResponse<String>> response = httpClient
-                .sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-        Assertions.assertEquals(200, response.get().statusCode());
-
-        List<String> payloads = this.relpServer.payloads();
-
-        // assert that payload was correctly split into two
-        Assertions.assertEquals(2, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains("foofoo"));
-        Assertions.assertFalse(payloads.get(0).contains("bar"));
-        Assertions.assertTrue(payloads.get(1).contains("bar"));
-        Assertions.assertFalse(payloads.get(1).contains("foofoo"));
-    }
-
-    @Test
-    public void testSplittingMessage2() throws InterruptedException, ExecutionException {
-        String requestBody = "foofoo\nbar\nfoo bar";
-
-        HttpClient httpClient = HttpClient.newHttpClient();
-
-        HttpRequest request = HttpRequest
-                .newBuilder(URI.create("http://" + nettyConfig.listenAddress + ":" + nettyConfig.listenPort))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-
-        CompletableFuture<HttpResponse<String>> response = httpClient
-                .sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-        Assertions.assertEquals(200, response.get().statusCode());
-
-        List<String> payloads = this.relpServer.payloads();
-
-        // assert that payload was correctly split into three parts
-        Assertions.assertEquals(3, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains("foofoo"));
-        Assertions.assertFalse(payloads.get(0).contains("bar"));
-        Assertions.assertTrue(payloads.get(1).contains("bar"));
-        Assertions.assertFalse(payloads.get(1).contains("foofoo"));
-        Assertions.assertTrue(payloads.get(2).contains("foo bar"));
+        relpServer.tearDown();
+        program.interrupt();
     }
 
     @Test
@@ -152,7 +100,7 @@ public class EndToEndTest {
     }
 
     @Test
-    public void testMultipleRequests() throws ExecutionException, InterruptedException {
+    public void testMultipleRequests() {
         ArrayList<String> requestBodies = new ArrayList<>();
 
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -169,7 +117,8 @@ public class EndToEndTest {
             CompletableFuture<HttpResponse<String>> response = httpClient
                     .sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
-            Assertions.assertEquals(200, response.get().statusCode());
+            int statusCode = Assertions.assertDoesNotThrow(() -> response.get().statusCode());
+            Assertions.assertEquals(200, statusCode);
         }
 
         List<String> payloads = this.relpServer.payloads();

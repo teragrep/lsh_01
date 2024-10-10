@@ -21,11 +21,11 @@ package com.teragrep.lsh_01;
 
 import com.codahale.metrics.MetricRegistry;
 import com.teragrep.jlt_01.StringLookupTable;
+import com.teragrep.lsh_01.conversion.RelpConversion;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.authentication.Subject;
 import com.teragrep.lsh_01.config.LookupConfig;
-import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
@@ -69,8 +69,7 @@ public class LookupTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
 
         // FirstUser:VeryFirstPassword!
@@ -94,8 +93,7 @@ public class LookupTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
 
         // FirstUser:VeryFirstPassword!
@@ -121,8 +119,7 @@ public class LookupTest {
                 pool,
                 securityConfig,
                 basicAuthentication,
-                new LookupConfig(),
-                new PayloadConfig()
+                new LookupConfig()
         );
 
         // MissingHostname:MyHostnameIsMissing

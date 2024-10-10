@@ -108,5 +108,4 @@ public class Pool<T extends Poolable> implements AutoCloseable, Supplier<T> {
         // close all that are in the pool right now
         offer(stub);
     }
-
 }

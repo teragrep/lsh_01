@@ -30,6 +30,10 @@ public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
     private final RelpConfig relpConfig;
     private final MetricRegistry metricRegistry;
 
+    public RelpConnectionFactory(RelpConfig relpConfig) { // for testing, new metric registry can be used
+        this(relpConfig, new MetricRegistry());
+    }
+
     public RelpConnectionFactory(RelpConfig relpConfig, MetricRegistry metricRegistry) {
         this.relpConfig = relpConfig;
         this.metricRegistry = metricRegistry;

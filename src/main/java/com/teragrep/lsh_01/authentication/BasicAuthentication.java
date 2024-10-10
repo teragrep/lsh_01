@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Base64;
+import java.util.Objects;
 
 public class BasicAuthentication {
 
@@ -66,5 +67,20 @@ public class BasicAuthentication {
         else {
             return subjectStub;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final BasicAuthentication cast = (BasicAuthentication) o;
+        return decoder.equals(cast.decoder) && credentialLookup.equals(cast.credentialLookup);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(decoder, credentialLookup);
     }
 }

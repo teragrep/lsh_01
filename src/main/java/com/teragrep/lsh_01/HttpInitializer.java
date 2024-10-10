@@ -20,6 +20,7 @@
 package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.InternalEndpointUrlConfig;
+import com.teragrep.lsh_01.conversion.IMessageHandler;
 import com.teragrep.lsh_01.util.LoggingHttpObjectAggregator;
 import com.teragrep.lsh_01.util.SslHandlerProvider;
 import io.netty.channel.ChannelInitializer;
