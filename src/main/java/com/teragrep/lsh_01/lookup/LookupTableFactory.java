@@ -22,17 +22,18 @@ package com.teragrep.lsh_01.lookup;
 import com.teragrep.jlt_01.StringLookupTable;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class LookupTableFactory {
 
     public StringLookupTable create(String path) {
         BufferedReader bufferedReader;
         try {
-            bufferedReader = new BufferedReader(new FileReader(path));
+            bufferedReader = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8));
         }
-        catch (FileNotFoundException e) {
+        catch (IOException e) {
             throw new IllegalArgumentException("Can't find lookup table from path <[" + path + "]>: ", e);
         }
         return new StringLookupTable(bufferedReader);
