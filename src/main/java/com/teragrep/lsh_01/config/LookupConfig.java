@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01.config;
 
+import java.util.Objects;
+
 public class LookupConfig implements Validateable {
 
     public final String hostnamePath;
@@ -39,5 +41,20 @@ public class LookupConfig implements Validateable {
     @Override
     public String toString() {
         return "LookupConfig{" + "hostnamePath='" + hostnamePath + '\'' + ", appNamePath='" + appNamePath + '\'' + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final LookupConfig cast = (LookupConfig) o;
+        return hostnamePath.equals(cast.hostnamePath) && appNamePath.equals(cast.appNamePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hostnamePath, appNamePath);
     }
 }

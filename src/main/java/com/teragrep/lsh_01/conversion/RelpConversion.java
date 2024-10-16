@@ -17,13 +17,12 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.conversion;
 
 import com.teragrep.jlt_01.StringLookupTable;
 import com.teragrep.lsh_01.authentication.BasicAuthentication;
 import com.teragrep.lsh_01.authentication.Subject;
 import com.teragrep.lsh_01.config.LookupConfig;
-import com.teragrep.lsh_01.config.PayloadConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
 import com.teragrep.lsh_01.pool.*;
@@ -35,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class RelpConversion implements IMessageHandler {
 
@@ -44,7 +42,6 @@ public class RelpConversion implements IMessageHandler {
     private final SecurityConfig securityConfig;
     private final BasicAuthentication basicAuthentication;
     private final LookupConfig lookupConfig;
-    private final PayloadConfig payloadConfig;
     private final StringLookupTable hostnameLookup;
     private final StringLookupTable appnameLookup;
 
@@ -52,8 +49,7 @@ public class RelpConversion implements IMessageHandler {
             Pool<IManagedRelpConnection> relpConnectionPool,
             SecurityConfig securityConfig,
             BasicAuthentication basicAuthentication,
-            LookupConfig lookupConfig,
-            PayloadConfig payloadConfig
+            LookupConfig lookupConfig
     ) {
         this.relpConnectionPool = relpConnectionPool;
         this.securityConfig = securityConfig;
@@ -61,26 +57,13 @@ public class RelpConversion implements IMessageHandler {
         this.lookupConfig = lookupConfig;
         this.hostnameLookup = new LookupTableFactory().create(lookupConfig.hostnamePath);
         this.appnameLookup = new LookupTableFactory().create(lookupConfig.appNamePath);
-        this.payloadConfig = payloadConfig;
     }
 
     public boolean onNewMessage(Subject subject, Map<String, String> headers, String body) {
         try {
-            if (payloadConfig.splitEnabled) {
-                Pattern splitPattern = Pattern.compile(payloadConfig.splitRegex);
-                Payload originalPayload = new Payload(body, splitPattern);
-
-                for (Payload payload : originalPayload.split()) {
-                    sendMessage(
-                            payload.take(), headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
-                    );
-                }
-            }
-            else {
-                sendMessage(
-                        body, headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
-                );
-            }
+            sendMessage(
+                    body, headers, subject.subject(), hostnameLookup.lookup(subject.subject()), appnameLookup.lookup(subject.subject())
+            );
         }
         catch (Exception e) {
             LOGGER.error("Unexpected error when sending a message: <{}>", e.getMessage(), e);
@@ -99,7 +82,7 @@ public class RelpConversion implements IMessageHandler {
 
     public RelpConversion copy() {
         LOGGER.debug("RelpConversion.copy called");
-        return new RelpConversion(relpConnectionPool, securityConfig, basicAuthentication, lookupConfig, payloadConfig);
+        return new RelpConversion(relpConnectionPool, securityConfig, basicAuthentication, lookupConfig);
     }
 
     public Map<String, String> responseHeaders() {

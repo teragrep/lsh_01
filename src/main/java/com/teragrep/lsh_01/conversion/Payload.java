@@ -17,40 +17,19 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-package com.teragrep.lsh_01;
+package com.teragrep.lsh_01.conversion;
 
-import com.teragrep.lsh_01.authentication.Subject;
-
-import java.util.Map;
+import java.util.List;
 
 /**
- * Created by joaoduarte on 16/10/2017.
+ * A message from a log source
  */
-public interface IMessageHandler {
+public interface Payload {
 
     /**
-     * This is triggered on every new message parsed by the http handler and should be executed in the ruby world.
+     * Takes the message(s) from the payload.
      *
-     * @param headers
-     * @param body
+     * @return list of messages
      */
-    boolean onNewMessage(Subject subject, Map<String, String> headers, String body);
-
-    /**
-     * @param token
-     * @return
-     */
-    Subject asSubject(String token);
-
-    boolean requiresToken();
-
-    /**
-     * @return copy of the message handler
-     */
-    IMessageHandler copy();
-
-    /**
-     * @return
-     */
-    Map<String, String> responseHeaders();
+    List<String> messages();
 }
