@@ -170,6 +170,13 @@
       <artifactId>rlp_03</artifactId>
       <version>${rlp_03.version}</version>
     </dependency>
+    <!-- Syslog parsing, testing -->
+    <dependency>
+      <groupId>com.teragrep</groupId>
+      <artifactId>rlo_06</artifactId>
+      <version>9.0.1</version>
+      <scope>test</scope>
+    </dependency>
     <!-- securemock, testing -->
     <dependency>
       <groupId>org.elasticsearch</groupId>

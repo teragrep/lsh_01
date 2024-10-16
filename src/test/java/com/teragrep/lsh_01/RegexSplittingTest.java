@@ -21,12 +21,16 @@ package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.NettyConfig;
 import com.teragrep.lsh_01.util.RelpServer;
+import com.teragrep.rlo_06.RFC5424Frame;
 import org.junit.jupiter.api.*;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -67,7 +71,14 @@ public class RegexSplittingTest {
 
     @Test
     public void testRegexSplittingTwoMessages() {
-        String requestBody = "foofoo\nbar";
+        String expected1 = "foofoo";
+        String expected2 = "bar";
+
+        ArrayList<String> expectedList = new ArrayList<>();
+        expectedList.add(expected1);
+        expectedList.add(expected2);
+
+        String requestBody = expected1 + "\n" + expected2;
 
         HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -86,15 +97,30 @@ public class RegexSplittingTest {
 
         // assert that payload was correctly split into two
         Assertions.assertEquals(2, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains("foofoo"));
-        Assertions.assertFalse(payloads.get(0).contains("bar"));
-        Assertions.assertTrue(payloads.get(1).contains("bar"));
-        Assertions.assertFalse(payloads.get(1).contains("foofoo"));
+
+        int loops = 0;
+        RFC5424Frame frame = new RFC5424Frame();
+        for (int i = 0; i < payloads.size(); i++) {
+            frame.load(new ByteArrayInputStream(payloads.get(i).getBytes(StandardCharsets.UTF_8)));
+            Assertions.assertDoesNotThrow(frame::next);
+            Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
+            loops++;
+        }
+        Assertions.assertEquals(payloads.size(), loops);
     }
 
     @Test
     public void testRegexSplittingThreeMessages() {
-        String requestBody = "foofoo\nbar\nfoo bar";
+        String expected1 = "foofoo";
+        String expected2 = "bar";
+        String expected3 = "foo bar";
+
+        ArrayList<String> expectedList = new ArrayList<>();
+        expectedList.add(expected1);
+        expectedList.add(expected2);
+        expectedList.add(expected3);
+
+        String requestBody = expected1 + "\n" + expected2 + "\n" + expected3;
 
         HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -113,10 +139,15 @@ public class RegexSplittingTest {
 
         // assert that payload was correctly split into three parts
         Assertions.assertEquals(3, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains("foofoo"));
-        Assertions.assertFalse(payloads.get(0).contains("bar"));
-        Assertions.assertTrue(payloads.get(1).contains("bar"));
-        Assertions.assertFalse(payloads.get(1).contains("foofoo"));
-        Assertions.assertTrue(payloads.get(2).contains("foo bar"));
+
+        int loops = 0;
+        RFC5424Frame frame = new RFC5424Frame();
+        for (int i = 0; i < payloads.size(); i++) {
+            frame.load(new ByteArrayInputStream(payloads.get(i).getBytes(StandardCharsets.UTF_8)));
+            Assertions.assertDoesNotThrow(frame::next);
+            Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
+            loops++;
+        }
+        Assertions.assertEquals(payloads.size(), loops);
     }
 }

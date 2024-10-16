@@ -21,12 +21,16 @@ package com.teragrep.lsh_01;
 
 import com.teragrep.lsh_01.config.NettyConfig;
 import com.teragrep.lsh_01.util.RelpServer;
+import com.teragrep.rlo_06.RFC5424Frame;
 import org.junit.jupiter.api.*;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -67,6 +71,7 @@ public class JsonSplittingTest {
     public void testJsonSplittingOneMessage() { // no splitting needed
         String message = "{\"foo\": 1}";
         String requestBody = "[\n" + message + "\n]";
+        String expected = message.replaceAll("\\s", "");
 
         NettyConfig nettyConfig = new NettyConfig();
 
@@ -85,17 +90,25 @@ public class JsonSplittingTest {
 
         List<String> payloads = this.relpServer.payloads();
 
-        String expected = message.replaceAll("\\s", "");
-
         // assert that there is just one payload with the correct message
         Assertions.assertEquals(1, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains(expected));
+
+        RFC5424Frame frame = new RFC5424Frame();
+        frame.load(new ByteArrayInputStream(payloads.get(0).getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertDoesNotThrow(frame::next);
+
+        Assertions.assertEquals(expected, frame.msg.toString());
     }
 
     @Test
     public void testJsonSplittingTwoMessages() {
         String message1 = "{\"foo\": 1}";
         String message2 = "{\"bar\": 2}";
+
+        ArrayList<String> expectedList = new ArrayList<>();
+        expectedList.add(message1.replaceAll("\\s", ""));
+        expectedList.add(message2.replaceAll("\\s", ""));
+
         String requestBody = "[\n" + message1 + ",\n" + message2 + "\n]";
 
         NettyConfig nettyConfig = new NettyConfig();
@@ -115,16 +128,18 @@ public class JsonSplittingTest {
 
         List<String> payloads = this.relpServer.payloads();
 
-        String expected1 = message1.replaceAll("\\s", "");
-        String expected2 = message2.replaceAll("\\s", "");
-
         // assert that payload was correctly split
         Assertions.assertEquals(2, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains(expected1));
-        Assertions.assertFalse(payloads.get(0).contains(expected2));
 
-        Assertions.assertTrue(payloads.get(1).contains(expected2));
-        Assertions.assertFalse(payloads.get(1).contains(expected1));
+        int loops = 0;
+        RFC5424Frame frame = new RFC5424Frame();
+        for (int i = 0; i < payloads.size(); i++) {
+            frame.load(new ByteArrayInputStream(payloads.get(i).getBytes(StandardCharsets.UTF_8)));
+            Assertions.assertDoesNotThrow(frame::next);
+            Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
+            loops++;
+        }
+        Assertions.assertEquals(payloads.size(), loops);
     }
 
     @Test
@@ -133,6 +148,11 @@ public class JsonSplittingTest {
         String message2 = "{\"bar\": 2}";
         String message3 = "{\"foobar\": 3}";
         String requestBody = "[\n" + message1 + ",\n" + message2 + "\n, \n" + message3 + "\n]";
+
+        ArrayList<String> expectedList = new ArrayList<>();
+        expectedList.add(message1.replaceAll("\\s", ""));
+        expectedList.add(message2.replaceAll("\\s", ""));
+        expectedList.add(message3.replaceAll("\\s", ""));
 
         NettyConfig nettyConfig = new NettyConfig();
 
@@ -151,28 +171,24 @@ public class JsonSplittingTest {
 
         List<String> payloads = this.relpServer.payloads();
 
-        String expected1 = message1.replaceAll("\\s", "");
-        String expected2 = message2.replaceAll("\\s", "");
-        String expected3 = message3.replaceAll("\\s", "");
-
         // assert that payload was correctly split
         Assertions.assertEquals(3, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains(expected1));
-        Assertions.assertFalse(payloads.get(0).contains(expected2));
-        Assertions.assertFalse(payloads.get(0).contains(expected3));
 
-        Assertions.assertTrue(payloads.get(1).contains(expected2));
-        Assertions.assertFalse(payloads.get(1).contains(expected1));
-        Assertions.assertFalse(payloads.get(1).contains(expected3));
-
-        Assertions.assertTrue(payloads.get(2).contains(expected3));
-        Assertions.assertFalse(payloads.get(2).contains(expected1));
-        Assertions.assertFalse(payloads.get(2).contains(expected2));
+        int loops = 0;
+        RFC5424Frame frame = new RFC5424Frame();
+        for (int i = 0; i < payloads.size(); i++) {
+            frame.load(new ByteArrayInputStream(payloads.get(i).getBytes(StandardCharsets.UTF_8)));
+            Assertions.assertDoesNotThrow(frame::next);
+            Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
+            loops++;
+        }
+        Assertions.assertEquals(payloads.size(), loops);
     }
 
     @Test
     public void testJsonSplittingNestedObjects() {
         String payload = "{\"foo\": {\"bar\": 2}}";
+        String expected = payload.replaceAll("\\s", "");
         String requestBody = "[\n" + payload + "\n]";
 
         NettyConfig nettyConfig = new NettyConfig();
@@ -192,10 +208,13 @@ public class JsonSplittingTest {
 
         List<String> payloads = this.relpServer.payloads();
 
-        String expected = payload.replaceAll("\\s", "");
-
         // assert that payload was correctly split
         Assertions.assertEquals(1, payloads.size());
-        Assertions.assertTrue(payloads.get(0).contains(expected));
+
+        RFC5424Frame frame = new RFC5424Frame();
+        frame.load(new ByteArrayInputStream(payloads.get(0).getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertDoesNotThrow(frame::next);
+
+        Assertions.assertEquals(expected, frame.msg.toString());
     }
 }
