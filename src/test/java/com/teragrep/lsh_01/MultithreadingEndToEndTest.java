@@ -121,7 +121,7 @@ public class MultithreadingEndToEndTest {
             Assertions.assertTrue(requestBodies.contains(frame.msg.toString())); // order of payloads can differ
             loops++;
         }
-        Assertions.assertEquals(payloads.size(), loops);
+        Assertions.assertEquals(clients * messagesPerClient, loops);
     }
 
     private String randomString() {

@@ -96,7 +96,7 @@ public class RegexSplittingTest {
         List<String> payloads = this.relpServer.payloads();
 
         // assert that payload was correctly split into two
-        Assertions.assertEquals(2, payloads.size());
+        Assertions.assertEquals(expectedList.size(), payloads.size());
 
         int loops = 0;
         RFC5424Frame frame = new RFC5424Frame();
@@ -106,7 +106,7 @@ public class RegexSplittingTest {
             Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
             loops++;
         }
-        Assertions.assertEquals(payloads.size(), loops);
+        Assertions.assertEquals(expectedList.size(), loops);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class RegexSplittingTest {
         List<String> payloads = this.relpServer.payloads();
 
         // assert that payload was correctly split into three parts
-        Assertions.assertEquals(3, payloads.size());
+        Assertions.assertEquals(expectedList.size(), payloads.size());
 
         int loops = 0;
         RFC5424Frame frame = new RFC5424Frame();
@@ -148,6 +148,6 @@ public class RegexSplittingTest {
             Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
             loops++;
         }
-        Assertions.assertEquals(payloads.size(), loops);
+        Assertions.assertEquals(expectedList.size(), loops);
     }
 }

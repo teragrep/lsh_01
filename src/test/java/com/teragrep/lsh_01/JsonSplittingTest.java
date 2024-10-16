@@ -129,7 +129,7 @@ public class JsonSplittingTest {
         List<String> payloads = this.relpServer.payloads();
 
         // assert that payload was correctly split
-        Assertions.assertEquals(2, payloads.size());
+        Assertions.assertEquals(expectedList.size(), payloads.size());
 
         int loops = 0;
         RFC5424Frame frame = new RFC5424Frame();
@@ -139,7 +139,7 @@ public class JsonSplittingTest {
             Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
             loops++;
         }
-        Assertions.assertEquals(payloads.size(), loops);
+        Assertions.assertEquals(expectedList.size(), loops);
     }
 
     @Test
@@ -172,7 +172,7 @@ public class JsonSplittingTest {
         List<String> payloads = this.relpServer.payloads();
 
         // assert that payload was correctly split
-        Assertions.assertEquals(3, payloads.size());
+        Assertions.assertEquals(expectedList.size(), payloads.size());
 
         int loops = 0;
         RFC5424Frame frame = new RFC5424Frame();
@@ -182,7 +182,7 @@ public class JsonSplittingTest {
             Assertions.assertEquals(expectedList.get(i), frame.msg.toString());
             loops++;
         }
-        Assertions.assertEquals(payloads.size(), loops);
+        Assertions.assertEquals(expectedList.size(), loops);
     }
 
     @Test
