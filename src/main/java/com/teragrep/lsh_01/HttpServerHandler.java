@@ -30,9 +30,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
@@ -41,8 +40,6 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
  * Created by joaoduarte on 11/10/2017.
  */
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-
-    private final static Logger LOGGER = LogManager.getLogger(HttpServerHandler.class);
 
     private final IMessageHandler messageHandler;
     private final ThreadPoolExecutor executorGroup;
@@ -75,8 +72,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        final ByteBuf content = copiedBuffer(cause.getMessage().getBytes());
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        final ByteBuf content = copiedBuffer(cause.getMessage().getBytes(StandardCharsets.UTF_8));
         final HttpResponseStatus responseStatus;
 
         if (cause instanceof DecompressionException) {

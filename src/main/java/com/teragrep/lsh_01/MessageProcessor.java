@@ -165,8 +165,8 @@ public class MessageProcessor implements RejectableRunnable {
 
         final FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), responseStatus);
         final DefaultHttpHeaders headers = new DefaultHttpHeaders();
-        for (String key : stringHeaders.keySet()) {
-            headers.set(key, stringHeaders.get(key));
+        for (Map.Entry<String, String> entry : stringHeaders.entrySet()) {
+            headers.set(entry.getKey(), entry.getValue());
         }
         response.headers().set(headers);
 

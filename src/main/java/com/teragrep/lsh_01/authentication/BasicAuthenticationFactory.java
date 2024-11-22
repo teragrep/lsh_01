@@ -22,8 +22,9 @@ package com.teragrep.lsh_01.authentication;
 import com.teragrep.jai_02.CredentialLookup;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class BasicAuthenticationFactory {
 
@@ -31,9 +32,9 @@ public class BasicAuthenticationFactory {
         BufferedReader br;
         String credentialsFile = System.getProperty("credentials.file", "etc/credentials.json");
         try {
-            br = new BufferedReader(new FileReader(credentialsFile));
+            br = new BufferedReader(new FileReader(credentialsFile, StandardCharsets.UTF_8));
         }
-        catch (FileNotFoundException e) {
+        catch (IOException e) {
             throw new IllegalArgumentException(
                     "Can't find credentials.json from path <[" + credentialsFile + "]>: ",
                     e

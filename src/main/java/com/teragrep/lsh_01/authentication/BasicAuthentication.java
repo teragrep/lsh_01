@@ -23,6 +23,7 @@ import com.teragrep.jai_02.CredentialLookup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -50,7 +51,10 @@ public class BasicAuthentication {
         if (!token.startsWith("Basic ")) {
             throw new IllegalArgumentException("Got invalid token, doesn't start with Basic");
         }
-        String tokenString = new String(decoder.decode(token.substring("Basic".length()).trim()));
+        String tokenString = new String(
+                decoder.decode(token.substring("Basic".length()).trim()),
+                StandardCharsets.UTF_8
+        );
         if (!tokenString.contains(":")) {
             throw new IllegalArgumentException("Got invalid token, doesn't include colon");
         }
