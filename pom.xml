@@ -232,6 +232,7 @@
             <!-- ci -->
             <exclude>.github/workflows/*</exclude>
             <exclude>.github/ISSUE_TEMPLATE/*</exclude>
+            <exclude>.github/pull_request_template.md</exclude>
             <exclude>toolchains.xml</exclude>
             <exclude>settings.xml</exclude>
             <!-- maven -->
