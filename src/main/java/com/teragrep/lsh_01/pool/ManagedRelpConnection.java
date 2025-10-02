@@ -22,8 +22,8 @@ package com.teragrep.lsh_01.pool;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.teragrep.rlp_01.RelpBatch;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -32,7 +32,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class ManagedRelpConnection implements IManagedRelpConnection {
 
-    private static final Logger LOGGER = LogManager.getLogger(ManagedRelpConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRelpConnection.class);
     private final IRelpConnection relpConnection;
     private boolean hasConnected;
 

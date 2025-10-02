@@ -19,14 +19,14 @@
 */
 package com.teragrep.lsh_01.pool;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class RebindableRelpConnection implements IManagedRelpConnection {
 
-    private static final Logger LOGGER = LogManager.getLogger(RebindableRelpConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RebindableRelpConnection.class);
 
     private final IManagedRelpConnection managedRelpConnection;
     private int recordsSent;

@@ -30,8 +30,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -42,7 +42,7 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
  */
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    private final static Logger LOGGER = LogManager.getLogger(HttpServerHandler.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
 
     private final IMessageHandler messageHandler;
     private final ThreadPoolExecutor executorGroup;

@@ -22,12 +22,12 @@ package com.teragrep.lsh_01.util;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggingHttpObjectAggregator extends HttpObjectAggregator {
 
-    private static final Logger LOGGER = LogManager.getLogger(LoggingHttpObjectAggregator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingHttpObjectAggregator.class);
 
     public LoggingHttpObjectAggregator(int maxContentLength) {
         super(maxContentLength);

@@ -20,8 +20,8 @@
 package com.teragrep.lsh_01.authentication;
 
 import com.teragrep.jai_02.CredentialLookup;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class BasicAuthentication {
     private final Base64.Decoder decoder;
     private final CredentialLookup credentialLookup;
     private final Subject subjectStub;
-    private final static Logger LOGGER = LogManager.getLogger(BasicAuthentication.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(BasicAuthentication.class);
 
     public BasicAuthentication(CredentialLookup credentialLookup) {
         this(Base64.getDecoder(), new SubjectStub(), credentialLookup);

@@ -19,8 +19,8 @@
 */
 package com.teragrep.lsh_01.pool;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 
 public class Pool<T extends Poolable> implements AutoCloseable, Supplier<T> {
 
-    private static final Logger LOGGER = LogManager.getLogger(com.teragrep.lsh_01.pool.Pool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(com.teragrep.lsh_01.pool.Pool.class);
 
     private final Supplier<T> supplier;
 

@@ -33,8 +33,8 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.teragrep.lsh_01.util.RejectableRunnable;
 
 import java.nio.charset.Charset;
@@ -51,7 +51,7 @@ public class MessageProcessor implements RejectableRunnable {
     private final InternalEndpointUrlConfig internalEndpointUrlConfig;
 
     private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
-    private final static Logger LOGGER = LogManager.getLogger(MessageProcessor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MessageProcessor.class);
 
     MessageProcessor(
             ChannelHandlerContext ctx,

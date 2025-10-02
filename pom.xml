@@ -12,7 +12,6 @@
     <hamcrest-library.version>2.2</hamcrest-library.version>
     <java.version>11</java.version>
     <junit.version>5.10.2</junit.version>
-    <log4j.version>2.23.1</log4j.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <metrics.version>4.2.8</metrics.version>
@@ -139,17 +138,6 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j2-impl</artifactId>
       <version>2.25.2</version>
-    </dependency>
-    <!-- log4j -->
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <!-- JSON processing -->
     <dependency>
