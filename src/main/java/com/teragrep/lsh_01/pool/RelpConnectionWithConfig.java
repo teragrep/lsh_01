@@ -22,15 +22,15 @@ package com.teragrep.lsh_01.pool;
 import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.rlp_01.RelpBatch;
 import com.teragrep.rlp_01.RelpConnection;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class RelpConnectionWithConfig implements IRelpConnection {
 
-    private final static Logger LOGGER = LogManager.getLogger(RelpConnectionWithConfig.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RelpConnectionWithConfig.class);
     private final RelpConnection relpConnection;
     private final RelpConfig relpConfig;
 

@@ -26,8 +26,8 @@ import com.teragrep.lsh_01.conversion.RegexConversion;
 import com.teragrep.lsh_01.conversion.RelpConversion;
 import com.teragrep.lsh_01.pool.IManagedRelpConnection;
 import com.teragrep.lsh_01.pool.Pool;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +36,7 @@ import java.util.regex.PatternSyntaxException;
 
 public final class ConversionFactory {
 
-    private final static Logger LOGGER = LogManager.getLogger(ConversionFactory.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ConversionFactory.class);
 
     private final String splitType;
     private final String regexPattern;

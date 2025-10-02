@@ -27,8 +27,8 @@ import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
 import com.teragrep.lsh_01.pool.*;
 import com.teragrep.rlo_14.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class RelpConversion implements IMessageHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(RelpConversion.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RelpConversion.class);
     private final Pool<IManagedRelpConnection> relpConnectionPool;
     private final SecurityConfig securityConfig;
     private final BasicAuthentication basicAuthentication;

@@ -29,15 +29,15 @@ import com.teragrep.lsh_01.metrics.Report;
 import com.teragrep.lsh_01.metrics.Slf4jReport;
 import com.teragrep.lsh_01.conversion.*;
 import com.teragrep.lsh_01.pool.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class Main {
 
-    private final static Logger LOGGER = LogManager.getLogger(Main.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         Map<String, String> propsMap;

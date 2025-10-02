@@ -22,8 +22,8 @@ package com.teragrep.lsh_01.util;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +70,7 @@ public class SslSimpleBuilder implements SslBuilder {
         }
     }
 
-    private final static Logger logger = LogManager.getLogger(SslSimpleBuilder.class);
+    private final static Logger logger = LoggerFactory.getLogger(SslSimpleBuilder.class);
 
     public static final Set<String> SUPPORTED_CIPHERS = new HashSet<>(
             Arrays.asList(((SSLServerSocketFactory) SSLServerSocketFactory.getDefault()).getSupportedCipherSuites())
