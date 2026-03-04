@@ -25,7 +25,7 @@ import com.teragrep.lsh_01.conversion.JsonConversion;
 import com.teragrep.lsh_01.conversion.RegexConversion;
 import com.teragrep.lsh_01.conversion.RelpConversion;
 import com.teragrep.lsh_01.pool.IManagedRelpConnection;
-import com.teragrep.lsh_01.pool.Pool;
+import com.teragrep.poj_01.pool.Pool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

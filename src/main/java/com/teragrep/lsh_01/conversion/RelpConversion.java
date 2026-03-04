@@ -26,6 +26,7 @@ import com.teragrep.lsh_01.config.LookupConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
 import com.teragrep.lsh_01.pool.*;
+import com.teragrep.poj_01.pool.Pool;
 import com.teragrep.rlo_14.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

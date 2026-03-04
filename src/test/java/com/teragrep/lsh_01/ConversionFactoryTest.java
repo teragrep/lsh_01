@@ -24,8 +24,9 @@ import com.teragrep.lsh_01.authentication.BasicAuthenticationFactory;
 import com.teragrep.lsh_01.config.*;
 import com.teragrep.lsh_01.pool.IManagedRelpConnection;
 import com.teragrep.lsh_01.pool.ManagedRelpConnectionStub;
-import com.teragrep.lsh_01.pool.Pool;
 import com.teragrep.lsh_01.pool.RelpConnectionFactory;
+import com.teragrep.poj_01.pool.Pool;
+import com.teragrep.poj_01.pool.UnboundPool;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ public class ConversionFactoryTest {
         String splitType = "regex";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         ConversionFactory conversionFactory = new ConversionFactory(
                 splitType,
@@ -63,7 +64,7 @@ public class ConversionFactoryTest {
         String splitType = "regex";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         ConversionFactory conversionFactory = new ConversionFactory(
                 splitType,
@@ -83,7 +84,7 @@ public class ConversionFactoryTest {
         String regexPattern = "";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         ConversionFactory conversionFactory = new ConversionFactory(
                 splitType,
@@ -110,7 +111,7 @@ public class ConversionFactoryTest {
         String splitType = "json_array";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         ConversionFactory conversionFactory = new ConversionFactory(
                 splitType,
@@ -151,7 +152,7 @@ public class ConversionFactoryTest {
         String splitType = "json_array";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         BasicAuthentication auth = new BasicAuthenticationFactory().create();
 
         ConversionFactory conversionFactory = new ConversionFactory(
@@ -184,7 +185,7 @@ public class ConversionFactoryTest {
         String splitType = "json_array";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         ConversionFactory conversionFactory = new ConversionFactory(
                 splitType,
@@ -215,7 +216,7 @@ public class ConversionFactoryTest {
         String splitType = "json_array";
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(new RelpConfig());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         BasicAuthentication auth = new BasicAuthenticationFactory().create();
 
         ConversionFactory conversionFactory1 = new ConversionFactory(

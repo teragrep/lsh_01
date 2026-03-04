@@ -19,6 +19,8 @@
 */
 package com.teragrep.lsh_01.pool;
 
+import com.teragrep.poj_01.pool.Poolable;
+
 public interface IManagedRelpConnection extends Poolable {
 
     void ensureSent(byte[] bytes);
