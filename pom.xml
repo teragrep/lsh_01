@@ -19,28 +19,29 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <prometheus-simpleclient.version>0.16.0</prometheus-simpleclient.version>
     <revision>0.0.1</revision>
-    <rlo_14.version>1.0.1</rlo_14.version>
-    <rlp_01.version>4.0.1</rlp_01.version>
-    <rlp_03.version>6.0.0</rlp_03.version>
     <sha1></sha1>
+    <teragrep.poj_01.version>3.0.0</teragrep.poj_01.version>
+    <teragrep.rlo_14.version>1.0.1</teragrep.rlo_14.version>
+    <teragrep.rlp_01.version>4.0.1</teragrep.rlp_01.version>
+    <teragrep.rlp_03.version>6.0.0</teragrep.rlp_03.version>
   </properties>
   <dependencies>
     <!-- pool -->
     <dependency>
       <groupId>com.teragrep</groupId>
       <artifactId>poj_01</artifactId>
-      <version>2.0.0</version>
+      <version>${teragrep.poj_01.version}</version>
     </dependency>
     <!-- relp -->
     <dependency>
       <groupId>com.teragrep</groupId>
       <artifactId>rlp_01</artifactId>
-      <version>${rlp_01.version}</version>
+      <version>${teragrep.rlp_01.version}</version>
     </dependency>
     <dependency>
       <groupId>com.teragrep</groupId>
       <artifactId>rlo_14</artifactId>
-      <version>${rlo_14.version}</version>
+      <version>${teragrep.rlo_14.version}</version>
     </dependency>
     <!-- security -->
     <dependency>
@@ -173,7 +174,7 @@
     <dependency>
       <groupId>com.teragrep</groupId>
       <artifactId>rlp_03</artifactId>
-      <version>${rlp_03.version}</version>
+      <version>${teragrep.rlp_03.version}</version>
     </dependency>
     <!-- Syslog parsing, testing -->
     <dependency>

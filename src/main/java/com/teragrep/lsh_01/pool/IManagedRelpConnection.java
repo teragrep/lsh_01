@@ -19,9 +19,11 @@
 */
 package com.teragrep.lsh_01.pool;
 
-import com.teragrep.poj_01.pool.Poolable;
+import com.teragrep.stb_01.Stubable;
 
-public interface IManagedRelpConnection extends Poolable {
+import java.io.Closeable;
+
+public interface IManagedRelpConnection extends Stubable, Closeable {
 
     void ensureSent(byte[] bytes);
 }
