@@ -30,6 +30,8 @@ import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.config.SecurityConfig;
 import com.teragrep.lsh_01.lookup.LookupTableFactory;
 import com.teragrep.lsh_01.pool.*;
+import com.teragrep.poj_01.pool.Pool;
+import com.teragrep.poj_01.pool.UnboundPool;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +66,7 @@ public class LookupTest {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
                 securityConfig,
@@ -88,7 +90,7 @@ public class LookupTest {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
                 securityConfig,
@@ -114,7 +116,7 @@ public class LookupTest {
         SecurityConfig securityConfig = new SecurityConfig();
         BasicAuthentication basicAuthentication = new BasicAuthenticationFactory().create();
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
         RelpConversion relpConversion = new RelpConversion(
                 pool,
                 securityConfig,

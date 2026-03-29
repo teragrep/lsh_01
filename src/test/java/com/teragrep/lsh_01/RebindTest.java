@@ -24,6 +24,8 @@ import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.pool.*;
 import com.teragrep.lsh_01.util.CountingFrameDelegate;
 import com.teragrep.lsh_01.util.RelpServer;
+import com.teragrep.poj_01.pool.Pool;
+import com.teragrep.poj_01.pool.UnboundPool;
 import com.teragrep.rlo_14.Facility;
 import com.teragrep.rlo_14.Severity;
 import com.teragrep.rlo_14.SyslogMessage;
@@ -96,7 +98,7 @@ public class RebindTest {
 
         // Multiple connections together using the RelpConnectionFactory and the Pool
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         IManagedRelpConnection firstConnection = pool.get();
         IManagedRelpConnection secondConnection = pool.get();
@@ -137,7 +139,7 @@ public class RebindTest {
         RelpConfig relpConfig = new RelpConfig();
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, new MetricRegistry());
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         IManagedRelpConnection connection = pool.get();
 

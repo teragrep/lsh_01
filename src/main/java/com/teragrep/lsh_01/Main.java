@@ -28,7 +28,10 @@ import com.teragrep.lsh_01.metrics.JmxReport;
 import com.teragrep.lsh_01.metrics.Report;
 import com.teragrep.lsh_01.metrics.Slf4jReport;
 import com.teragrep.lsh_01.conversion.*;
-import com.teragrep.lsh_01.pool.*;
+import com.teragrep.lsh_01.pool.IManagedRelpConnection;
+import com.teragrep.lsh_01.pool.ManagedRelpConnectionStub;
+import com.teragrep.lsh_01.pool.RelpConnectionFactory;
+import com.teragrep.poj_01.pool.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +85,7 @@ public class Main {
         );
 
         RelpConnectionFactory relpConnectionFactory = new RelpConnectionFactory(relpConfig, metricRegistry);
-        Pool<IManagedRelpConnection> pool = new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
+        Pool<IManagedRelpConnection> pool = new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub());
 
         IMessageHandler conversion = new MetricRelpConversion(
                 new ConversionFactory(propsMap, pool, securityConfig, basicAuthentication, lookupConfig).conversion(),

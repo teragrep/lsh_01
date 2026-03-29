@@ -24,10 +24,14 @@ import com.teragrep.lsh_01.config.RelpConfig;
 import com.teragrep.lsh_01.pool.IManagedRelpConnection;
 import com.teragrep.lsh_01.pool.ManagedRelpConnection;
 import com.teragrep.lsh_01.pool.MetricRelpConnection;
+import com.teragrep.poj_01.pool.Pool;
+import com.teragrep.poj_01.pool.PoolableSupplier;
 
-import java.util.function.Supplier;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
-public class RelpConnectionFactoryFake implements Supplier<IManagedRelpConnection> {
+public final class RelpConnectionFactoryFake
+        implements PoolableSupplier<Pool<IManagedRelpConnection>, IManagedRelpConnection> {
 
     private final int sendLatency;
     private final int connectLatency;
@@ -35,10 +39,10 @@ public class RelpConnectionFactoryFake implements Supplier<IManagedRelpConnectio
     private final MetricRegistry metricRegistry;
 
     public RelpConnectionFactoryFake(
-            int sendLatency,
-            int connectLatency,
-            RelpConfig relpConfig,
-            MetricRegistry metricRegistry
+            final int sendLatency,
+            final int connectLatency,
+            final RelpConfig relpConfig,
+            final MetricRegistry metricRegistry
     ) {
         this.sendLatency = sendLatency;
         this.connectLatency = connectLatency;
@@ -47,7 +51,22 @@ public class RelpConnectionFactoryFake implements Supplier<IManagedRelpConnectio
     }
 
     @Override
-    public IManagedRelpConnection get() {
+    public void close() {
+        // no-op
+    }
+
+    @Override
+    public void accept(final IManagedRelpConnection iManagedRelpConnection) {
+        try {
+            iManagedRelpConnection.close();
+        }
+        catch (final IOException e) {
+            throw new UncheckedIOException("Exception occurred in accept() method", e);
+        }
+    }
+
+    @Override
+    public IManagedRelpConnection apply(final Pool<IManagedRelpConnection> iManagedRelpConnectionPool) {
         return new ManagedRelpConnection(
                 new MetricRelpConnection(new RelpConnectionFake(relpConfig, sendLatency, connectLatency), metricRegistry), metricRegistry
         );

@@ -21,11 +21,14 @@ package com.teragrep.lsh_01.pool;
 
 import com.codahale.metrics.MetricRegistry;
 import com.teragrep.lsh_01.config.RelpConfig;
+import com.teragrep.poj_01.pool.Pool;
+import com.teragrep.poj_01.pool.PoolableSupplier;
 import com.teragrep.rlp_01.RelpConnection;
 
-import java.util.function.Supplier;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
-public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
+public class RelpConnectionFactory implements PoolableSupplier<Pool<IManagedRelpConnection>, IManagedRelpConnection> {
 
     private final RelpConfig relpConfig;
     private final MetricRegistry metricRegistry;
@@ -40,7 +43,22 @@ public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
     }
 
     @Override
-    public IManagedRelpConnection get() {
+    public void close() {
+        // no-op
+    }
+
+    @Override
+    public void accept(final IManagedRelpConnection iManagedRelpConnection) {
+        try {
+            iManagedRelpConnection.close();
+        }
+        catch (final IOException e) {
+            throw new UncheckedIOException("Exception occurred in accept() method", e);
+        }
+    }
+
+    @Override
+    public IManagedRelpConnection apply(final Pool<IManagedRelpConnection> iManagedRelpConnectionPool) {
         IRelpConnection relpConnection = new MetricRelpConnection(
                 new RelpConnectionWithConfig(new RelpConnection(), relpConfig),
                 metricRegistry
@@ -54,5 +72,4 @@ public class RelpConnectionFactory implements Supplier<IManagedRelpConnection> {
 
         return managedRelpConnection;
     }
-
 }

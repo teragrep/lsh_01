@@ -35,6 +35,7 @@ import com.teragrep.lsh_01.fakes.RelpConnectionFake;
 import com.teragrep.lsh_01.fakes.ResendingRelpConnectionFake;
 import com.teragrep.lsh_01.fakes.ThrowingRelpConnectionFake;
 import com.teragrep.lsh_01.pool.*;
+import com.teragrep.poj_01.pool.UnboundPool;
 import com.teragrep.rlo_14.Facility;
 import com.teragrep.rlo_14.Severity;
 import com.teragrep.rlo_14.SyslogMessage;
@@ -207,7 +208,7 @@ public class MetricTest {
 
         // the message processing starts from RelpConversion
         IMessageHandler relpConversion = new MetricRelpConversion(
-                new RelpConversion(new Pool<>(relpConnectionFactory, new ManagedRelpConnectionStub()), new SecurityConfig(), new BasicAuthenticationFactory().create(), new LookupConfig()), registry
+                new RelpConversion(new UnboundPool<>(relpConnectionFactory, new ManagedRelpConnectionStub()), new SecurityConfig(), new BasicAuthenticationFactory().create(), new LookupConfig()), registry
         );
 
         for (int i = 0; i < messages; i++) {
